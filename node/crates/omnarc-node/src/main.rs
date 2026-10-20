@@ -291,7 +291,7 @@ fn parse_wire(name: &str) -> Result<DType, String> {
     }
 }
 
-fn ring(args: RingArgs) -> Result<(), ring::BoxError> {
+fn ring(args: RingArgs, data: &Path) -> Result<(), ring::BoxError> {
     let config = ring::Config {
         model: args.model,
         windows: args.layers,
@@ -299,7 +299,7 @@ fn ring(args: RingArgs) -> Result<(), ring::BoxError> {
         next: args.next,
         next_replica: args.next_replica,
         prev: args.prev,
-        key: args.key.unwrap_or_else(ring::default_key_path),
+        key: args.key.unwrap_or_else(|| data.join("node.key")),
         engine: args.engine.unwrap_or_else(ring::default_engine_path),
         backend: args.backend,
         max_tokens: args.max_tokens,
@@ -910,7 +910,7 @@ fn main() {
                 std::process::exit(1);
             }
         }
-        Command::Id { key } => match ring::node_id(&key.unwrap_or_else(ring::default_key_path)) {
+        Command::Id { key } => match ring::node_id(&key.unwrap_or_else(|| data.join("node.key"))) {
             Ok(id) => println!("{id}"),
             Err(e) => {
                 eprintln!("omnarc-node: {e}");
@@ -918,7 +918,7 @@ fn main() {
             }
         },
         Command::Ring(args) => {
-            if let Err(e) = ring(*args) {
+            if let Err(e) = ring(*args, &data) {
                 eprintln!("omnarc-node: {e}");
                 std::process::exit(1);
             }
