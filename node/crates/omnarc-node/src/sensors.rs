@@ -84,8 +84,8 @@ pub fn power_state(supplies: &[Supply]) -> v1::PowerState {
     v1::PowerState { on_battery: !plugged && !charging, charging, battery_fraction: fraction.clamp(0.0, 1.0) }
 }
 
-/// The power supplies of this device: Linux and Android say it in `/sys/class/power_supply`; elsewhere the apps of
-/// stage B5 will.
+/// The power supplies of this device: Linux and Android say it in `/sys/class/power_supply`; Windows answers
+/// [`power`] itself, and on the other systems the apps of stage B5 will.
 #[must_use]
 pub fn supplies() -> Vec<Supply> {
     let root = Path::new("/sys/class/power_supply");
@@ -108,13 +108,71 @@ pub fn supplies() -> Vec<Supply> {
 /// This device's power, when it says.
 #[must_use]
 pub fn power() -> Option<v1::PowerState> {
-    let supplies = supplies();
-    (!supplies.is_empty()).then(|| power_state(&supplies))
+    #[cfg(windows)]
+    {
+        windows::power()
+    }
+    #[cfg(not(windows))]
+    {
+        let supplies = supplies();
+        (!supplies.is_empty()).then(|| power_state(&supplies))
+    }
+}
+
+/// The power state in Windows' terms (`SYSTEM_POWER_STATUS`): `ac_line` 0 off, 1 on, 255 unknown; `battery_flag` a
+/// set of 1 high, 2 low, 4 critical and 8 charging, 128 without a battery and 255 unknown; `percent` 0–100, 255
+/// unknown. A device without a battery runs on the mains, as on Linux.
+#[must_use]
+pub fn windows_power_state(ac_line: u8, battery_flag: u8, percent: u8) -> Option<v1::PowerState> {
+    match battery_flag {
+        255 => None,
+        128 => Some(v1::PowerState { on_battery: false, charging: false, battery_fraction: 1.0 }),
+        flag => {
+            let charging = flag & 8 != 0;
+            let fraction = if percent <= 100 { f32::from(percent) / 100.0 } else { 0.0 };
+            Some(v1::PowerState { on_battery: ac_line == 0 && !charging, charging, battery_fraction: fraction })
+        }
+    }
+}
+
+#[cfg(windows)]
+mod windows {
+    #![allow(unsafe_code)]
+
+    use omnarc_protocol::v1;
+    use windows_sys::Win32::System::Power::{GetSystemPowerStatus, SYSTEM_POWER_STATUS};
+
+    pub fn power() -> Option<v1::PowerState> {
+        // SAFETY: SYSTEM_POWER_STATUS is plain data, all zeros a valid value
+        let mut status: SYSTEM_POWER_STATUS = unsafe { std::mem::zeroed() };
+        // SAFETY: the pointer is to a live, writable SYSTEM_POWER_STATUS that the call only fills in
+        if unsafe { GetSystemPowerStatus(&raw mut status) } == 0 {
+            return None;
+        }
+        super::windows_power_state(status.ACLineStatus, status.BatteryFlag, status.BatteryLifePercent)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn windows_says_where_the_power_comes_from() {
+        // plugged in and charging, plugged in and full, on battery and low, a desktop, and nothing known
+        let charging = windows_power_state(1, 8 | 1, 81).unwrap();
+        assert!(charging.charging && !charging.on_battery && (charging.battery_fraction - 0.81).abs() < 1e-6);
+        let full = windows_power_state(1, 1, 100).unwrap();
+        assert!(!full.charging && !full.on_battery);
+        let low = windows_power_state(0, 2, 18).unwrap();
+        assert!(low.on_battery && !low.charging && (low.battery_fraction - 0.18).abs() < 1e-6);
+        assert_eq!(
+            windows_power_state(1, 128, 255),
+            Some(v1::PowerState { on_battery: false, charging: false, battery_fraction: 1.0 })
+        );
+        assert_eq!(windows_power_state(255, 255, 255), None);
+        assert_eq!(windows_power_state(0, 1, 255).unwrap().battery_fraction, 0.0);
+    }
 
     fn supply(kind: &str, status: &str, capacity: Option<u8>, online: Option<bool>) -> Supply {
         Supply { kind: kind.into(), status: status.into(), capacity, online }
