@@ -14,7 +14,7 @@ design concept (its section number), or "—".
 <!-- count:begin — written by .github/scripts/spec_count.py from the tables below; do not edit by hand -->
 | Part | Screens | Functions | ✓ done | ◐ partly | ○ not started | Ready |
 |---|---|---|---|---|---|---|
-| Engine | 0 | 30 | 8 | 2 | 20 | 30 % |
+| Engine | 0 | 30 | 9 | 2 | 19 | 33 % |
 | Node agent and API | 0 | 40 | 9 | 10 | 21 | 35 % |
 | Panel | 24 | 7 | 3 | 7 | 21 | 21 % |
 | Desktop app | 4 | 5 | 0 | 0 | 9 | 0 % |
@@ -27,7 +27,7 @@ design concept (its section number), or "—".
 | Islands | 0 | 3 | 0 | 0 | 3 | 0 % |
 | Benchmarks, sites and releases | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Design system and quality across all apps | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **All** | **50** | **141** | **28** | **29** | **134** | **22 %** |
+| **All** | **50** | **141** | **29** | **29** | **133** | **23 %** |
 
 "Ready" counts a partly done item as half. By stage — what each stage has to deliver:
 
@@ -36,7 +36,7 @@ design concept (its section number), or "—".
 | B0 | 10 | 9 | 1 | 0 |
 | B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
-| B3 | 14 | 0 | 0 | 14 |
+| B3 | 14 | 1 | 0 | 13 |
 | B4 | 18 | 0 | 0 | 18 |
 | B5 | 53 | 0 | 5 | 48 |
 | B6 | 23 | 0 | 0 | 23 |
@@ -84,7 +84,7 @@ design concept (its section number), or "—".
 | EN-14 | Hot and cold neurons (PowerInfer) | function | D4 | B4 | — | ○ |
 | EN-15 | MoE experts placed by co-activation, predicted and fetched ahead; hot experts copied (EPLB) | function | D4 | B4 | — | ○ |
 | EN-16 | Paged KV cache, radix prefix cache, q8/q4 KV | function | P§4 | B4 | — | ○ |
-| EN-17 | KV cache copied continuously to a neighbor, so a replica continues without recomputing | function | R3, Y7 | B3 | — | ○ |
+| EN-17 | A replica is kept in step with the device that is answering, so it continues without recomputing: it is sent the same inputs and runs them, and a cache can also be handed over directly | function | R3, Y7 | B3 | — | ✓ |
 | EN-18 | Ring attention: long context across the memory of many devices | function | Y9 | B4 | — | ○ |
 | EN-19 | f8e4m3 activations with a per-token scale | function | T3 | B4 | — | ○ |
 | EN-20 | Continuous batching | function | D6 | B4 | — | ○ |
@@ -145,6 +145,8 @@ design concept (its section number), or "—".
 | NO-41 | Placement with HiGHS (≤ 1 s for 64 devices; larger networks in groups) | function | R1, W6 | B3 | 04 | ○ |
 | NO-42 | Routing every request through the replicas (Parallax) | function | R1 | B3 | — | ○ |
 | NO-43 | Devices join and leave while models run; a precomputed backup plan takes over within 1 s | function | R2, R3 | B3 | — | ○ |
+| NO-51 | A device announces a budget (memory, cores or GPU share, hours) and the placement never exceeds it | function | Q1, Q7 | B3 | — | ○ |
+| NO-52 | A device too small for any window is left out of the plan instead of slowing it down | function | Q7, R6 | B3 | — | ○ |
 | NO-44 | Never slower: a model that fits on one device is not split over a slower link | function | R6, W11 | B3 | — | ○ |
 | NO-45 | The mode of each request: latency, throughput, capacity, accuracy | function | R4 | B3 | 01 | ○ |
 | NO-46 | Tensor-parallel groups only over links of ≤ 1 ms | function | R5 | B3 | — | ○ |

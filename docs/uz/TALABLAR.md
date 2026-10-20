@@ -182,7 +182,13 @@ Tarmoqdan faqat qisqa xabarlar o'tadi, shuning uchun telefonlar va internet ham 
   prefill GPU yoki NPU'li qurilmada (D6). Qatlamlar faqat model sig'magandagina bo'linadi.
 
 **Qurilmalar (Q)**
-- Q1 — Linux, Windows va macOS uchun tray ilova; foydalanuvchi resurs ulushini va ish vaqtini o'zi belgilaydi.
+- Q1 — **Har bir qurilma egasi qancha desa, shuncha beradi — ortig'ini emas.** Bu qoida hammasi uchun
+  bir xil — telefon ham, noutbuk ham, ish stansiyasi ham, server ham, brauzer varag'i ham — va u kichik
+  qurilmalarga qilingan yon berish EMAS. Egasi byudjet belgilaydi: xotira, nechta yadro yoki GPU ning qancha
+  ulushi, va qaysi soatlarda. 2 GB li telefon 500 MB va bitta yadro berishi mumkin; 64 GB li ish stansiyasi
+  egasi ishlayotgani uchun atigi 8 GB berishi mumkin; ofis mashinasi soat 19:00 dan keyin hammasini, undan
+  oldin esa hech narsa bermasligi mumkin. Qurilma nimaga qodir bo'lishidan qat'i nazar, shu byudjetda ushlanadi.
+  Linux/Windows/macOS tray ilovasi ham, telefon ilovalari ham (Q2, Q3) bir xil boshqaruvni ko'rsatadi.
 - Q2 — Android (minSdk 26): native ilova, Vulkan/OpenCL/Hexagon.
   Zaryadda ishlaydigan fon xizmati turi: API ≥ 34 da `specialUse`, API < 34 da `dataSync`.
   Sababi: Android 15'dan boshlab `dataSync` sutkasiga 6 soatdan keyin to'xtatiladi.
@@ -192,8 +198,15 @@ Tarmoqdan faqat qisqa xabarlar o'tadi, shuning uchun telefonlar va internet ham 
   WebGPU faqat HTTPS sahifada ishlaydi, shuning uchun sahifa loyiha domenidan yuklanib keshda qoladi.
   Internet umuman yo'q tarmoqda brauzer tuguni faqat oldin keshlangan bo'lsa ishlaydi.
 - Q5 — Batareya va qizish chegarasi: qurilma yukini zaxiraga bo'shatib beradi.
-- Q6 — Kuchsiz telefon (xotirasi ≤ 4 GB) faqat mijoz bo'lib qo'shila oladi: ovoz yoki matn yuboradi va javobni
-  eshittiradi; qatlam ushlamaydi.
+- Q6 — Hech bir qurilma kirita olmaydigan darajada kichik emas. 500 MB va bitta yadro byudjeti ham haqiqiy
+  hissa, va rejalashtiruvchi bunday qurilmaga shu byudjetga sig'adigan oyna beradi, oyna foyda bermasa esa
+  umuman bermaydi. Qatlam ushlamaslik ham to'g'ri tanlov bo'lib qoladi — qurilma faqat ovoz yoki matn yuborib
+  javobni eshitadigan mijoz bo'lishi mumkin — lekin bu Q1 bo'yicha EGASINING tanlovi, apparat haqidagi qoida emas.
+- Q7 — Ish har bir qurilma **taklif qilganiga** qarab joylashtiriladi — qurilmalar soniga qarab ham emas,
+  hammasi so'ralsa nimaga qodir ekaniga qarab ham emas. Q1 dagi byudjet joylashtirishga qattiq cheklov bo'lib
+  kiradi: reja taklif qilinganidan kam ishlatishi mumkin, ko'p emas. 500 MB dan beradigan ikki qurilma —
+  1 GB beradigan bitta qurilma EMAS, va ularni profiler farqlaydi. Byudjeti rejaga foyda bera olmaydigan
+  qurilma hammani sekinlashtirgandan ko'ra rejadan chetda qoldiriladi (R6).
 
 **Miqyos (M)**
 - K1 — Shaxsiy klaster, oila halqasi bilan (§1): oila yoki jamoa a'zolari bitta yordamchini ishlatadi, har a'zoning

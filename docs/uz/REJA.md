@@ -393,3 +393,70 @@ UI har bosqich bilan birga quriladi — oxiriga qoldirilmaydi.
 | Domen | brauzer tuguni sahifasi (HTTPS), rele, hujjatlar | GitHub Pages manzili |
 | Sinov qurilmalari: 2 kompyuter (biri NVIDIA), 2 Android (biri Snapdragon 8 Gen 2+), 1 iPhone, 1 Mac (Apple Silicon) | W1–W5 o'lchovlari | o'lchov faqat mavjud qurilmalarda |
 | GPU'li mashinada CI runner | CUDA sinovlari | CUDA faqat qo'lda sinaladi |
+
+## 14. Kim uchun va o'zini qanday oqlaydi
+
+Butun mahsulot bitta jumlaga tayanadi:
+
+> **Sizda allaqachon bor qurilmalar AI ni yurgiza oladi. Omnarc ularni birlashtiradi.**
+
+Buni boshqa hech kim ayta olmaydi. GPU bulut o'zi sotib olgan apparatni sotadi. Bulutdagi yordamchi
+birovning markazida ishlaydi. exo faqat Mac, GPUStack faqat NVIDIA serverlari, Mesh LLM da telefon ham,
+brauzer ham yo'q. Klaster — mahsulotning imkoniyati emas, **mahsulotning o'zi**.
+
+### 14.1 Ikki yuz, bitta klaster
+
+Dvigatel va halqa (B1–B4) yadro bo'lib qoladi. Ularning ustida ikki yuz turadi va alohida chiqariladi:
+
+| Yuz | Kim ochadi | Nima u |
+|---|---|---|
+| **Yordamchi** | odamlar | so'rash, yozish, hujjat o'qish, kun rejasi — xonadagi qurilmalarda |
+| **Ish maydoni** | dasturchilar | modelni yurgizish, API, deploy, xarajatni ko'rish |
+
+Ikkalasi ham bitta tugun agenti bilan gaplashadi. Ikkinchi xil hisoblash o'ylab topilmaydi: yondagi
+qurilmalar yetmasa, tarmoqdan so'raladi (§14.3), markazdagi GPU ijaraga olinmaydi.
+
+### 14.2 Bosqichlar
+
+Bosqichlar `TALABLAR.md` §2 dagi uch miqyosga ergashadi va har biri uni ko'taradigan bosqich tugaganda
+sotiladigan bo'ladi. Darvozasidan oldin sotish — ishontirilgan odamlarni yo'qotishning yo'li.
+
+| Bosqich | Miqyos | Nima qo'shadi | Tayyor |
+|---|---|---|---|
+| **Bepul** | Shaxsiy | o'z qurilmalaringiz, ma'lumot chiqmaydi, internetsiz ishlaydi | B5 |
+| **Uy** | Shaxsiy | bir nechta qurilma birlashadi → bittasiga sig'maydigan model ishlaydi | B5 |
+| **Dasturchi** | Shaxsiy | API, deploy, model katalogi, xarajat ko'rinishi | B8 |
+| **Tashkilot** | Tashkilot | tungi ofis: bo'sh mashinalar bitta klaster; hisoblar, kvota, audit | B6 |
+| **Tarmoq** | Ommaviy | qurilmangizni bering — kredit oling; o'zingizniki yetmasa — sarflang | B6 |
+
+### 14.3 Pul qayerdan keladi
+
+Hisoblash foydalanuvchining o'ziniki, demak hisoblash sotilmaydi. Sotiladigani — uning atrofidagi
+hamma narsa: hisoblar va rollar, kvota va jadval, audit izi, boshqa tarmoqdagi qurilmalarni
+tanishtiradigan relelar, imzolangan chiqarishlar va qo'llab-quvvatlash. Shakl bulutga emas, park
+boshqaruvchisiga yaqin: klaster bepul, klasterlar parkini boshqarish esa yo'q.
+
+Daromad **Tashkilot** dan kutiladi. Kompaniya mashinalarni allaqachon sotib olgan va GPU soatiga
+allaqachon to'layapti — ehtiyoj ham, byudjet ham bir stolda turgan yagona bosqich shu. Odamlar kam
+to'laydi: Bepul va Uy bosqichlari — loyiha tanilishi yo'li, shuning uchun ular birovga aytgudek
+yaxshi bo'lishi shart. Tarmoq bosqichi — bozor, va uni halol qiladigan narsa kredit jurnali (B6).
+
+### 14.4 Hech qachon va'da qilinmaydigan narsalar
+
+Uchta va'dani birinchi o'lchagan odam buzadi, shuning uchun ular berilmaydi:
+
+- **Markazdan tez.** Modelni uy havolalari ustida bo'lish sekinroq, va sekin qoladi. Ikki oddiy
+  mashinadagi o'lchangan halqa ijaradagi GPU dan ancha past chiqdi. Omnarc narxda, maxfiylikda,
+  internetsiz ishlashda va **o'zingizdagi bironta mashinaga sig'maydigan** modelni yurgizishda
+  yutadi — soniyadagi tokenda emas.
+- **Birovning modeliga arzon yo'l.** Bulutdagi API ni qayta sotish — yupqa foyda va odatda uning
+  shartlariga zid. Katalog bunday modellarni ko'rsatishi mumkin, lekin ularni o'ziniki deb atamaydi.
+- **Hamma narsani bo'lish.** `R6` bitta qurilmaga sig'adigan modelni bo'lishni taqiqlaydi: ommaviy
+  sinovda bu generatsiyani 3–5 barobar sekinlashtirgan. Ortiqcha qurilmalar butun nusxa oladi.
+
+### 14.5 Tartib
+
+Yuzlar bosqich tartibini o'zgartirmaydi, unga ulanadi. B5 Bepul va Uy ni haqiqiy qiladi, chunki
+qurilma ilovalari o'sha yerda tushadi. B6 Tashkilot va Tarmoq ni haqiqiy qiladi, chunki hisoblar,
+kvota va kredit jurnali o'sha yerda. B8 Dasturchi ni haqiqiy qiladi, chunki API va orollar o'sha yerda.
+Shungacha mahsulot reja sifatida aytiladi, sotiladigan narsa sifatida emas.

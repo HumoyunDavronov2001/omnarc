@@ -172,7 +172,12 @@ cross the network, so phones and internet links work as well as a LAN.
   split only when a model does not fit.
 
 **Devices (Q)**
-- Q1 — A tray app for Linux, Windows and macOS; the owner sets the resource share and working hours.
+- Q1 — **Every device gives what its owner decides, and nothing more.** This is the same rule for all of them
+  -- phone, laptop, workstation, server, browser tab -- and it is not a concession to small devices. An owner
+  names a budget: memory, how many cores or how much of the GPU, and the hours it applies. A 2 GB phone may
+  offer 500 MB and one core; a 64 GB workstation may offer 8 GB because its owner is working; an office machine
+  may offer everything after 19:00 and nothing before. The device is held to that budget whatever it could
+  otherwise do. A tray app on Linux, Windows and macOS and the phone apps (Q2, Q3) all show the same control.
 - Q2 — Android (minSdk 26): native app with Vulkan/OpenCL/Hexagon. Foreground service type while charging:
   `specialUse` on API ≥ 34, `dataSync` on API < 34 — because from Android 15, `dataSync` is stopped after
   6 hours per day.
@@ -182,8 +187,15 @@ cross the network, so phones and internet links work as well as a LAN.
   so the page is loaded from the project domain and cached. On a network with no internet at all, a browser node
   works only if the page was cached before.
 - Q5 — Battery and heat limits: a device hands its work to a replica when it reaches them.
-- Q6 — A weak phone (≤ 4 GB of memory) can join as a client only: it sends speech or text and plays the answer; it
-  holds no layers.
+- Q6 — No device is too small to be let in. A budget of 500 MB and one core is a real contribution, and the
+  scheduler gives such a device a window that fits inside it, or no window at all when a window would not help.
+  Holding no layers stays a valid choice -- a device can be a client that only sends speech or text and plays
+  the answer -- but that is its owner's choice under Q1, not a rule about what the hardware is.
+- Q7 — Work is placed by what each device **offers**, never by how many devices there are and never by what
+  they could do if asked for everything. The budget of Q1 enters the placement as a hard constraint: the plan
+  may use less of a device than offered, never more. Two devices offering 500 MB each are not one device
+  offering 1 GB, and the profiler is what tells them apart. A device whose budget cannot help the plan is left
+  out of it rather than slowing everyone down (R6).
 
 **Scale (K)**
 - K1 — Personal cluster, including the family ring (§1): the members of a family or a team share one assistant, and

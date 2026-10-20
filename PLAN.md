@@ -125,6 +125,12 @@ Telemetry: by default **nothing** is sent anywhere.
 
 - **Profiler** (~20 s when a device joins): FLOPS per backend × quantization, memory bandwidth, disk reads, NPU
   operations.
+- **Budgets (Q1, Q7).** Every device announces what it offers -- memory, cores or GPU share, and the hours it
+  is willing -- and that is a hard constraint of the placement, never a suggestion. This holds at both ends:
+  a 2 GB phone offering 500 MB is planned for exactly as carefully as a 64 GB workstation that offers 8 GB
+  while its owner works, or an office machine that offers everything after 19:00 and nothing before. The plan
+  may use less than offered and never more. Nothing is placed by device count: two devices offering 500 MB
+  each are not one device offering 1 GB, and the profiler is what tells them apart.
 - **Placement.** HiGHS MILP runs on the coordinator: ≤ 1 s for ≤ 64 nodes. Larger networks are split into groups of
   64 and planned hierarchically.
 - **Never slower (R6).** A model that fits on one device is not split over a slower link: in a public test, splitting
@@ -382,3 +388,71 @@ The UI is built together with every stage — it is never left for the end.
 | A domain | the browser-node page (HTTPS), relay, docs | a GitHub Pages address |
 | Test devices: 2 computers (one with NVIDIA), 2 Android phones (one Snapdragon 8 Gen 2+), 1 iPhone, 1 Mac (Apple Silicon) | W1–W5 measurements | benchmarks only on the devices available |
 | A CI runner on a GPU machine | CUDA tests | CUDA is tested by hand |
+
+## 14. Who it is for, and how it pays for itself
+
+One sentence carries the whole product:
+
+> **The devices you already own can run AI. Omnarc puts them together.**
+
+No one else can say it. A GPU cloud sells hardware it had to buy. A hosted assistant runs in someone
+else's data centre. exo is Macs only, GPUStack is NVIDIA servers only, Mesh LLM has no phones and no
+browser. The cluster is not a feature of the product — it **is** the product.
+
+### 14.1 Two surfaces, one cluster
+
+The engine and the ring (B1–B4) stay the core. Two surfaces sit on top of them and ship separately:
+
+| Surface | Who opens it | What it is |
+|---|---|---|
+| **Assistant** | people | ask, write, read a document, plan a day — on the devices in the room |
+| **Workspace** | developers | run a model, call it over the API, deploy, watch what it costs |
+
+Both talk to the same node agent. Neither invents a second kind of compute: when a surface needs more
+than the devices at hand, it asks the network (§14.3), it does not rent a data-centre GPU.
+
+### 14.2 Tiers
+
+The tiers follow the three scales of REQUIREMENTS.md §2, and each becomes sellable only when the stage
+that carries it is done. Selling a tier before its gate is how a project loses the people it convinced.
+
+| Tier | Scale | What it adds | Ready at |
+|---|---|---|---|
+| **Free** | Personal | your own devices, nothing leaves them, works offline | B5 |
+| **Home** | Personal | several devices pooled, so a model too big for any one of them runs; shared prefix cache | B5 |
+| **Developer** | Personal | API, deploy, model catalogue, cost view | B8 |
+| **Organization** | Organization | the night office: idle machines become one cluster; accounts, quotas, audit | B6 |
+| **Network** | Public | lend a device, earn credit; spend credit when your own devices are not enough | B6 |
+
+### 14.3 Where the money comes from
+
+The compute belongs to the person using it, so compute is not what is sold. What is sold is everything
+around it: accounts and roles, quotas and schedules, the audit trail, the relays that introduce devices
+on different networks, signed releases and support. The shape is closer to a fleet manager than to a
+cloud: the cluster is free, running a fleet of them is not.
+
+Expect the revenue to come from **Organization**. A company already bought the machines and already pays
+for GPU hours; it is the only tier where both the need and the budget exist on the same desk. People pay
+rarely — the Free and Home tiers are how the project becomes known, and they must be good enough to be
+worth telling someone about. The Network tier is a market, and the credit log (B6) is what makes it
+honest.
+
+### 14.4 What is never claimed
+
+Three promises would be broken by the first person who measures them, so they are not made:
+
+- **Faster than a data centre.** Splitting a model over home links is slower, and stays slower. The
+  measured ring on two ordinary machines ran far below what a rented GPU does. Omnarc wins on cost, on
+  privacy, on working offline and on running a model that fits in no single machine you own — not on
+  tokens per second.
+- **A cheaper way to reach somebody else's model.** Reselling a hosted API is a thin margin and usually
+  against its terms. The catalogue may point at such models; the product does not pretend to own them.
+- **Splitting everything.** R6 forbids splitting a model that fits on one device: in a public test it
+  made generation 3–5× slower. Extra devices get whole copies instead.
+
+### 14.5 The order
+
+The surfaces do not change the stage order; they attach to it. B5 makes the Free and Home tiers real
+because it is where the device apps land. B6 makes Organization and Network real because it is where
+accounts, quotas and the credit log land. B8 makes Developer real because it is where the API and the
+islands land. Until then the product is told as a plan, not sold as one.
