@@ -26,9 +26,9 @@ maketi dizayn konsepsiyasida bo'lsa — uning bo'lim raqami, bo'lmasa «—».
 | Ommaviy tarmoq va rele | 0 | 7 | 0 | 0 | 7 | 0 % |
 | O'qitish | 0 | 4 | 0 | 0 | 4 | 0 % |
 | Orollar | 0 | 3 | 0 | 0 | 3 | 0 % |
-| O'lchovlar, saytlar va relizlar | 3 | 9 | 2 | 1 | 9 | 21 % |
+| O'lchovlar, saytlar va relizlar | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Dizayn tizimi va barcha ilovalardagi sifat | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **Jami** | **50** | **141** | **28** | **28** | **135** | **22 %** |
+| **Jami** | **50** | **141** | **28** | **29** | **134** | **22 %** |
 
 «Tayyorlik» ustunida qisman bajarilgan band yarim hisoblanadi. Bosqichlar bo'yicha — har bosqich nimani topshirishi
 kerak:
@@ -36,7 +36,7 @@ kerak:
 | Bosqich | Bandlar | ✓ | ◐ | ○ |
 |---|---|---|---|---|
 | B0 | 10 | 9 | 1 | 0 |
-| B1 | 16 | 12 | 1 | 3 |
+| B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
 | B3 | 14 | 0 | 0 | 14 |
 | B4 | 18 | 0 | 0 | 18 |
@@ -473,7 +473,7 @@ Ekranlar panelda (PA-18 dan PA-22 gacha); bu yerda — ularning ortidagi xizmat.
 |---|---|---|---|---|---|---|
 | BE-01 | Olti platformada CI, dvigatel backend'lari, yamoqlarni har hafta yangi llama.cpp ustiga qayta qo'yish | funksiya | P§8 | B0 | — | ✓ |
 | BE-02 | B1 darvozasi vositalari: nazorat yig'indisi bilan model yuklash, aniqlik darvozasi skripti, solishtirish uchun yig'ilgan prima.cpp | funksiya | W10 | B1 | — | ✓ |
-| BE-03 | B1 darvozasi: Llama 3.x 8B, Qwen3 32B va R1-Distill 70B da aniqlik | funksiya | P§11 | B1 | — | ○ |
+| BE-03 | B1 darvozasi: Llama 3.x 8B, Qwen3 32B va R1-Distill 70B da aniqlik | funksiya | P§11 | B1 | — | ◐ |
 | BE-04 | B1 darvozasi: 70B model Linux va Windows kompyuterlarida birgalikda ishlaydi | funksiya | P§11 | B1 | — | ○ |
 | BE-05 | B1 darvozasi: bitta chiqish tokeniga ketadigan vaqt prima.cpp'nikidan yomon emas | funksiya | P§11 | B1 | — | ○ |
 | BE-06 | `omnarc-bench`: W1–W13 bo'yicha exo, prima.cpp, Parallax, distributed-llama, llama.cpp RPC, Mesh LLM, colibri bilan solishtirish | funksiya | W1–W13 | B9 | — | ○ |

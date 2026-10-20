@@ -25,16 +25,16 @@ design concept (its section number), or "—".
 | Public network and relay | 0 | 7 | 0 | 0 | 7 | 0 % |
 | Training | 0 | 4 | 0 | 0 | 4 | 0 % |
 | Islands | 0 | 3 | 0 | 0 | 3 | 0 % |
-| Benchmarks, sites and releases | 3 | 9 | 2 | 1 | 9 | 21 % |
+| Benchmarks, sites and releases | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Design system and quality across all apps | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **All** | **50** | **141** | **28** | **28** | **135** | **22 %** |
+| **All** | **50** | **141** | **28** | **29** | **134** | **22 %** |
 
 "Ready" counts a partly done item as half. By stage — what each stage has to deliver:
 
 | Stage | Items | ✓ | ◐ | ○ |
 |---|---|---|---|---|
 | B0 | 10 | 9 | 1 | 0 |
-| B1 | 16 | 12 | 1 | 3 |
+| B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
 | B3 | 14 | 0 | 0 | 14 |
 | B4 | 18 | 0 | 0 | 18 |
@@ -456,7 +456,7 @@ The screens are in the panel (PA-18 to PA-22); this is the service behind them.
 |---|---|---|---|---|---|---|
 | BE-01 | CI on six platforms, the engine backends, the weekly llama.cpp rebase | function | P§8 | B0 | — | ✓ |
 | BE-02 | B1 gate tools: model downloads with checksums, the accuracy gate script, prima.cpp built for comparison | function | W10 | B1 | — | ✓ |
-| BE-03 | B1 gate: accuracy on Llama 3.x 8B, Qwen3 32B and R1-Distill 70B | function | P§11 | B1 | — | ○ |
+| BE-03 | B1 gate: accuracy on Llama 3.x 8B, Qwen3 32B and R1-Distill 70B | function | P§11 | B1 | — | ◐ |
 | BE-04 | B1 gate: a 70B model across Linux and Windows computers | function | P§11 | B1 | — | ○ |
 | BE-05 | B1 gate: time per output token no worse than prima.cpp's | function | P§11 | B1 | — | ○ |
 | BE-06 | `omnarc-bench`: W1–W13 against exo, prima.cpp, Parallax, distributed-llama, llama.cpp RPC, Mesh LLM, colibri | function | W1–W13 | B9 | — | ○ |

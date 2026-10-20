@@ -1,0 +1,126 @@
+# Stage B1 accuracy gate — WIN-PF18TUHVMMQ (Windows 11 Pro, i5-8300H 8 cores, 11.8 GB, GTX 1050 4 GB)
+# Engine: CI artifact of 624f42d (llama.cpp v0.7.0). 10 chunks of 512 wikitext-2 tokens.
+# Gate: mean KL <= 0.01 and |perplexity difference| <= 0.5%.
+
+## Backend cpu
+
+# B1 accuracy gate on WIN-PF18TUHVMMQ, backend cpu, 10 chunks of 512 tokens, 2026-10-20T16:38Z
+# engine 624f42d (v0.7.0 artifact), llama.cpp v0.7.0
+== 8B, the whole model on one device
+model   D:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf: llama, 32 layers, hidden 4096, vocab 128256
+backend whole: cpu, windows:
+reference D:\omnarc\data\reference-8b-cpu.bin.part: 10 chunks of 512 tokens
+== 8B, split halves
+model   D:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf: llama, 32 layers, hidden 4096, vocab 128256
+split   [0, 16) [16, 33), hidden state on the wire as f16
+backend whole: from file, windows: cpu cpu
+tokens  5110 in 10 chunks of 512
+ppl     whole 12.0703, split 12.0753, difference +0.0413%
+kl      mean 0.001829, max 0.209822
+top-1   97.50% the same, max |logit difference| 4.979352
+gate    PASS (mean KL <= 0.01, |ppl difference| <= 0.5%)
+== 8B, split even:2
+model   D:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf: llama, 32 layers, hidden 4096, vocab 128256
+split   [0, 16) [16, 32) [32, 33), hidden state on the wire as f16
+backend whole: from file, windows: cpu cpu cpu
+tokens  5110 in 10 chunks of 512
+ppl     whole 12.0703, split 12.0751, difference +0.0392%
+kl      mean 0.001829, max 0.211848
+top-1   97.61% the same, max |logit difference| 4.977440
+gate    PASS (mean KL <= 0.01, |ppl difference| <= 0.5%)
+== 8B, split even:4
+model   D:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf: llama, 32 layers, hidden 4096, vocab 128256
+split   [0, 8) [8, 16) [16, 24) [24, 32) [32, 33), hidden state on the wire as f16
+backend whole: from file, windows: cpu cpu cpu cpu cpu
+tokens  5110 in 10 chunks of 512
+ppl     whole 12.0703, split 12.0869, difference +0.1371%
+kl      mean 0.001857, max 0.316724
+top-1   97.53% the same, max |logit difference| 5.638006
+gate    PASS (mean KL <= 0.01, |ppl difference| <= 0.5%)
+done cpu 17:13
+
+
+## Backend vulkan (GTX 1050)
+
+# B1 accuracy gate on WIN-PF18TUHVMMQ, backend vulkan, 10 chunks of 512 tokens, 2026-10-20T17:27Z
+# engine 624f42d (v0.7.0 artifact), llama.cpp v0.7.0, GPU GTX 1050 4GB
+== 8B, the whole model on one device
+
+chunk 1/10
+chunk 2/10
+chunk 3/10
+chunk 4/10
+chunk 5/10
+chunk 6/10
+chunk 7/10
+chunk 8/10
+chunk 9/10
+chunk 10/10
+model   D:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf: llama, 32 layers, hidden 4096, vocab 128256
+backend whole: vulkan, windows:
+reference D:\omnarc\data\reference-8b-vulkan2.bin.part: 10 chunks of 512 tokens
+exit_reference=0
+== 8B, split halves
+
+chunk 1/10
+chunk 2/10
+chunk 3/10
+chunk 4/10
+chunk 5/10
+chunk 6/10
+chunk 7/10
+chunk 8/10
+chunk 9/10
+chunk 10/10
+model   D:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf: llama, 32 layers, hidden 4096, vocab 128256
+split   [0, 16) [16, 33), hidden state on the wire as f16
+backend whole: from file, windows: vulkan vulkan
+tokens  5110 in 10 chunks of 512
+ppl     whole 11.9838, split 11.9611, difference -0.1893%
+kl      mean 0.001044, max 0.083425
+top-1   98.22% the same, max |logit difference| 3.480854
+gate    PASS (mean KL <= 0.01, |ppl difference| <= 0.5%)
+exit_halves=0
+== 8B, split even:2
+
+chunk 1/10
+chunk 2/10
+chunk 3/10
+chunk 4/10
+chunk 5/10
+chunk 6/10
+chunk 7/10
+chunk 8/10
+chunk 9/10
+chunk 10/10
+model   D:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf: llama, 32 layers, hidden 4096, vocab 128256
+split   [0, 16) [16, 32) [32, 33), hidden state on the wire as f16
+backend whole: from file, windows: vulkan vulkan vulkan
+tokens  5110 in 10 chunks of 512
+ppl     whole 11.9838, split 12.0316, difference +0.3990%
+kl      mean 0.005176, max 0.125469
+top-1   94.77% the same, max |logit difference| 3.511595
+gate    PASS (mean KL <= 0.01, |ppl difference| <= 0.5%)
+exit_even:2=0
+== 8B, split even:4
+
+chunk 1/10
+chunk 2/10
+chunk 3/10
+chunk 4/10
+chunk 5/10
+chunk 6/10
+chunk 7/10
+chunk 8/10
+chunk 9/10
+chunk 10/10
+model   D:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf: llama, 32 layers, hidden 4096, vocab 128256
+split   [0, 8) [8, 16) [16, 24) [24, 32) [32, 33), hidden state on the wire as f16
+backend whole: from file, windows: vulkan vulkan vulkan vulkan vulkan
+tokens  5110 in 10 chunks of 512
+ppl     whole 11.9838, split 12.0350, difference +0.4271%
+kl      mean 0.005231, max 0.095724
+top-1   94.85% the same, max |logit difference| 2.571173
+gate    PASS (mean KL <= 0.01, |ppl difference| <= 0.5%)
+exit_even:4=0
+VULKAN DONE 18:18
