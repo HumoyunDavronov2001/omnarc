@@ -127,3 +127,58 @@ fn errors_are_reported() {
     engine.kill().unwrap();
     assert!(matches!(engine.model_info(&model), Err(Error::Io(_))));
 }
+
+#[test]
+fn a_replica_continues_an_answer_from_the_kv_cache() {
+    // EN-17: the cache of a request is handed to a replica of the same layers, and the replica carries the
+    // answer on from the same token. Without it a device leaving would mean reading the prompt again, which
+    // is the interruption the cluster promises never to have (Y7).
+    let (exe, model) = paths();
+    let mut engine = Engine::spawn(&exe, 1 << 22).unwrap();
+    assert!(engine.abi_version() >= 4);
+    let info = engine.model_info(&model).unwrap();
+    let n = info.layer_count;
+
+    let live = engine.open(&model, 0..n + 1, Backend::Cpu, 256).unwrap();
+    let replica = engine.open(&model, 0..n + 1, Backend::Cpu, 256).unwrap();
+
+    let prompt = engine.tokenize(live.id, "Once upon a time, there was a little girl named", true).unwrap();
+    let logits = engine.run(&live, &tokens_step(1, 0, &prompt)).unwrap().to_f32();
+    let next = i32::try_from(argmax(&logits)).unwrap();
+    let position = u32::try_from(prompt.len()).unwrap();
+
+    // the cache grows with the answer, so its size is asked for right before it is handed over
+    let size = engine.kv_size(live.id, 1).unwrap();
+    assert!(size > 0, "a request that has run holds a cache");
+    let cache = engine.kv_read(live.id, 1).unwrap();
+    assert_eq!(u64::try_from(cache.len()).unwrap(), size);
+
+    // the replica knows nothing of this request until the cache arrives, under an id of its own
+    engine.kv_write(replica.id, 7, &cache).unwrap();
+    assert_eq!(engine.kv_size(replica.id, 7).unwrap(), size);
+
+    let on_live = engine.run(&live, &tokens_step(1, position, &[next])).unwrap().to_f32();
+    let on_replica = engine.run(&replica, &tokens_step(7, position, &[next])).unwrap().to_f32();
+    assert_eq!(on_live, on_replica, "the replica continues the answer instead of recomputing it");
+
+    // the same step on a shard that never got the cache differs, so the equality above means something
+    let bare = engine.open(&model, 0..n + 1, Backend::Cpu, 256).unwrap();
+    let on_bare = engine.run(&bare, &tokens_step(9, position, &[next])).unwrap().to_f32();
+    assert_ne!(on_live, on_bare, "an empty cache cannot stand in for the one that was handed over");
+
+    // a cache from a different layer window is refused rather than quietly giving wrong answers
+    if n > 2 {
+        let other = engine.open(&model, 0..n / 2, Backend::Cpu, 256).unwrap();
+        let error = engine.kv_write(other.id, 7, &cache).unwrap_err();
+        assert!(matches!(error, Error::Engine { .. }), "{error}");
+        engine.close(other.id).unwrap();
+    }
+
+    let unknown = engine.kv_size(replica.id, 404).unwrap_err();
+    assert!(matches!(unknown, Error::Engine { status: Status::InvalidArgument, .. }), "{unknown}");
+
+    for shard in [&live, &replica, &bare] {
+        engine.close(shard.id).unwrap();
+    }
+    engine.quit().unwrap();
+}

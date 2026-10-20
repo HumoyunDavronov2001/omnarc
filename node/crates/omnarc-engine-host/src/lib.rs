@@ -212,6 +212,9 @@ mod op {
     pub const SAMPLER_CLOSE: u16 = 14;
     pub const QUIT: u16 = 15;
     pub const DEVICES: u16 = 16;
+    pub const KV_SIZE: u16 = 17;
+    pub const KV_READ: u16 = 18;
+    pub const KV_WRITE: u16 = 19;
 }
 
 const EL_TOKENS: u8 = 0;
@@ -432,6 +435,56 @@ impl Engine {
         payload.extend_from_slice(&request.to_le_bytes());
         payload.extend_from_slice(&position.to_le_bytes());
         self.request(op::TRUNCATE, &payload).map(drop)
+    }
+
+    /// The bytes this request's KV cache takes right now. It grows with the answer, so it is asked again
+    /// before every read.
+    ///
+    /// # Errors
+    /// Unknown request, or the engine is gone.
+    pub fn kv_size(&mut self, shard: ShardId, request: u64) -> Result<u64> {
+        let mut payload = shard.0.to_le_bytes().to_vec();
+        payload.extend_from_slice(&request.to_le_bytes());
+        self.request(op::KV_SIZE, &payload)?.u64()
+    }
+
+    /// Copies a request's KV cache out of the engine. A replica holding the same layers writes it back with
+    /// [`Self::kv_write`] and carries the answer on from the same token, instead of reading the prompt again.
+    ///
+    /// # Errors
+    /// Unknown request, a cache larger than the shared region, or the engine is gone.
+    pub fn kv_read(&mut self, shard: ShardId, request: u64) -> Result<Vec<u8>> {
+        let mut payload = shard.0.to_le_bytes().to_vec();
+        payload.extend_from_slice(&request.to_le_bytes());
+        let mut r = self.request(op::KV_READ, &payload)?;
+        let written =
+            usize::try_from(r.u64()?).map_err(|_| Error::Protocol("the KV cache size does not fit".into()))?;
+        let data = self
+            .shm
+            .output()
+            .get(..written)
+            .ok_or_else(|| Error::Protocol("the KV cache does not fit the shared region".into()))?;
+        Ok(data.to_vec())
+    }
+
+    /// Writes a KV cache taken by [`Self::kv_read`] back under `request`, replacing what that request held.
+    /// The shard must hold the same layer window the cache came from.
+    ///
+    /// # Errors
+    /// A cache larger than the shared region, a cache from different layers, or the engine is gone.
+    pub fn kv_write(&mut self, shard: ShardId, request: u64, data: &[u8]) -> Result<()> {
+        if data.is_empty() {
+            return Err(invalid("the KV cache is empty"));
+        }
+        let room = self.shm.input_mut().len();
+        if data.len() > room {
+            return Err(capacity("the KV cache is larger than the shared region"));
+        }
+        self.shm.input_mut()[..data.len()].copy_from_slice(data);
+        let mut payload = shard.0.to_le_bytes().to_vec();
+        payload.extend_from_slice(&request.to_le_bytes());
+        payload.extend_from_slice(&(data.len() as u64).to_le_bytes());
+        self.request(op::KV_WRITE, &payload).map(drop)
     }
 
     /// Starts reading a shard's weights from disk in the background (prima.cpp's prefetching).

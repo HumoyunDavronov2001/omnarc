@@ -49,6 +49,9 @@ status carries one string, the error message, as its payload.
 | 14 | `SAMPLER_CLOSE` | `u32` sampler | — |
 | 15 | `QUIT` | — | — |
 | 16 | `DEVICES` | — | `u32` count, then per GPU: `u32` backend, `u64` memory in bytes, string name (ABI 3) |
+| 17 | `KV_SIZE` | `u32` shard, `u64` request | `u64` bytes the cache takes now (ABI 4) |
+| 18 | `KV_READ` | `u32` shard, `u64` request | `u64` bytes written, the cache itself in the output half (ABI 4) |
+| 19 | `KV_WRITE` | `u32` shard, `u64` request, `u64` bytes; the cache in the input half | — (ABI 4) |
 
 - **Model info:** string architecture, `u32` layer count, `u32` hidden size, `u32` vocabulary size, `u32` context
   length, `u64` file size, `u8` splittable.

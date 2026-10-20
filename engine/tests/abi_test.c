@@ -15,7 +15,7 @@ static int failures = 0;
 
 int main(void) {
     CHECK(om_abi_version() == OMNARC_ABI_VERSION);
-    CHECK(OMNARC_ABI_VERSION == 3u);
+    CHECK(OMNARC_ABI_VERSION == 4u);
     CHECK(strcmp(om_version_string(), "0.1.0") == 0);
     CHECK(strcmp(om_status_string(OM_OK), "ok") == 0);
     CHECK(strcmp(om_status_string(OM_ERR_NOT_IMPLEMENTED), "not implemented") == 0);
@@ -57,6 +57,10 @@ int main(void) {
     CHECK(om_shard_forward(NULL, 1, 0, 1, buffer, buffer) == OM_ERR_INVALID_ARGUMENT);
     CHECK(om_shard_run(NULL, NULL, buffer, 4) == OM_ERR_INVALID_ARGUMENT);
     CHECK(om_shard_drop(NULL, 1) == OM_ERR_INVALID_ARGUMENT);
+    size_t kv_size = 0;
+    CHECK(om_shard_kv_size(NULL, 1, &kv_size) == OM_ERR_INVALID_ARGUMENT);
+    CHECK(om_shard_kv_read(NULL, 1, buffer, sizeof buffer, &kv_size) == OM_ERR_INVALID_ARGUMENT);
+    CHECK(om_shard_kv_write(NULL, 1, buffer, sizeof buffer) == OM_ERR_INVALID_ARGUMENT);
     om_shard_close(NULL);
 
     /* greedy sampling picks the largest logit */

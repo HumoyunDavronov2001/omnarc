@@ -47,6 +47,9 @@ enum opcode : uint16_t {
     OP_SAMPLER_CLOSE = 14,
     OP_QUIT = 15,
     OP_DEVICES = 16,
+    OP_KV_SIZE = 17,
+    OP_KV_READ = 18,
+    OP_KV_WRITE = 19,
 };
 
 enum element : uint8_t { EL_TOKENS = 0, EL_F32 = 1, EL_F16 = 2, EL_BF16 = 3 };
@@ -262,6 +265,31 @@ struct engine {
                 const auto position = in.get<uint32_t>();
                 if (!in.ok() || s == nullptr) break;
                 return om_shard_truncate(s, request, position);
+            }
+            case OP_KV_SIZE: {
+                om_shard *s = shard(in.get<uint32_t>());
+                const auto request = in.get<uint64_t>();
+                if (!in.ok() || s == nullptr) break;
+                size_t size = 0;
+                const om_status status = om_shard_kv_size(s, request, &size);
+                if (status == OM_OK) out.put(static_cast<uint64_t>(size));
+                return status;
+            }
+            case OP_KV_READ: {
+                om_shard *s = shard(in.get<uint32_t>());
+                const auto request = in.get<uint64_t>();
+                if (!in.ok() || s == nullptr) break;
+                size_t written = 0;
+                const om_status status = om_shard_kv_read(s, request, shm.output(), shm.half(), &written);
+                if (status == OM_OK) out.put(static_cast<uint64_t>(written));
+                return status;
+            }
+            case OP_KV_WRITE: {
+                om_shard *s = shard(in.get<uint32_t>());
+                const auto request = in.get<uint64_t>();
+                const auto size = in.get<uint64_t>();
+                if (!in.ok() || s == nullptr || size > shm.half()) break;
+                return om_shard_kv_write(s, request, shm.input(), static_cast<size_t>(size));
             }
             case OP_PREFETCH: {
                 om_shard *s = shard(in.get<uint32_t>());

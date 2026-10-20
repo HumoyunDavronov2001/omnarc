@@ -529,6 +529,44 @@ om_status om_shard_truncate(om_shard *shard, uint64_t request_id, uint32_t posit
     return OM_OK;
 }
 
+om_status om_shard_kv_size(om_shard *shard, uint64_t request_id, size_t *out_size) {
+    if (shard == nullptr || out_size == nullptr) return fail(OM_ERR_INVALID_ARGUMENT, "shard and out_size are required");
+    const auto it = shard->requests.find(request_id);
+    if (it == shard->requests.end()) return fail(OM_ERR_INVALID_ARGUMENT, "unknown request");
+    *out_size = llama_state_seq_get_size(shard->ctx, it->second);
+    return OM_OK;
+}
+
+om_status om_shard_kv_read(om_shard *shard, uint64_t request_id, void *out, size_t out_size, size_t *out_written) {
+    if (shard == nullptr || out == nullptr) return fail(OM_ERR_INVALID_ARGUMENT, "shard and out are required");
+    const auto it = shard->requests.find(request_id);
+    if (it == shard->requests.end()) return fail(OM_ERR_INVALID_ARGUMENT, "unknown request");
+    const size_t needed = llama_state_seq_get_size(shard->ctx, it->second);
+    if (out_size < needed) return fail(OM_ERR_CAPACITY, "the buffer is smaller than the KV cache");
+    const size_t written = llama_state_seq_get_data(shard->ctx, static_cast<uint8_t *>(out), out_size, it->second);
+    if (written == 0) return fail(OM_ERR_BACKEND, "the KV cache cannot be read");
+    if (out_written != nullptr) *out_written = written;
+    return OM_OK;
+}
+
+om_status om_shard_kv_write(om_shard *shard, uint64_t request_id, const void *data, size_t size) {
+    if (shard == nullptr || data == nullptr) return fail(OM_ERR_INVALID_ARGUMENT, "shard and data are required");
+    if (size == 0) return fail(OM_ERR_INVALID_ARGUMENT, "the KV cache is empty");
+    auto it = shard->requests.find(request_id);
+    if (it == shard->requests.end()) {
+        if (shard->free_seqs.empty()) return fail(OM_ERR_CAPACITY, "all request slots of the shard are in use");
+        it = shard->requests.emplace(request_id, shard->free_seqs.back()).first;
+        shard->free_seqs.pop_back();
+    } else {
+        // whatever the request held is replaced, so the written cache is the whole of it
+        llama_memory_seq_rm(llama_get_memory(shard->ctx), it->second, -1, -1);
+    }
+    if (llama_state_seq_set_data(shard->ctx, static_cast<const uint8_t *>(data), size, it->second) == 0) {
+        return fail(OM_ERR_BACKEND, "the KV cache cannot be written: it came from a different layer window");
+    }
+    return OM_OK;
+}
+
 om_status om_shard_prefetch(om_shard *shard) {
     if (shard == nullptr) return fail(OM_ERR_INVALID_ARGUMENT, "shard is required");
     for (auto &prefetcher : shard->prefetchers) prefetcher->prefetch();

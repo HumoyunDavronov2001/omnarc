@@ -23,7 +23,7 @@ extern "C" {
 
 /* 1: stage B0 interface. 2: shards on llama.cpp — model info, om_shard_run, KV management, prefetching,
  * tokenizer and sampler. 3: om_devices. */
-#define OMNARC_ABI_VERSION 3u
+#define OMNARC_ABI_VERSION 4u
 
 typedef enum om_status {
     OM_OK = 0,
@@ -145,6 +145,19 @@ om_status om_shard_drop(om_shard *shard, uint64_t request_id);
 
 /* Removes a request's KV cache from position onwards, e.g. after rejected speculative tokens. */
 om_status om_shard_truncate(om_shard *shard, uint64_t request_id, uint32_t position);
+
+/* The bytes om_shard_kv_read needs for this request's KV cache as it stands. The size grows with the answer, so
+ * it is asked for again before every read. */
+om_status om_shard_kv_size(om_shard *shard, uint64_t request_id, size_t *out_size);
+
+/* Copies a request's KV cache out of the shard. A replica of these layers on another device writes it back with
+ * om_shard_kv_write and carries the answer on from the same token, instead of reading the prompt again -- the
+ * promise that a device leaving does not interrupt the answer. Writes how many bytes were used. */
+om_status om_shard_kv_read(om_shard *shard, uint64_t request_id, void *out, size_t out_size, size_t *out_written);
+
+/* Writes a KV cache taken by om_shard_kv_read into this shard as request_id, replacing what that request held.
+ * The shard must hold the same layer window the cache came from, or the engine refuses it. */
+om_status om_shard_kv_write(om_shard *shard, uint64_t request_id, const void *data, size_t size);
 
 /* Starts reading the shard's weights from disk in the background and returns at once (prima.cpp's prefetching):
  * a shard whose weights do not stay in memory is read while the other shards of the ring compute, so it is ready
