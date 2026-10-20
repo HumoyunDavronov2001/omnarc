@@ -224,12 +224,24 @@ struct RingArgs {
     /// The next node of the ring: `<node id>@<ip:port>`.
     #[arg(long)]
     next: Peer,
-    /// The id of the previous node; connections from other nodes are refused.
+    /// The ids connections are accepted from; give it more than once for a replica that must also accept
+    /// the node it stands in for. Connections from anyone else are refused.
+    #[arg(long, required = true)]
+    prev: Vec<EndpointId>,
+    /// The device that takes the next node's place if it leaves: `<node id>@<ip:port>`.
     #[arg(long)]
-    prev: EndpointId,
+    next_replica: Option<Peer>,
     /// Where this node listens for the previous node.
     #[arg(long, default_value = "0.0.0.0:7700")]
     listen: SocketAddr,
+    /// Only mirror: run the frames a live node sends to keep this node's KV cache in step, and connect to no
+    /// next node. A node started this way is the replica of the windows it holds.
+    #[arg(long)]
+    mirror_only: bool,
+    /// The device holding a replica of this node's windows: `<node id>@<ip:port>`. It is sent a copy of every
+    /// frame this node receives, so it can carry an answer on from the same token if this node leaves.
+    #[arg(long)]
+    replica: Option<Peer>,
     /// The prompt; given only on the head.
     #[arg(long)]
     prompt: Option<String>,
@@ -285,6 +297,7 @@ fn ring(args: RingArgs) -> Result<(), ring::BoxError> {
         windows: args.layers,
         listen: args.listen,
         next: args.next,
+        next_replica: args.next_replica,
         prev: args.prev,
         key: args.key.unwrap_or_else(ring::default_key_path),
         engine: args.engine.unwrap_or_else(ring::default_engine_path),
@@ -292,6 +305,8 @@ fn ring(args: RingArgs) -> Result<(), ring::BoxError> {
         max_tokens: args.max_tokens,
         chunk: args.chunk.max(1),
         wire: args.wire,
+        mirror_only: args.mirror_only,
+        replica: args.replica,
         prompt: args.prompt,
         generate: args.generate,
     };

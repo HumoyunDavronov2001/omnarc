@@ -45,7 +45,9 @@ A receiver rejects a frame whose `payload_len` does not match this formula.
 | 0 | `DRAFT` | the tokens are speculative drafts that still need verification |
 | 1 | `LAST_STAGE` | the frame is addressed to the stage that produces logits |
 | 2 | `REPLAY` | resent after a failover; the receiver may already hold this step |
-| 3–15 | — | reserved, must be zero |
+| 3 | `MIRROR` | a copy for the replica of these layers: it runs the frame to keep its KV cache in step and forwards nothing |
+| 4 | `TOKENS` | the payload is `token_count` little-endian i32 token ids, not a hidden state (`payload_len = token_count × 4`); only the window holding layer 0 takes tokens |
+| 5–15 | — | reserved, must be zero |
 
 A receiver rejects a frame with unknown `magic`, an unsupported `version` or `dtype`, reserved flag bits set,
 `token_count = 0` or `hidden_dim = 0`.

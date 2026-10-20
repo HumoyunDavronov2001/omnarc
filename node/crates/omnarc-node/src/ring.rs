@@ -58,7 +58,12 @@ pub struct Config {
     pub windows: Vec<Window>,
     pub listen: SocketAddr,
     pub next: Peer,
-    pub prev: EndpointId,
+    /// The device that takes the next node's place if it leaves: the replica of the window after this one.
+    pub next_replica: Option<Peer>,
+    /// Connections are accepted from these nodes. Normally one -- the previous node of the ring -- but a
+    /// replica also accepts the node it mirrors, and the node that will become its previous one if the
+    /// device it stands in for leaves (NO-43).
+    pub prev: Vec<EndpointId>,
     pub key: PathBuf,
     pub engine: PathBuf,
     pub backend: Backend,
@@ -67,6 +72,13 @@ pub struct Config {
     pub chunk: u32,
     /// Element type of the hidden state between nodes: F16 (default), Bf16 or F32.
     pub wire: DType,
+    /// This node only mirrors: it runs the frames a live node sends it to keep its KV cache in step, and
+    /// connects to no next node. Taking over as the live node is stage B3's next piece (NO-43).
+    pub mirror_only: bool,
+    /// The device that holds a replica of these windows, if there is one. It is sent a copy of every frame
+    /// this node receives, runs it to keep its KV cache in step, and forwards nothing, so it can carry an
+    /// answer on from the same token if this node leaves (EN-17).
+    pub replica: Option<Peer>,
     /// Only on the head.
     pub prompt: Option<String>,
     pub generate: u32,
@@ -155,6 +167,14 @@ impl Node {
         }
     }
 
+    /// A frame carrying token ids for the replica of the window that holds layer 0: that window takes tokens,
+    /// not a hidden state, so its replica cannot be kept in step with an ordinary frame.
+    fn token_frame(&self, request: u64, step: u32, position: u32, count: u32) -> Result<FrameHeader, BoxError> {
+        let flags = Flags::MIRROR.union(Flags::TOKENS);
+        let hidden = u16::try_from(self.hidden_dim)?;
+        Ok(FrameHeader::new(self.wire, flags, request, step, position, u16::try_from(count)?, hidden)?)
+    }
+
     fn frame(
         &self,
         request: u64,
@@ -200,6 +220,88 @@ fn open_node(config: &Config) -> Result<Node, BoxError> {
 }
 
 /// Connects to the next node, retrying while it starts, and opens one link per window boundary that leads to it.
+/// Opens a link per window to the device holding the replica of this node's windows. A replica that cannot be
+/// reached is reported and left out: it is redundancy, not something the ring depends on.
+/// Sends the replica of a window a copy of a frame. A replica that cannot keep up is dropped, not waited for:
+/// it is redundancy, and the answer must not slow down on its account.
+async fn mirror(mirrors: &mut HashMap<u32, SendStream>, window: u32, header: &FrameHeader, payload: &[u8]) {
+    let Some(link) = mirrors.get_mut(&window) else { return };
+    if let Err(e) = omnarc_network::write_frame(link, header, payload).await {
+        eprintln!("omnarc: the replica fell behind and was dropped ({e})");
+        mirrors.clear();
+    }
+}
+
+/// Sends a frame on to the next window, and if the device holding it has gone, to the replica standing in
+/// for it. The resent frame carries `REPLAY`, so a receiver that already holds the step can tell. The ring
+/// keeps generating: this is the one second of NO-43, not a restart.
+#[allow(clippy::too_many_arguments)]
+async fn forward(
+    endpoint: &Endpoint,
+    config: &Config,
+    node: &Node,
+    next: &mut Option<Connection>,
+    links: &mut HashMap<u32, SendStream>,
+    key: u32,
+    header: &FrameHeader,
+    payload: &[u8],
+) -> Result<(), BoxError> {
+    if let Some(link) = links.get_mut(&key) {
+        match omnarc_network::write_frame(link, header, payload).await {
+            Ok(()) => return Ok(()),
+            Err(e) => eprintln!("omnarc: the next node stopped answering ({e})"),
+        }
+    }
+    let peer = config.next_replica.clone().ok_or("the next node is gone and no replica stands in for it")?;
+    let connection = omnarc_network::connect(endpoint, &peer).await?;
+    let mut fresh = HashMap::new();
+    for shard in &node.shards {
+        if !shard.gives_logits() {
+            fresh.insert(shard.layers.end, omnarc_network::open_link(&connection, shard.layers.end).await?);
+        }
+    }
+    *links = fresh;
+    if let Some(old) = next.replace(connection) {
+        old.close(0u32.into(), b"replaced by the replica");
+    }
+    eprintln!("omnarc: the replica of the next window took over");
+    let mut replay = *header;
+    replay.flags = header.flags.union(Flags::REPLAY);
+    let link = links.get_mut(&key).ok_or("the replica holds no link for this window")?;
+    omnarc_network::write_frame(link, &replay, payload).await?;
+    Ok(())
+}
+
+async fn connect_replica(
+    endpoint: &Endpoint,
+    config: &Config,
+    node: &Node,
+) -> (Option<Connection>, HashMap<u32, SendStream>) {
+    let Some(peer) = config.replica.as_ref() else { return (None, HashMap::new()) };
+    let connection = match omnarc_network::connect(endpoint, peer).await {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("omnarc: no replica for these windows ({e})");
+            return (None, HashMap::new());
+        }
+    };
+    let mut links = HashMap::new();
+    for shard in &node.shards {
+        // the replica holds the same window, so it is addressed by where that window starts
+        match omnarc_network::open_link(&connection, shard.layers.start).await {
+            Ok(link) => {
+                links.insert(shard.layers.start, link);
+            }
+            Err(e) => {
+                eprintln!("omnarc: the replica refused the link for layer {} ({e})", shard.layers.start);
+                return (None, HashMap::new());
+            }
+        }
+    }
+    eprintln!("omnarc: mirroring {} window(s) to the replica", links.len());
+    (Some(connection), links)
+}
+
 async fn connect_next(
     endpoint: &Endpoint,
     config: &Config,
@@ -242,7 +344,7 @@ async fn accept_prev(
     let connection = loop {
         let incoming = endpoint.accept().await.ok_or("the endpoint closed")?;
         let connection = incoming.await?;
-        if connection.remote_id() == config.prev {
+        if config.prev.contains(&connection.remote_id()) {
             break connection;
         }
         eprintln!("omnarc: refused a connection from {}, not the previous node", connection.remote_id());
@@ -280,7 +382,13 @@ pub async fn serve(config: Config) -> Result<(), BoxError> {
     loop {
         let (tx, mut inbox) = mpsc::channel(256);
         let prev = accept_prev(&endpoint, &config, &node, tx).await?;
-        let (next, mut links) = connect_next(&endpoint, &config, &node).await?;
+        let (mut next, mut links) = if config.mirror_only {
+            (None, HashMap::new())
+        } else {
+            let (connection, links) = connect_next(&endpoint, &config, &node).await?;
+            (Some(connection), links)
+        };
+        let (replica, mut mirrors) = connect_replica(&endpoint, &config, &node).await;
         eprintln!("omnarc: ring session started");
         let mut requests = HashSet::new();
         loop {
@@ -288,19 +396,49 @@ pub async fn serve(config: Config) -> Result<(), BoxError> {
                 message = inbox.recv() => {
                     let Some(Inbound { shard, header, payload }) = message else { break };
                     requests.insert(header.request_id);
+                    let mirrored = header.flags.contains(Flags::MIRROR);
+                    if !mirrored {
+                        // the replica gets this node's input, not its output: running the same input is what
+                        // keeps its KV cache identical (EN-17)
+                        let mut copy = header;
+                        copy.flags = header.flags.union(Flags::MIRROR);
+                        mirror(&mut mirrors, node.shards[shard].layers.start, &copy, &payload).await;
+                    }
+                    if header.flags.contains(Flags::TOKENS) {
+                        // the replica of the layer-0 window runs the tokens themselves
+                        let tokens = payload.as_chunks::<4>().0.iter().map(|b| i32::from_le_bytes(*b)).collect();
+                        node.run_tokens(shard, header.request_id, header.position_start, tokens).await?;
+                        continue;
+                    }
                     let output = node.run(shard, &header, payload).await?;
-                    let info = &node.shards[shard];
+                    if mirrored || config.mirror_only {
+                        // a replica keeps its cache in step and forwards nothing
+                        continue;
+                    }
+                    let info = node.shards[shard].clone();
                     let count = u32::from(header.token_count);
                     let to_logits = info.layers.end == info.model.layer_count;
                     let frame = node.frame(header.request_id, header.step, header.position_start, count, to_logits)?;
-                    let link = links.get_mut(&info.layers.end).ok_or("no link for the next window")?;
-                    omnarc_network::write_frame(link, &frame, &output).await?;
+                    // a node that was only mirroring is live the moment a frame arrives without MIRROR
+                    if links.is_empty() {
+                        let (connection, fresh) = connect_next(&endpoint, &config, &node).await?;
+                        links = fresh;
+                        next = Some(connection);
+                        eprintln!("omnarc: this replica is now the live node for its windows");
+                    }
+                    forward(&endpoint, &config, &node, &mut next, &mut links, info.layers.end, &frame, &output)
+                        .await?;
                 }
                 _ = prev.closed() => break,
             }
         }
         node.drop_requests(&requests).await;
-        next.close(0u32.into(), b"session over");
+        if let Some(replica) = replica {
+            replica.close(0u32.into(), b"session over");
+        }
+        if let Some(next) = next {
+            next.close(0u32.into(), b"session over");
+        }
         eprintln!("omnarc: ring session ended");
     }
 }
@@ -318,7 +456,9 @@ pub async fn generate(config: Config) -> Result<Report, BoxError> {
         return Err("the head must hold the output head too (layer N, e.g. N:N+1)".into());
     }
     let endpoint = bind(&config).await?;
-    let (next, mut links) = connect_next(&endpoint, &config, &node).await?;
+    let (connection, mut links) = connect_next(&endpoint, &config, &node).await?;
+    let mut next = Some(connection);
+    let (replica, mut mirrors) = connect_replica(&endpoint, &config, &node).await;
     let (tx, mut inbox) = mpsc::channel(256);
     let _prev = accept_prev(&endpoint, &config, &node, tx).await?;
 
@@ -331,13 +471,15 @@ pub async fn generate(config: Config) -> Result<Report, BoxError> {
 
     // prefill: the prompt goes around the ring in chunks, one after another
     let first_end = node.shards[first].layers.end;
+    let first_start = node.shards[first].layers.start;
     for (i, chunk) in tokens.chunks(config.chunk as usize).enumerate() {
         let position = u32::try_from(i * config.chunk as usize)?;
         let count = u32::try_from(chunk.len())?;
+        let bytes: Vec<u8> = chunk.iter().flat_map(|t| t.to_le_bytes()).collect();
+        mirror(&mut mirrors, first_start, &node.token_frame(request, 0, position, count)?, &bytes).await;
         let output = node.run_tokens(first, request, position, chunk.to_vec()).await?;
         let frame = node.frame(request, 0, position, count, false)?;
-        let link = links.get_mut(&first_end).ok_or("no link after the first window")?;
-        omnarc_network::write_frame(link, &frame, &output).await?;
+        forward(&endpoint, &config, &node, &mut next, &mut links, first_end, &frame, &output).await?;
     }
 
     let mut generated = Vec::new();
@@ -347,12 +489,14 @@ pub async fn generate(config: Config) -> Result<Report, BoxError> {
     while let Some(Inbound { shard, header, payload }) = inbox.recv().await {
         let info = node.shards[shard].clone();
         let count = u32::from(header.token_count);
+        let mut copy = header;
+        copy.flags = header.flags.union(Flags::MIRROR);
+        mirror(&mut mirrors, info.layers.start, &copy, &payload).await;
         let output = node.run(shard, &header, payload).await?;
         if !info.gives_logits() {
             let to_logits = info.layers.end == info.model.layer_count;
             let frame = node.frame(request, header.step, header.position_start, count, to_logits)?;
-            let link = links.get_mut(&info.layers.end).ok_or("no link for the next window")?;
-            omnarc_network::write_frame(link, &frame, &output).await?;
+            forward(&endpoint, &config, &node, &mut next, &mut links, info.layers.end, &frame, &output).await?;
             continue;
         }
         // logits: only the end of the prompt and every decoded token pick a next token
@@ -372,16 +516,21 @@ pub async fn generate(config: Config) -> Result<Report, BoxError> {
             break;
         }
         let step = u32::try_from(generated.len())?;
+        mirror(&mut mirrors, first_start, &node.token_frame(request, step, position, 1)?, &token.to_le_bytes()).await;
         let output = node.run_tokens(first, request, position, vec![token]).await?;
         let frame = node.frame(request, step, position, 1, false)?;
-        let link = links.get_mut(&first_end).ok_or("no link after the first window")?;
-        omnarc_network::write_frame(link, &frame, &output).await?;
+        forward(&endpoint, &config, &node, &mut next, &mut links, first_end, &frame, &output).await?;
     }
     println!();
 
     with_engine(&node.engine, move |engine| engine.sampler_close(sampler)).await?;
     node.drop_requests(&HashSet::from([request])).await;
-    next.close(0u32.into(), b"done");
+    if let Some(replica) = replica {
+        replica.close(0u32.into(), b"done");
+    }
+    if let Some(next) = next {
+        next.close(0u32.into(), b"done");
+    }
     endpoint.close().await;
 
     let ttft = times.first().copied().unwrap_or_default();

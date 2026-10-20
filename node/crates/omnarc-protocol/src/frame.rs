@@ -65,7 +65,15 @@ impl Flags {
     pub const LAST_STAGE: Self = Self(1 << 1);
     /// Resent after a failover; the receiver may already hold this step.
     pub const REPLAY: Self = Self(1 << 2);
-    const KNOWN: u16 = 0b111;
+    /// A copy for the replica of these layers: it runs the frame to keep its KV cache in step with the
+    /// device that is answering, and forwards nothing. The replica can then carry the answer on from the
+    /// same token if that device leaves (EN-17).
+    pub const MIRROR: Self = Self(1 << 3);
+    /// The payload is `token_count` little-endian i32 token ids, not a hidden state. Only the window that
+    /// holds layer 0 takes tokens, so only its replica is sent them; `hidden_dim` still carries the model's
+    /// hidden size and takes no part in the payload size.
+    pub const TOKENS: Self = Self(1 << 4);
+    const KNOWN: u16 = 0b11111;
 
     /// No flags set.
     #[must_use]
@@ -160,7 +168,7 @@ impl FrameHeader {
         if token_count == 0 || hidden_dim == 0 {
             return Err(FrameError::EmptyTensor);
         }
-        let expected = expected_payload_len(dtype, token_count, hidden_dim);
+        let expected = expected_payload_len(dtype, flags, token_count, hidden_dim);
         let payload_len =
             u32::try_from(expected).map_err(|_| FrameError::PayloadMismatch { declared: u32::MAX, expected })?;
         Ok(Self { dtype, flags, request_id, step, position_start, token_count, hidden_dim, payload_len })
@@ -208,7 +216,7 @@ impl FrameHeader {
             return Err(FrameError::EmptyTensor);
         }
         let payload_len = u32::from_le_bytes([h[28], h[29], h[30], h[31]]);
-        let expected = expected_payload_len(dtype, token_count, hidden_dim);
+        let expected = expected_payload_len(dtype, Flags(flags), token_count, hidden_dim);
         if u64::from(payload_len) != expected {
             return Err(FrameError::PayloadMismatch { declared: payload_len, expected });
         }
@@ -228,8 +236,11 @@ impl FrameHeader {
 /// Payload size for a tensor of `token_count × hidden_dim` elements of `dtype`,
 /// including the per-token scales of the 8-bit types.
 #[must_use]
-pub fn expected_payload_len(dtype: DType, token_count: u16, hidden_dim: u16) -> u64 {
+pub fn expected_payload_len(dtype: DType, flags: Flags, token_count: u16, hidden_dim: u16) -> u64 {
     let tokens = u64::from(token_count);
+    if flags.contains(Flags::TOKENS) {
+        return tokens * 4;
+    }
     let elements = tokens * u64::from(hidden_dim) * dtype.element_size() as u64;
     if dtype.has_scales() { elements + tokens * 4 } else { elements }
 }
@@ -259,9 +270,11 @@ mod tests {
 
     #[test]
     fn eight_bit_payloads_carry_one_scale_per_token() {
-        assert_eq!(expected_payload_len(DType::F8E4M3, 4, 4096), 4 * 4 + 4 * 4096);
-        assert_eq!(expected_payload_len(DType::I8, 1, 16), 4 + 16);
-        assert_eq!(expected_payload_len(DType::F32, 2, 10), 80);
+        assert_eq!(expected_payload_len(DType::F8E4M3, Flags::empty(), 4, 4096), 4 * 4 + 4 * 4096);
+        assert_eq!(expected_payload_len(DType::I8, Flags::empty(), 1, 16), 4 + 16);
+        assert_eq!(expected_payload_len(DType::F32, Flags::empty(), 2, 10), 80);
+        // a token payload is four bytes each, whatever the hidden size says
+        assert_eq!(expected_payload_len(DType::F16, Flags::TOKENS, 7, 4096), 28);
     }
 
     #[test]
