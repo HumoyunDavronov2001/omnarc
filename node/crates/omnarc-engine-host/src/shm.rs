@@ -1,6 +1,7 @@
 //! A shared-memory region that the engine process opens by name.
 //!
-//! POSIX shared memory (`shm_open`) on Unix, a named file mapping on Windows. The region is split in two halves: the
+//! POSIX shared memory (`shm_open`) on Unix, a named file mapping on Windows. Android has no POSIX shared memory, so
+//! there the region is an ordinary file in the temporary directory, mapped shared -- the engine still opens it by name. The region is split in two halves: the
 //! input area, written by the host and read by the engine, and the output area, written by the engine and read by
 //! the host. The protocol is synchronous (`engine/HOST.md`): the engine touches the region only between a request and
 //! its response, and the host holds `&mut Engine` for that whole time, so no Rust reference into the region is alive
@@ -11,6 +12,32 @@ use std::io;
 use std::sync::atomic::{AtomicU32, Ordering};
 
 static COUNTER: AtomicU32 = AtomicU32::new(0);
+
+/// Opens (or with `O_CREAT`, creates) the object behind a region's name.
+#[cfg(all(unix, not(target_os = "android")))]
+unsafe fn open_region(name: *const libc::c_char, flags: libc::c_int) -> libc::c_int {
+    // SAFETY: the caller passes a valid NUL-terminated name.
+    unsafe { libc::shm_open(name, flags, 0o600) }
+}
+
+#[cfg(target_os = "android")]
+unsafe fn open_region(name: *const libc::c_char, flags: libc::c_int) -> libc::c_int {
+    // SAFETY: the caller passes a valid NUL-terminated path.
+    unsafe { libc::open(name, flags, 0o600 as libc::c_uint) }
+}
+
+/// Removes a region's name; the mappings stay valid.
+#[cfg(all(unix, not(target_os = "android")))]
+unsafe fn unlink_region(name: *const libc::c_char) -> libc::c_int {
+    // SAFETY: the caller passes a valid NUL-terminated name.
+    unsafe { libc::shm_unlink(name) }
+}
+
+#[cfg(target_os = "android")]
+unsafe fn unlink_region(name: *const libc::c_char) -> libc::c_int {
+    // SAFETY: the caller passes a valid NUL-terminated path.
+    unsafe { libc::unlink(name) }
+}
 
 /// A region the engine opens by its name.
 #[derive(Debug)]
@@ -43,10 +70,15 @@ impl SharedMemory {
         }
     }
 
-    #[cfg(unix)]
+    #[cfg(all(unix, not(target_os = "android")))]
     fn name_for(pid: u32, id: u32) -> String {
         // macOS allows 31 characters
         format!("/bk-{pid}-{id}")
+    }
+
+    #[cfg(target_os = "android")]
+    fn name_for(pid: u32, id: u32) -> String {
+        std::env::temp_dir().join(format!("omnarc-{pid}-{id}")).to_string_lossy().into_owned()
     }
 
     #[cfg(windows)]
@@ -59,7 +91,7 @@ impl SharedMemory {
         let cname = std::ffi::CString::new(name).map_err(io::Error::other)?;
         let size = libc::off_t::try_from(len).map_err(io::Error::other)?;
         // SAFETY: cname is a valid NUL-terminated string; O_EXCL makes sure the region is new.
-        let fd = unsafe { libc::shm_open(cname.as_ptr(), libc::O_CREAT | libc::O_EXCL | libc::O_RDWR, 0o600) };
+        let fd = unsafe { open_region(cname.as_ptr(), libc::O_CREAT | libc::O_EXCL | libc::O_RDWR) };
         if fd < 0 {
             return Err(io::Error::last_os_error());
         }
@@ -68,7 +100,7 @@ impl SharedMemory {
             if libc::ftruncate(fd, size) != 0 {
                 let error = io::Error::last_os_error();
                 libc::close(fd);
-                libc::shm_unlink(cname.as_ptr());
+                unlink_region(cname.as_ptr());
                 return Err(error);
             }
             let ptr =
@@ -76,7 +108,7 @@ impl SharedMemory {
             libc::close(fd);
             if ptr == libc::MAP_FAILED {
                 let error = io::Error::last_os_error();
-                libc::shm_unlink(cname.as_ptr());
+                unlink_region(cname.as_ptr());
                 return Err(error);
             }
             ptr.cast::<u8>()
@@ -143,7 +175,7 @@ impl SharedMemory {
         if let Ok(cname) = std::ffi::CString::new(self.name.as_str()) {
             // SAFETY: a valid NUL-terminated name; unlinking an already removed name only returns an error.
             unsafe {
-                libc::shm_unlink(cname.as_ptr());
+                unlink_region(cname.as_ptr());
             }
         }
     }

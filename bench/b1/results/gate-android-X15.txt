@@ -1,0 +1,26 @@
+# Stage B1 accuracy gate — X15 pro max (Android 10, armeabi-v7a only, 4 cores, 2.9 GB)
+# Engine: 8839495 + the Android shared-memory fix, cross-built with NDK r27c for armeabi-v7a
+# (GGML_LLAMAFILE=OFF, GGML_OPENMP=OFF), run over adb from /data/local/tmp. Backend cpu.
+# Model: stories15M-q8_0 (6 layers) -- the only model that fits beside the OS; the input is
+# --random-tokens 384 in 3 chunks of 128, so the absolute perplexity means nothing: the gate
+# compares each split with the whole model on the same tokens.
+# Gate: mean KL <= 0.01 and |perplexity difference| <= 0.5%.
+
+== split halves
+split   [0, 3) [3, 7), hidden state on the wire as f16
+ppl     whole 244123.4329, split 244631.1621, difference +0.2080%
+kl      mean 0.001273, max 0.005860
+top-1   96.59% the same, max |logit difference| 0.302250
+gate    PASS (mean KL <= 0.01, |ppl difference| <= 0.5%)
+== split even:2
+split   [0, 3) [3, 6) [6, 7), hidden state on the wire as f16
+ppl     whole 244123.4329, split 244562.6781, difference +0.1799%
+kl      mean 0.001265, max 0.005258
+top-1   96.85% the same, max |logit difference| 0.305696
+gate    PASS (mean KL <= 0.01, |ppl difference| <= 0.5%)
+== split even:4
+split   [0, 1) [1, 3) [3, 4) [4, 6) [6, 7), hidden state on the wire as f16
+ppl     whole 244123.4329, split 244397.2348, difference +0.1122%
+kl      mean 0.001976, max 0.009431
+top-1   94.75% the same, max |logit difference| 0.409563
+gate    PASS (mean KL <= 0.01, |ppl difference| <= 0.5%)

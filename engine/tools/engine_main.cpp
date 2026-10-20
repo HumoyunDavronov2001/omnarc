@@ -66,7 +66,12 @@ public:
         base_ = static_cast<uint8_t *>(MapViewOfFile(mapping_, FILE_MAP_ALL_ACCESS, 0, 0, size));
         return base_ != nullptr;
 #else
+#if defined(__ANDROID__)
+        // Android has no POSIX shared memory; there the host's region is an ordinary file, mapped shared
+        const int fd = ::open(name.c_str(), O_RDWR);
+#else
         const int fd = shm_open(name.c_str(), O_RDWR, 0600);
+#endif
         if (fd < 0) return false;
         void *addr = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         close(fd);
