@@ -52,8 +52,11 @@ jobs:
           today = datetime.date.today().isoformat()
           path = "UPSTREAM.md"
           text = open(path).read()
-          text = re.sub(r"\| `[0-9a-f]{12}` \(tag b\d+, [0-9-]+\) \| the engine and all backends",
-                        f"| `{commit}` (tag {tag}, {today}) | the engine and all backends", text)
+          # any tag name: llama.cpp numbered its releases bNNNNN until v0.7.0
+          text, changed = re.subn(r"\| `[0-9a-f]{12}` \(tag [^,]+, [0-9-]+\) \| the engine and all backends",
+                                  f"| `{commit}` (tag {tag}, {today}) | the engine and all backends", text)
+          if changed != 1:
+              sys.exit(f"{path}: the llama.cpp row was not found, so it would go stale without anyone noticing")
           open(path, "w").write(text)
           EOF
           git status --short

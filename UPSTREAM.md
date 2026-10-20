@@ -7,7 +7,7 @@ and `NOTICE` gains its copyright line.
 | Project | License | Commit studied | What we take | Status |
 |---|---|---|---|---|
 | [prima.cpp](https://github.com/OpenCPIL/prima.cpp) | MIT | `288df6a2cc21` (2026-09-01) | piped-ring parallelism, prefetching, device profiler, Halda scheduler | B1: windows and prefetching reimplemented on current llama.cpp; profiler and Halda in B3 |
-| [llama.cpp / ggml](https://github.com/ggml-org/llama.cpp) | MIT | `f9a95aeb2096` (tag b11565, 2026-10-12) | the engine and all backends | submodule `engine/third_party/llama.cpp` + [`engine/patches`](engine/patches/README.md) |
+| [llama.cpp / ggml](https://github.com/ggml-org/llama.cpp) | MIT | `620d2225cc43` (tag v0.7.0, 2026-10-20) | the engine and all backends | submodule `engine/third_party/llama.cpp` + [`engine/patches`](engine/patches/README.md) |
 | [exo](https://github.com/exo-explore/exo) | Apache-2.0 | `35182424fef5` (2026-10-12) | discovery, placement, API adapters, dashboard components, MLX engine, prefill/decode split | studied; stages B2, B8 |
 | [GPUStack](https://github.com/gpustack/gpustack) | Apache-2.0 | `6f2b17b60a53` (2026-10-12) | users, monitoring, vLLM/SGLang management | studied; stages B6, B8 |
 | [Parallax](https://github.com/GradientHQ/parallax) | Apache-2.0 | — | internet-scale scheduling, KV management | stage B3 |
