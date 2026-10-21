@@ -168,29 +168,22 @@ async fn a_cluster_places_a_model_by_what_each_device_offers_and_answers_from_an
         .await;
 
     // the phone holds no layer and still asks: the head answers
-    let mut steps =
-        phone.api().ask(v1::AskRequest { prompt: PROMPT.into(), max_tokens: GENERATE, ..Default::default() });
-    let (mut text, mut done) = (String::new(), None);
-    while let Some(step) = tokio::time::timeout(Duration::from_secs(120), steps.next()).await.expect("an answer") {
-        match step.unwrap_or_else(|e| panic!("{}", e.message)).step {
-            Some(v1::ask_response::Step::Piece(piece)) => text.push_str(&piece),
-            Some(v1::ask_response::Step::Done(d)) => done = Some(d),
-            None => {}
-        }
-    }
+    let (text, done) =
+        answer(&phone, v1::AskRequest { prompt: PROMPT.into(), max_tokens: GENERATE, ..Default::default() }).await;
     assert_eq!(text, expected, "the ring answers what one device holding the whole model answers");
     let done = done.expect("the answer ends with its timings");
     assert!(done.generated_tokens > 0 && done.ttft_ms > 0.0, "{done:?}");
 
+    // a conversation: a model without a chat template answers its last message as plain text
+    let messages = [("user", "Hello"), ("assistant", "Hi."), ("user", PROMPT)]
+        .map(|(role, content)| v1::ChatMessage { role: role.into(), content: content.into() })
+        .to_vec();
+    let (chat, _) = answer(&phone, v1::AskRequest { messages, max_tokens: GENERATE, ..Default::default() }).await;
+    assert_eq!(chat, expected);
+
     // accuracy mode: three sampled paths, and the answer most of them agree on
-    let mut steps =
-        phone.api().ask(v1::AskRequest { prompt: PROMPT.into(), max_tokens: 8, paths: 3, ..Default::default() });
-    let mut done = None;
-    while let Some(step) = tokio::time::timeout(Duration::from_secs(120), steps.next()).await.expect("an answer") {
-        if let Some(v1::ask_response::Step::Done(d)) = step.unwrap_or_else(|e| panic!("{}", e.message)).step {
-            done = Some(d);
-        }
-    }
+    let (_, done) =
+        answer(&phone, v1::AskRequest { prompt: PROMPT.into(), max_tokens: 8, paths: 3, ..Default::default() }).await;
     let done = done.expect("accuracy mode ends with its count");
     assert_eq!(done.paths, 3);
     assert!((1..=3).contains(&done.agreed), "{done:?}");
@@ -206,16 +199,22 @@ async fn a_cluster_places_a_model_by_what_each_device_offers_and_answers_from_an
     }
 }
 
-async fn ask(service: &Service) -> String {
-    let mut steps =
-        service.api().ask(v1::AskRequest { prompt: PROMPT.into(), max_tokens: GENERATE, ..Default::default() });
-    let mut text = String::new();
+/// The answer `service` gives to `request`, and its timings.
+async fn answer(service: &Service, request: v1::AskRequest) -> (String, Option<v1::AskDone>) {
+    let mut steps = service.api().ask(request);
+    let (mut text, mut done) = (String::new(), None);
     while let Some(step) = tokio::time::timeout(Duration::from_secs(120), steps.next()).await.expect("an answer") {
-        if let Some(v1::ask_response::Step::Piece(piece)) = step.unwrap_or_else(|e| panic!("{}", e.message)).step {
-            text.push_str(&piece);
+        match step.unwrap_or_else(|e| panic!("{}", e.message)).step {
+            Some(v1::ask_response::Step::Piece(piece)) => text.push_str(&piece),
+            Some(v1::ask_response::Step::Done(d)) => done = Some(d),
+            None => {}
         }
     }
-    text
+    (text, done)
+}
+
+async fn ask(service: &Service) -> String {
+    answer(service, v1::AskRequest { prompt: PROMPT.into(), max_tokens: GENERATE, ..Default::default() }).await.0
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 6)]

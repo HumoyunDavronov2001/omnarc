@@ -15,7 +15,7 @@ static int failures = 0;
 
 int main(void) {
     CHECK(om_abi_version() == OMNARC_ABI_VERSION);
-    CHECK(OMNARC_ABI_VERSION == 5u);
+    CHECK(OMNARC_ABI_VERSION == 6u);
     CHECK(strcmp(om_version_string(), "0.1.0") == 0);
     CHECK(strcmp(om_status_string(OM_OK), "ok") == 0);
     CHECK(strcmp(om_status_string(OM_ERR_NOT_IMPLEMENTED), "not implemented") == 0);

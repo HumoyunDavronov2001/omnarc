@@ -25,10 +25,18 @@
     if (!text || asking) return;
     prompt = '';
     asking = true;
+    // the whole conversation goes along, so the model answers in its own chat template and remembers it
+    const messages = turns
+      .filter((t) => !t.failed)
+      .flatMap((t) => [
+        { role: 'user', content: t.prompt },
+        { role: 'assistant', content: t.answer },
+      ]);
+    messages.push({ role: 'user', content: text });
     turns.push({ prompt: text, answer: '', done: null, failed: '' });
     const turn = turns[turns.length - 1];
     try {
-      for await (const step of api.ask({ prompt: text, maxTokens: 256, paths: accurate ? 3 : 1 })) {
+      for await (const step of api.ask({ prompt: text, messages, maxTokens: 256, paths: accurate ? 3 : 1 })) {
         if (step.step.case === 'piece') turn.answer += step.step.value;
         else if (step.step.case === 'done') turn.done = step.step.value;
       }

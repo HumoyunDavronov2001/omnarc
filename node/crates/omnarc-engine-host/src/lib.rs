@@ -259,6 +259,7 @@ mod op {
     pub const KV_SIZE: u16 = 17;
     pub const KV_READ: u16 = 18;
     pub const KV_WRITE: u16 = 19;
+    pub const CHAT_PROMPT: u16 = 20;
 }
 
 const EL_TOKENS: u8 = 0;
@@ -594,6 +595,28 @@ impl Engine {
         let mut r = self.request(op::TOKEN_TEXT, &payload)?;
         let text = r.string()?;
         Ok((text, r.u8()? != 0))
+    }
+
+    /// A conversation as the model's own chat template writes it, ending where the answer begins; `None` when the
+    /// model has no template the engine knows, or the engine is older than ABI 6.
+    ///
+    /// # Errors
+    /// The engine is gone.
+    pub fn chat_prompt(&mut self, shard: ShardId, messages: &[(&str, &str)]) -> Result<Option<String>> {
+        if self.abi_version < 6 {
+            return Ok(None);
+        }
+        let mut payload = shard.0.to_le_bytes().to_vec();
+        payload.extend_from_slice(&u32::try_from(messages.len()).unwrap_or(u32::MAX).to_le_bytes());
+        for (role, text) in messages {
+            put_str(&mut payload, role);
+            put_str(&mut payload, text);
+        }
+        match self.request(op::CHAT_PROMPT, &payload) {
+            Ok(mut r) => Ok(Some(r.string()?)),
+            Err(Error::Engine { status: Status::Unsupported, .. }) => Ok(None),
+            Err(e) => Err(e),
+        }
     }
 
     /// Creates a sampler; one per request.

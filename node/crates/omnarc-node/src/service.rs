@@ -181,6 +181,9 @@ async fn profiled(mut device: v1::DeviceInfo, budget: Option<&v1::Budget>) -> v1
     device
 }
 
+/// How long a leaving device gives its leave notice to reach its neighbors before it closes its connections.
+const LEAVE_FLUSH: Duration = Duration::from_millis(250);
+
 /// How long the profiler measures this device when the service starts.
 const PROFILE_TIME: Duration = Duration::from_secs(2);
 
@@ -446,6 +449,8 @@ impl Service {
     pub async fn shutdown(self) {
         let leave = v1::GossipPayload { kind: Some(v1::gossip_payload::Kind::Leave(v1::LeaveNotice {})) };
         let _ = self.shared.sender.broadcast(gossip::seal(&self.shared.key, &leave, now_unix_ms()).into()).await;
+        // the notice goes out before the connections close, or the cluster learns of the leaving only from silence
+        tokio::time::sleep(LEAVE_FLUSH).await;
         for task in &self.tasks {
             task.abort();
         }

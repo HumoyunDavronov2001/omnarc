@@ -190,10 +190,17 @@ sealed interface AskStep {
 }
 
 /** Asks the model the cluster runs; the agent passes the prompt to whichever device answers. */
-fun ask(prompt: String, onStep: (AskStep) -> Unit) {
+fun ask(prompt: String, history: List<Pair<String, String>>, onStep: (AskStep) -> Unit) {
     runCatching {
         val connection = call("Ask", "application/connect+proto", 0)
-        val request = ProtoWriter().string(1, prompt).uint(2, 256).toByteArray()
+        // the conversation goes along: the model answers in its own chat template and remembers what was said
+        val writer = ProtoWriter().string(1, prompt).uint(2, 256)
+        for ((question, answer) in history) {
+            writer.message(6, ProtoWriter().string(1, "user").string(2, question).toByteArray())
+            writer.message(6, ProtoWriter().string(1, "assistant").string(2, answer).toByteArray())
+        }
+        writer.message(6, ProtoWriter().string(1, "user").string(2, prompt).toByteArray())
+        val request = writer.toByteArray()
         DataOutputStream(connection.outputStream).use { it.writeByte(0); it.writeInt(request.size); it.write(request) }
         if (connection.responseCode != HttpURLConnection.HTTP_OK) {
             onStep(AskStep.Failed("the agent refused the question (${connection.responseCode})"))

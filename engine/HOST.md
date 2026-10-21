@@ -52,6 +52,7 @@ status carries one string, the error message, as its payload.
 | 17 | `KV_SIZE` | `u32` shard, `u64` request | `u64` bytes the cache takes now (ABI 4) |
 | 18 | `KV_READ` | `u32` shard, `u64` request | `u64` bytes written, the cache itself in the output half (ABI 4) |
 | 19 | `KV_WRITE` | `u32` shard, `u64` request, `u64` bytes; the cache in the input half | — (ABI 4) |
+| 20 | `CHAT_PROMPT` | `u32` shard, `u32` count, then count × (string role, string text) | string: the conversation in the model's chat template, ending where the answer begins (ABI 6) |
 
 - **Model info:** string architecture, `u32` layer count, `u32` hidden size, `u32` vocabulary size, `u32` context
   length, `u64` file size, `u8` splittable.

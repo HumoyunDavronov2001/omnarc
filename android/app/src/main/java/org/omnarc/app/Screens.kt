@@ -135,10 +135,11 @@ private fun Conversation(model: String) {
                     prompt = ""
                     asking = true
                     note = ""
+                    val history = turns.toList()
                     turns.add(question to "")
                     val index = turns.lastIndex
                     scope.launch(Dispatchers.IO) {
-                        ask(question) { step ->
+                        ask(question, history) { step ->
                             scope.launch(Dispatchers.Main) {
                                 when (step) {
                                     is AskStep.Piece -> turns[index] = question to turns[index].second + step.text

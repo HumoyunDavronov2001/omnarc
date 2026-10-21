@@ -227,6 +227,15 @@ message AskRequest {
   float temperature = 4;
   // The sampler's seed, so the paths of accuracy mode differ.
   uint64 seed = 5;
+  // A conversation, oldest message first, written in the model's own chat template; when given, prompt is unused.
+  // A model without a template answers the last user message as plain text.
+  repeated ChatMessage messages = 6;
+}
+
+message ChatMessage {
+  // "system", "user" or "assistant".
+  string role = 1;
+  string content = 2;
 }
 
 message AskResponse {

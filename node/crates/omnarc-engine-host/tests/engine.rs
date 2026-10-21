@@ -213,3 +213,21 @@ fn a_shard_holds_its_cache_in_eight_bits_too() {
     assert_eq!(engine.run(&shard, &next).unwrap().data.len(), hidden * 4);
     engine.quit().unwrap();
 }
+
+#[test]
+fn a_conversation_takes_the_models_own_template() {
+    let (engine_path, model) = paths();
+    let mut engine = Engine::spawn(&engine_path, 16 << 20).unwrap();
+    let shard = engine.open(&model, 0..1, Backend::Cpu, 64).unwrap();
+    let chat = [("system", "Be brief."), ("user", "Hello"), ("assistant", "Hi."), ("user", "How are you?")];
+    match engine.chat_prompt(shard.id, &chat).unwrap() {
+        // the model's own words around each message, ending where the answer begins
+        Some(prompt) => {
+            assert!(prompt.contains("Be brief.") && prompt.contains("How are you?"), "{prompt}");
+            assert!(prompt.find("Hello").unwrap() < prompt.find("How are you?").unwrap());
+        }
+        // a model without a chat template, such as stories15M: the caller asks with the plain text instead
+        None => eprintln!("this model has no chat template"),
+    }
+    engine.quit().unwrap();
+}

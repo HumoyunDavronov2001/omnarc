@@ -477,11 +477,16 @@ async fn answer_here(
         seed: request.seed,
         ..omnarc_engine_host::SamplerParams::default()
     };
-    let report = head
-        .ask(&request.prompt, max, params, |piece| {
-            let _ = tx.send(Ok(v1::AskResponse { step: Some(Step::Piece(piece.to_owned())) }));
-        })
-        .await?;
+    let piece = |piece: &str| {
+        let _ = tx.send(Ok(v1::AskResponse { step: Some(Step::Piece(piece.to_owned())) }));
+    };
+    let report = if request.messages.is_empty() {
+        head.ask(&request.prompt, max, params, piece).await?
+    } else {
+        let messages: Vec<(String, String)> =
+            request.messages.iter().map(|m| (m.role.clone(), m.content.clone())).collect();
+        head.ask_chat(&messages, max, params, piece).await?
+    };
     #[allow(clippy::cast_possible_truncation)]
     let done = v1::AskDone {
         prompt_tokens: u32::try_from(report.prompt_tokens).unwrap_or(u32::MAX),

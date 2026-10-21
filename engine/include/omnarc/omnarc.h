@@ -23,7 +23,7 @@ extern "C" {
 
 /* 1: stage B0 interface. 2: shards on llama.cpp — model info, om_shard_run, KV management, prefetching,
  * tokenizer and sampler. 3: om_devices. */
-#define OMNARC_ABI_VERSION 5u
+#define OMNARC_ABI_VERSION 6u
 
 typedef enum om_status {
     OM_OK = 0,
@@ -181,6 +181,19 @@ om_status om_shard_set_threads(om_shard *shard, uint32_t threads);
  * nothing is written and OM_ERR_CAPACITY is returned. add_special adds the model's BOS token, if any. */
 om_status om_shard_tokenize(const om_shard *shard, const char *text, size_t text_len, uint32_t add_special,
                             int32_t *tokens, size_t capacity, size_t *count);
+
+/* One message of a conversation: role "system", "user" or "assistant", and its text. */
+typedef struct om_chat_message {
+    const char *role;
+    const char *content;
+} om_chat_message;
+
+/* A conversation as the model's own chat template writes it, ending where the assistant's answer begins; written to
+ * out without a terminating zero, *len receiving its length in bytes. If out is too small, nothing is written, *len
+ * receives the length needed and OM_ERR_CAPACITY is returned. A model without a chat template, or with one the
+ * engine does not know, returns OM_ERR_UNSUPPORTED. */
+om_status om_shard_chat_prompt(const om_shard *shard, const om_chat_message *messages, size_t count, char *out,
+                               size_t capacity, size_t *len);
 
 /* The text of one token, written to out without a terminating zero; *len receives its length in bytes. */
 om_status om_shard_token_text(const om_shard *shard, int32_t token, char *out, size_t capacity, size_t *len);

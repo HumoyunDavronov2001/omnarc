@@ -541,17 +541,36 @@ async fn accept_prev(
     let acks = Arc::new(tokio::sync::Mutex::new(None::<SendStream>));
     // the last link to run dry reports the session's end, so it comes after every frame of the session
     let open_links = Arc::new(std::sync::atomic::AtomicUsize::new(expected.max(1)));
+    // the reason a session's connection ended: a close in good order (code 0), or the peer going away. Nothing
+    // here may hold the connection open while it waits, or a node that stopped would keep its peers waiting too
+    let graceful = |reason: Option<omnarc_network::ConnectionError>| match reason {
+        Some(omnarc_network::ConnectionError::ApplicationClosed(close)) => close.error_code == 0u32.into(),
+        // streams finished while the connection stays: the peer is done with them
+        None => true,
+        Some(_) => false,
+    };
     let end = move |connection: Connection,
                     inbox: mpsc::Sender<Inbound>,
                     open_links: Arc<std::sync::atomic::AtomicUsize>| async move {
-        if open_links.fetch_sub(1, std::sync::atomic::Ordering::AcqRel) == 1 {
-            let reason = connection.closed().await;
-            let graceful = matches!(reason, omnarc_network::ConnectionError::ApplicationClosed(ref close) if close.error_code == 0u32.into());
+        if open_links.fetch_sub(1, std::sync::atomic::Ordering::AcqRel) == 1 && !inbox.is_closed() {
+            let graceful = graceful(connection.close_reason());
+            drop(connection);
             let _ = inbox.send(Inbound::Closed { session, graceful }).await;
         }
     };
     if expected == 0 {
-        tokio::spawn(end(connection.clone(), inbox.clone(), Arc::clone(&open_links)));
+        // no link to run dry: the session ends with its connection, unless this node stops first
+        let (watched, inbox) = (connection.clone(), inbox.clone());
+        tokio::spawn(async move {
+            tokio::select! {
+                reason = watched.closed() => {
+                    let graceful = graceful(Some(reason));
+                    drop(watched);
+                    let _ = inbox.send(Inbound::Closed { session, graceful }).await;
+                }
+                () = inbox.closed() => {}
+            }
+        });
     }
     for _ in 0..expected {
         let (begin, mut stream) = omnarc_network::accept_link(&connection).await?.ok_or("the previous node left")?;
@@ -858,11 +877,56 @@ impl Head {
     ///
     /// # Panics
     /// If a task panicked while it held the table of prompts being answered.
-    // one loop, because every step of an answer shares the ring's connections, mirrors and the last frame sent
-    #[allow(clippy::too_many_lines)]
     pub async fn ask(
         &self,
         prompt: &str,
+        max_tokens: u32,
+        params: SamplerParams,
+        on_piece: impl FnMut(&str),
+    ) -> Result<Report, BoxError> {
+        self.ask_text(prompt, true, max_tokens, params, on_piece).await
+    }
+
+    /// Answers a conversation: `(role, text)` messages written in the model's own chat template, the answer
+    /// beginning where the template leaves off. A model without a template answers the last message as plain text.
+    ///
+    /// # Errors
+    /// As [`ask`](Self::ask).
+    ///
+    /// # Panics
+    /// As [`ask`](Self::ask).
+    pub async fn ask_chat(
+        &self,
+        messages: &[(String, String)],
+        max_tokens: u32,
+        params: SamplerParams,
+        on_piece: impl FnMut(&str),
+    ) -> Result<Report, BoxError> {
+        let first =
+            self.node.shards.iter().position(ShardInfo::takes_tokens).ok_or("the head holds no window at layer 0")?;
+        let shard = self.node.shards[first].id;
+        let owned = messages.to_vec();
+        let prompt = with_engine(&self.node.engine, move |engine| {
+            let pairs: Vec<(&str, &str)> = owned.iter().map(|(r, t)| (r.as_str(), t.as_str())).collect();
+            engine.chat_prompt(shard, &pairs)
+        })
+        .await?;
+        if let Some(prompt) = prompt {
+            // the template writes the model's own special tokens, its beginning included
+            return self.ask_text(&prompt, false, max_tokens, params, on_piece).await;
+        }
+        let last = messages.iter().rev().find(|(role, _)| role == "user").or(messages.last());
+        let text = last.map_or("", |(_, t)| t.as_str());
+        self.ask_text(text, true, max_tokens, params, on_piece).await
+    }
+
+    // `special`: whether the model's beginning-of-text token goes before the prompt. One loop, because every step of
+    // an answer shares the ring's connections, mirrors and the steps not answered yet
+    #[allow(clippy::too_many_lines)]
+    async fn ask_text(
+        &self,
+        prompt: &str,
+        special: bool,
         max_tokens: u32,
         params: SamplerParams,
         mut on_piece: impl FnMut(&str),
@@ -872,7 +936,7 @@ impl Head {
         let first =
             node.shards.iter().position(ShardInfo::takes_tokens).ok_or("the head holds no window at layer 0")?;
         if node.shards[first].gives_logits() {
-            return self.ask_alone(first, prompt, max_tokens, params, on_piece).await;
+            return self.ask_alone(first, prompt, special, max_tokens, params, on_piece).await;
         }
         let (connection, mut links) = connect_next(endpoint, config, node).await?;
         let mut next = Some(connection);
@@ -887,7 +951,7 @@ impl Head {
         let mut inflight: std::collections::VecDeque<(u32, FrameHeader, Vec<u8>)> = std::collections::VecDeque::new();
 
         let shard_id = node.shards[first].id;
-        let tokens = with_engine(&node.engine, move |engine| engine.tokenize(shard_id, &prompt, true)).await?;
+        let tokens = with_engine(&node.engine, move |engine| engine.tokenize(shard_id, &prompt, special)).await?;
         let sampler = with_engine(&node.engine, move |engine| engine.sampler_open(params)).await?;
         let prompt_len = u32::try_from(tokens.len())?;
         let start = Instant::now();
@@ -1033,6 +1097,7 @@ impl Head {
         &self,
         shard: usize,
         prompt: String,
+        special: bool,
         max_tokens: u32,
         params: SamplerParams,
         mut on_piece: impl FnMut(&str),
@@ -1040,7 +1105,7 @@ impl Head {
         let node = &self.node;
         let info = node.shards[shard].clone();
         let shard_id = info.id;
-        let tokens = with_engine(&node.engine, move |engine| engine.tokenize(shard_id, &prompt, true)).await?;
+        let tokens = with_engine(&node.engine, move |engine| engine.tokenize(shard_id, &prompt, special)).await?;
         let sampler = with_engine(&node.engine, move |engine| engine.sampler_open(params)).await?;
         let request = new_request();
         let start = Instant::now();

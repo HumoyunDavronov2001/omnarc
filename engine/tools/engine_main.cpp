@@ -50,6 +50,7 @@ enum opcode : uint16_t {
     OP_KV_SIZE = 17,
     OP_KV_READ = 18,
     OP_KV_WRITE = 19,
+    OP_CHAT_PROMPT = 20,
 };
 
 enum element : uint8_t { EL_TOKENS = 0, EL_F32 = 1, EL_F16 = 2, EL_BF16 = 3 };
@@ -320,6 +321,29 @@ struct engine {
                 const om_status status = om_shard_tokenize(s, text.data(), text.size(), add_special, tokens,
                                                            shm.half() / sizeof(int32_t), &count);
                 if (status == OM_OK) out.put(static_cast<uint32_t>(count));
+                return status;
+            }
+            case OP_CHAT_PROMPT: {
+                om_shard *s = shard(in.get<uint32_t>());
+                const auto count = in.get<uint32_t>();
+                std::vector<std::string> texts;
+                for (uint32_t i = 0; i < count && in.ok(); ++i) {
+                    texts.push_back(in.str());
+                    texts.push_back(in.str());
+                }
+                if (!in.ok() || s == nullptr) break;
+                std::vector<om_chat_message> messages(count);
+                for (uint32_t i = 0; i < count; ++i) messages[i] = {texts[2 * i].c_str(), texts[2 * i + 1].c_str()};
+                std::string prompt(4096, '\0');
+                size_t len = 0;
+                om_status status = om_shard_chat_prompt(s, messages.data(), count, prompt.data(), prompt.size(), &len);
+                if (status == OM_ERR_CAPACITY) {
+                    prompt.resize(len);
+                    status = om_shard_chat_prompt(s, messages.data(), count, prompt.data(), prompt.size(), &len);
+                }
+                if (status != OM_OK) return status;
+                prompt.resize(len);
+                out.str(prompt);
                 return status;
             }
             case OP_TOKEN_TEXT: {

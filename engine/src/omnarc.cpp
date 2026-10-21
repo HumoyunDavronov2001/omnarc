@@ -660,4 +660,26 @@ om_status om_sampler_sample(om_sampler *sampler, const float *logits, uint32_t v
 
 void om_sampler_close(om_sampler *sampler) { delete sampler; }
 
+om_status om_shard_chat_prompt(const om_shard *shard, const om_chat_message *messages, size_t count, char *out,
+                               size_t capacity, size_t *len) {
+    if (shard == nullptr || len == nullptr || (messages == nullptr && count > 0)) {
+        return fail(OM_ERR_INVALID_ARGUMENT, "shard, messages and len are required");
+    }
+    const char *tmpl = llama_model_chat_template(shard->model, nullptr);
+    if (tmpl == nullptr) return fail(OM_ERR_UNSUPPORTED, "the model has no chat template");
+    std::vector<llama_chat_message> chat(count);
+    for (size_t i = 0; i < count; ++i) {
+        if (messages[i].role == nullptr || messages[i].content == nullptr) {
+            return fail(OM_ERR_INVALID_ARGUMENT, "every message needs a role and a text");
+        }
+        chat[i] = llama_chat_message{messages[i].role, messages[i].content};
+    }
+    const int32_t n = llama_chat_apply_template(tmpl, chat.data(), count, /*add_ass =*/true, out,
+                                                static_cast<int32_t>(std::min<size_t>(capacity, INT32_MAX)));
+    if (n < 0) return fail(OM_ERR_UNSUPPORTED, "the engine does not know this model's chat template");
+    *len = static_cast<size_t>(n);
+    if (static_cast<size_t>(n) > capacity) return fail(OM_ERR_CAPACITY, "the buffer is too small for the prompt");
+    return OM_OK;
+}
+
 }  // extern "C"
