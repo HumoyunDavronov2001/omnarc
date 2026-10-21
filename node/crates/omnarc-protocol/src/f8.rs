@@ -78,7 +78,7 @@ pub fn pack(values: &[f32], hidden: usize) -> Vec<u8> {
 #[must_use]
 pub fn unpack(payload: &[u8], hidden: usize) -> Option<Vec<f32>> {
     let row = 4 + hidden;
-    if hidden == 0 || payload.len() % row != 0 {
+    if hidden == 0 || !payload.len().is_multiple_of(row) {
         return None;
     }
     let tokens = payload.len() / row;
