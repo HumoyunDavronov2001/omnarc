@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Omnarc — every device is an arc. Together, one mind.</title>
+<meta name="description" content="Omnarc turns computers, phones, servers and browsers into one AI cluster — from the devices in one home to idle devices around the world. Open source, Apache 2.0.">
+<meta property="og:title" content="Omnarc — every device is an arc. Together, one mind.">
+<meta property="og:description" content="Computers, phones, servers and browsers as one AI cluster. Open source, Apache 2.0.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://humoyundavronov2001.github.io/omnarc/">
+<meta property="og:url" content="https://humoyundavronov2001.github.io/omnarc/">
+<meta property="og:site_name" content="Omnarc">
+<meta property="og:image" content="https://raw.githubusercontent.com/HumoyunDavronov2001/omnarc/main/design/assets/home-screen-dark.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Omnarc — every device is an arc. Together, one mind.">
+<meta name="twitter:description" content="Computers, phones, servers and browsers as one AI cluster. Open source, Apache 2.0.">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/HumoyunDavronov2001/omnarc/main/design/assets/home-screen-dark.png">
+<meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#08120e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23118d4f' stroke-width='2.6' stroke-linecap='round' stroke-dasharray='38 18.5' transform='rotate(-90 12 12)'/%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23c99a2e' stroke-width='2.6' stroke-linecap='round' stroke-dasharray='9 47.5' transform='rotate(150 12 12)'/%3E%3Ccircle cx='19' cy='7.5' r='2.4' fill='%231be480'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f7f6f1;--bg-soft:#f1efe6;--fg:#1a2218;--muted:#55604f;--subtle:#6b7463;
+  --border:rgba(26,33,24,.11);--border-strong:rgba(26,33,24,.22);
+  --card:#ffffff;--brand:#0c7a43;--brand-lo:#0a6a3a;--bright:#17b565;
+  --gold:#c99a2e;--lapis:#2b5f9e;--turq:#1a8f8f;--danger:#c4553a;
+  --wash:rgba(17,141,79,.07);
+  /* instrument panels — always ink (the film & the rack are cinema) */
+  --ink-hi:#0f2a1e;--ink:#07110d;--ink-2:#0c1a14;--ink-3:#12241b;--ink-g2:#10261b;
+  --ink-line:rgba(215,232,221,.10);
+  --ink-fg:#d7e8dd;--ink-muted:#7d9384;--ink-dim:#4d6457;--beam:#9be9bf;
+  --font-sans:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-display:"Bricolage Grotesque","Geist",system-ui,sans-serif;
+  --font-mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --nav-bg:rgba(255,255,255,.9);--nav-line:rgba(22,33,27,.10);--nav-fg:#16211b;--nav-muted:#5b6459;--nav-hover:rgba(22,33,27,.07);
+  --r-sm:8px;--r:14px;--r-lg:22px;
+  --wrap:1200px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0e1411;--bg-soft:#121a16;--fg:#e4ede6;--muted:#9ba79d;--subtle:#98a39a;
+    --border:rgba(228,237,230,.09);--border-strong:rgba(228,237,230,.18);
+    --card:#141c18;--brand:#22a565;--brand-lo:#1b8a54;--wash:rgba(34,165,101,.09);
+    --ink-hi:#0f2a1e;--ink:#07110d;--ink-2:#0c1a14;--ink-3:#12241b;--ink-g2:#10261b;
+    --ink-line:rgba(215,232,221,.10);--ink-fg:#d7e8dd;--ink-muted:#7d9384;--ink-dim:#4d6457;--beam:#9be9bf;
+    --nav-bg:rgba(10,16,13,.88);--nav-line:rgba(215,232,221,.10);--nav-fg:#d7e8dd;--nav-muted:#8d9a90;--nav-hover:rgba(215,232,221,.08);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e1411;--bg-soft:#121a16;--fg:#e4ede6;--muted:#9ba79d;--subtle:#98a39a;
+  --border:rgba(228,237,230,.09);--border-strong:rgba(228,237,230,.18);
+  --card:#141c18;--brand:#22a565;--brand-lo:#1b8a54;--wash:rgba(34,165,101,.09);
+  --ink-hi:#0f2a1e;--ink:#07110d;--ink-2:#0c1a14;--ink-3:#12241b;--ink-g2:#10261b;
+  --ink-line:rgba(215,232,221,.10);--ink-fg:#d7e8dd;--ink-muted:#7d9384;--ink-dim:#4d6457;--beam:#9be9bf;
+  --nav-bg:rgba(10,16,13,.88);--nav-line:rgba(215,232,221,.10);--nav-fg:#d7e8dd;--nav-muted:#8d9a90;--nav-hover:rgba(215,232,221,.08);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,canvas,svg{max-width:100%;display:block}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--bright);outline-offset:3px;border-radius:4px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+.mono{font-family:var(--font-mono)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ── nav ── */
+.nav{position:fixed;inset:0 0 auto;z-index:50;padding-top:env(safe-area-inset-top,0px);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+.nav.solid{background:var(--nav-bg);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border-bottom-color:var(--nav-line)}
+.nav-in{display:flex;align-items:center;gap:20px;height:62px;color:var(--nav-fg);transition:color .3s}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.01em}
+.logo svg{width:24px;height:24px}
+.nav-links{display:flex;gap:4px;margin-left:18px}
+.nav-links a{text-decoration:none;font-size:14px;color:var(--nav-muted);padding:6px 10px;border-radius:8px;transition:color .2s,background .2s}
+.nav-links a:hover{color:var(--nav-fg);background:var(--nav-hover)}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--nav-line);background:transparent;color:var(--nav-fg);cursor:pointer;text-decoration:none;transition:border-color .2s,color .2s}
+.icon-btn:hover{border-color:color-mix(in srgb,var(--nav-fg) 35%,transparent)}
+.icon-btn svg{width:17px;height:17px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;height:42px;padding:0 18px;border-radius:11px;font-weight:600;font-size:15px;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:transform .15s,background .2s}
+.btn:active{transform:translateY(1px)}
+.btn-brand{background:var(--brand);color:#fff;box-shadow:0 10px 30px -12px rgba(27,228,128,.55)}
+.btn-brand:hover{background:#14a05b}
+.btn-ghost{border-color:rgba(215,232,221,.22);color:var(--ink-fg);background:rgba(215,232,221,.04)}
+.btn-ghost:hover{background:rgba(215,232,221,.09)}
+.btn-sm{height:36px;padding:0 14px;font-size:14px;border-radius:10px}
+@media (max-width:900px){.nav-links{display:none}}
+@media (max-width:480px){.nav .gh{display:none}}
+
+/* ── motion tokens ── */
+:root{--ease:cubic-bezier(.2,.7,.1,1);--ease-io:cubic-bezier(.65,0,.35,1);--d1:.18s;--d2:.4s;--d3:.9s}
+
+/* ── lang ── */
+.lang{display:inline-flex;border:1px solid var(--nav-line);border-radius:10px;padding:2px;gap:1px;transition:border-color .3s}
+.lang button{border:0;background:transparent;color:var(--nav-muted);font-family:var(--font-mono);font-size:11.5px;padding:0 9px;height:34px;border-radius:7px;cursor:pointer;transition:color .2s}
+.lang button[aria-pressed="true"]{background:var(--nav-hover);color:var(--nav-fg)}
+@media (max-width:430px){.nav-cta{display:none}}
+
+/* ── hero ── */
+.hero{position:relative;min-height:max(720px,100svh);background:radial-gradient(90% 70% at 50% 55%,var(--ink-hi) 0%,var(--ink) 62%);color:var(--ink-fg);overflow:hidden;isolation:isolate}
+.hero::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(38% 42% at 50% 46%,color-mix(in srgb,var(--ink) 76%,transparent) 0%,color-mix(in srgb,var(--ink) 42%,transparent) 55%,transparent 100%)}
+#hero3d{position:absolute;inset:0;width:100%;height:100%;z-index:0;cursor:grab;touch-action:pan-y}
+#hero3d:active{cursor:grabbing}
+.hero-labels{position:absolute;inset:0;pointer-events:none;z-index:1}
+.dlabel{position:absolute;transform:translate(-50%,-50%);font-family:var(--font-mono);font-size:11px;line-height:1.3;color:var(--ink-fg);white-space:nowrap;text-align:center;text-shadow:0 1px 8px color-mix(in srgb,var(--ink) 78%,transparent);transition:opacity var(--d2)}
+.dlabel b{display:block;font-weight:500}
+.dlabel span{color:var(--ink-muted)}
+.dlabel.sel,.dlabel.sel b{color:#fff}
+.dev-card{position:absolute;transform:translate(-50%,-104%);background:color-mix(in srgb,var(--ink) 94%,transparent);border:1px solid rgba(27,228,128,.35);border-radius:12px;padding:10px 13px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-fg);text-align:left;white-space:nowrap;z-index:3;box-shadow:0 24px 60px -24px rgba(0,0,0,.85);pointer-events:none;transition:opacity var(--d2)}
+.dev-card b{display:block;color:var(--bright);font-weight:600;margin-bottom:2px}
+.dev-card span{display:block;color:var(--ink-muted)}
+.dev-card span+span{color:#cfe4d7}
+.nav-links a.on{color:var(--nav-fg);background:var(--nav-hover)}
+.gh{display:inline-flex;align-items:center;gap:7px;width:auto;min-width:36px;padding:0 12px}
+.gh .gh-n{display:block;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-muted)}
+@media (prefers-reduced-motion:reduce){
+  .intro{animation:none;opacity:1;transform:none}
+  .dot,.tk{animation:none}
+  .a-txt.typing::after{animation:none;opacity:0}
+  .answer{animation:none}
+  .story-prog i{transition:none}
+  #hero3d,#rack3d{cursor:default}
+}
+.prog{position:fixed;top:0;left:0;height:2px;width:0;z-index:70;background:linear-gradient(90deg,var(--brand),var(--bright));pointer-events:none}
+.road-legend{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.pill-b{font-family:var(--font-mono);font-size:11.5px;padding:5px 11px;border-radius:99px;border:1px solid var(--border);color:var(--muted)}
+.pill-b.ok{color:var(--brand)}
+.pill-b.now{color:var(--gold)}
+.story-prog i{cursor:pointer}
+.hero-in{position:relative;z-index:2;min-height:max(720px,100svh);display:flex;align-items:center;justify-content:center;padding:calc(92px + env(safe-area-inset-top,0px)) 18px 150px;pointer-events:none}
+.hero-center{width:min(720px,100%);display:flex;flex-direction:column;align-items:center;text-align:center;pointer-events:auto}
+.status{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-muted);border:1px solid var(--ink-line);border-radius:99px;padding:5px 12px 5px 10px;background:color-mix(in srgb,var(--ink) 70%,transparent);width:max-content;max-width:100%}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--bright);box-shadow:0 0 0 0 rgba(27,228,128,.6);animation:pulse 2.4s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(27,228,128,0)}100%{box-shadow:0 0 0 0 rgba(27,228,128,0)}}
+.hero h1{font-family:var(--font-display);font-weight:650;font-size:clamp(36px,5.6vw,74px);line-height:.98;letter-spacing:-.035em;margin:20px 0 0;text-wrap:balance}
+.hero h1 .l2{display:block;font-weight:300;font-stretch:78%;font-variation-settings:"wdth" 78;letter-spacing:-.02em;color:color-mix(in srgb,var(--brand) 38%,var(--ink-fg))}
+.ask{width:100%;margin-top:30px;text-align:left}
+.answer{display:none;margin-bottom:12px;background:color-mix(in srgb,var(--ink) 86%,transparent);border:1px solid var(--ink-line);border-radius:20px;padding:16px 20px 18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);max-height:min(46vh,420px);overflow-y:auto;animation:rise var(--d2) var(--ease)}
+.answer.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.a-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-muted);margin-bottom:10px}
+.a-q{margin:0 0 10px;color:#9fb3a6;font-size:14.5px;border-left:2px solid var(--ink-line);padding-left:10px}
+.a-txt{font-size:16px;line-height:1.68;color:var(--ink-fg);white-space:pre-wrap;min-height:1.6em}
+.a-txt .tk{animation:tk .5s var(--ease)}
+@keyframes tk{from{color:#1be480;text-shadow:0 0 12px rgba(27,228,128,.8)}}
+.a-txt.typing::after{content:"";display:inline-block;width:8px;height:1.05em;vertical-align:-2px;margin-left:2px;background:var(--bright);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.askbox{display:flex;align-items:flex-end;gap:8px;background:color-mix(in srgb,var(--ink) 82%,transparent);border:1px solid color-mix(in srgb,var(--ink-fg) 20%,transparent);border-radius:26px;padding:8px 8px 8px 20px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 30px 80px -30px rgba(0,0,0,.5);transition:border-color var(--d2),box-shadow var(--d2)}
+.askbox:focus-within{border-color:rgba(27,228,128,.45);box-shadow:0 30px 80px -30px rgba(0,0,0,.5),0 0 0 4px rgba(27,228,128,.10)}
+.askbox textarea{flex:1;min-width:0;background:transparent;border:0;outline:0;resize:none;color:var(--ink-fg);font-size:17px;line-height:1.5;padding:10px 0;max-height:150px;font-family:var(--font-sans)}
+.askbox textarea::placeholder{color:color-mix(in srgb,var(--ink-fg) 48%,transparent)}
+.send{flex:none;width:42px;height:42px;border-radius:50%;background:var(--ink-fg);color:var(--ink);border:0;display:grid;place-items:center;cursor:pointer;transition:transform var(--d1),opacity var(--d1)}
+.send:hover:not(:disabled){transform:scale(1.06)}
+.send:disabled{opacity:.3;cursor:default}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.chip{border:1px solid var(--ink-line);background:color-mix(in srgb,var(--ink) 58%,transparent);color:var(--ink-muted);border-radius:99px;padding:7px 14px;font-size:14px;cursor:pointer;transition:color var(--d1),border-color var(--d1)}
+.chip:hover{color:var(--ink-fg);border-color:rgba(215,232,221,.28)}
+.chip:disabled{opacity:.45;cursor:default}
+.sim-note{font-size:12.5px;color:var(--ink-muted);text-align:center;margin:14px 0 0}
+.hero-foot{position:absolute;z-index:2;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 16px;padding:0 clamp(18px,4vw,40px);pointer-events:none}
+.hero-foot > *{pointer-events:auto}
+.hud{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-muted);display:grid;grid-template-columns:repeat(4,auto);gap:2px 24px;background:color-mix(in srgb,var(--ink) 58%,transparent);border:1px solid var(--ink-line);border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px)}
+.hud b{display:block;color:var(--ink-fg);font-weight:500;font-size:16px;font-variant-numeric:tabular-nums}
+.clone{display:flex;align-items:center;gap:10px;max-width:min(470px,100%);background:color-mix(in srgb,var(--ink) 76%,transparent);border:1px solid var(--ink-line);border-radius:12px;padding:6px 6px 6px 14px;font-family:var(--font-mono);font-size:12.5px}
+.clone code{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;color:var(--beam);scrollbar-width:none}
+.clone code::-webkit-scrollbar{display:none}
+.clone button{flex:none;height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--ink-line);background:var(--ink-3);color:var(--ink-fg);font-size:12px;cursor:pointer}
+/* page-load sequence: the one orchestrated moment */
+.intro{opacity:0;transform:translateY(14px);animation:intro var(--d3) var(--ease) forwards}
+.i1{animation-delay:.15s}.i2{animation-delay:.35s}.i3{animation-delay:.75s}.i4{animation-delay:1.3s}
+@keyframes intro{to{opacity:1;transform:none}}
+@media (max-width:760px){
+  .hero-in{align-items:flex-start;padding-top:calc(96px + env(safe-area-inset-top,0px));padding-bottom:40px}
+  .hero::after{background:linear-gradient(180deg,color-mix(in srgb,var(--ink) 84%,transparent) 0%,color-mix(in srgb,var(--ink) 58%,transparent) 60%,transparent 100%)}
+  .hero-foot{position:relative;bottom:auto;flex-direction:column;align-items:stretch;padding-bottom:28px;margin-top:-10px}
+  .hud{grid-template-columns:repeat(4,auto);justify-content:space-between}
+  .hero-labels{display:none}
+  .hero{min-height:auto}
+  .hero-in{min-height:auto}
+}
+
+/* ── story ── */
+.story{position:relative;height:520vh;background:var(--ink);color:var(--ink-fg)}
+.story-stick{position:sticky;top:0;height:100svh;overflow:hidden}
+#story3d{position:absolute;inset:0;width:100%;height:100%}
+.story-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,color-mix(in srgb,var(--ink) 84%,transparent) 0%,color-mix(in srgb,var(--ink) 36%,transparent) 40%,transparent 62%)}
+.caps{position:absolute;left:clamp(18px,7vw,110px);top:0;bottom:0;width:min(470px,calc(100% - 36px));display:grid;align-items:center}
+.cap{grid-area:1/1;opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease),transform .6s var(--ease);pointer-events:none}
+.cap.on{opacity:1;transform:none}
+.cap .n{font-family:var(--font-mono);font-size:12.5px;color:var(--bright)}
+.cap h2{font-family:var(--font-display);font-weight:640;font-size:clamp(32px,4.4vw,58px);line-height:1;letter-spacing:-.03em;margin:12px 0 16px;text-wrap:balance}
+.cap p{font-size:clamp(16px,1.4vw,18.5px);color:var(--ink-muted);margin:0;max-width:40ch}
+.story-prog{position:absolute;right:clamp(14px,3vw,32px);top:50%;transform:translateY(-50%);display:grid;gap:10px}
+.story-prog i{display:block;position:relative;width:4px;height:28px;border-radius:2px;background:color-mix(in srgb,var(--ink-fg) 16%,transparent);transition:background var(--d2),height var(--d2)}
+.story-prog i::after{content:"";position:absolute;inset:-9px -14px}
+.story-prog i.on{background:var(--bright);height:44px}
+@media (max-width:760px){
+  .story-shade{background:linear-gradient(0deg,color-mix(in srgb,var(--ink) 90%,transparent) 0%,color-mix(in srgb,var(--ink) 58%,transparent) 38%,transparent 62%)}
+  .caps{align-items:end;padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+  .cap h2{font-size:32px}
+}
+.story.no3d .story-stick{background:radial-gradient(70% 60% at 70% 50%,var(--ink-g2),var(--ink))}
+
+/* ── measure ── */
+.measure{border:1px dashed color-mix(in srgb,var(--brand) 55%,var(--border));border-radius:14px;padding:14px;margin:4px 0 18px;background:var(--wash)}
+.m-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.m-top .sub{margin:2px 0 0}
+.m-out{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.m-out div{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px;min-width:0}
+.m-out span{display:block;font-size:12px;color:var(--muted)}
+.m-out b{font-family:var(--font-mono);font-weight:500;font-size:14.5px;overflow-wrap:anywhere}
+.m-status{font-size:13px;color:var(--muted);margin:10px 0 0;min-height:1em}
+@media (max-width:480px){.m-out{grid-template-columns:1fr}}
+.dev.me .nm::after{content:" ●";color:var(--brand)}
+
+/* ── sections ── */
+section.s{padding:clamp(80px,11vw,140px) 0}
+section.s.soft{background:var(--bg-soft)}
+.s-head{max-width:720px;margin-bottom:48px}
+.s-head h2{font-family:var(--font-display);font-weight:700;font-size:clamp(32px,4.4vw,56px);line-height:1.02;letter-spacing:-.03em;margin:0 0 16px;text-wrap:balance}
+.s-head p{color:var(--muted);font-size:17.5px;margin:0;max-width:60ch}
+.kicker{font-family:var(--font-mono);font-size:13px;color:var(--brand);margin:0 0 14px}
+
+/* how */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--border-strong)}
+.step{padding:28px 28px 8px 0}
+.step + .step{padding-left:28px;border-left:1px solid var(--border)}
+.step .n{font-family:var(--font-mono);font-size:13px;color:var(--subtle)}
+.step h3{font-family:var(--font-display);font-size:23px;letter-spacing:-.015em;line-height:1.15;margin:10px 0 10px}
+.step p{margin:0;color:var(--muted)}
+@media (max-width:820px){.steps{grid-template-columns:1fr}.step,.step+.step{padding:24px 0;border-left:0;border-bottom:1px solid var(--border)}}
+
+/* ── lab ── */
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:22px;align-items:start}
+@media (max-width:980px){.lab{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;box-shadow:0 1px 2px rgba(26,33,24,.05),0 14px 36px -28px rgba(26,33,24,.3)}
+.panel h3{font-size:15px;font-weight:600;margin:0 0 4px}
+.panel .sub{font-size:13.5px;color:var(--muted);margin:0 0 16px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:10px;padding:3px;gap:2px;background:var(--bg-soft)}
+.seg button{border:0;background:transparent;padding:6px 11px;border-radius:7px;font-size:13.5px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.devs{display:grid;gap:8px}
+.dev{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--border);border-radius:12px;cursor:pointer;user-select:none}
+.dev:has(input:checked){border-color:color-mix(in srgb,var(--brand) 45%,var(--border));background:var(--wash)}
+.dev input{width:17px;height:17px;accent-color:var(--brand);margin:0}
+.dev .nm{font-weight:600;font-size:14.5px;line-height:1.25}
+.dev .sp{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.dev .sw{width:10px;height:10px;border-radius:3px}
+.formula{margin-top:18px;padding:16px 18px;border-radius:12px;background:var(--bg-soft);border:1px dashed var(--border-strong);font-family:"Bricolage Grotesque",Georgia,serif;font-size:17px;line-height:1.9;overflow-x:auto}
+.formula var{font-style:italic}
+.formula .c{font-family:var(--font-sans);font-size:13.5px;color:var(--muted);line-height:1.5;margin:0 0 6px}
+.result{background:var(--ink);color:var(--ink-fg);border-color:transparent}
+.result .sub{color:var(--ink-muted)}
+.ring-wrap{display:grid;grid-template-columns:240px 1fr;gap:20px;align-items:center}
+@media (max-width:560px){.ring-wrap{grid-template-columns:1fr;justify-items:center}}
+#labRing{width:240px;height:240px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.kpi{border:1px solid var(--ink-line);border-radius:12px;padding:10px 12px}
+.kpi .k{font-size:12px;color:var(--ink-muted)}
+.kpi .v{font-family:var(--font-mono);font-size:22px;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi .v small{font-size:12px;color:var(--ink-muted)}
+.alloc{width:100%;border-collapse:collapse;margin-top:18px;font-size:13px}
+.tbl-scroll{overflow-x:auto}
+.alloc th{text-align:left;font-weight:500;color:var(--ink-muted);padding:7px 8px;border-bottom:1px solid var(--ink-line);white-space:nowrap}
+.alloc td{padding:8px;border-bottom:1px solid var(--ink-line);font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.alloc td:first-child{font-family:var(--font-sans)}
+.bar{height:6px;border-radius:3px;background:var(--ink-3);overflow:hidden;min-width:70px}
+.bar i{display:block;height:100%;border-radius:3px}
+.warn{margin-top:14px;padding:10px 12px;border-radius:10px;background:rgba(196,85,58,.14);color:#f0b39f;font-size:13.5px;display:none}
+.warn.on{display:block}
+.note{font-size:12.5px;color:var(--ink-muted);margin:14px 0 0}
+
+/* ── node ── */
+.node{background:var(--ink);color:var(--ink-fg)}
+.node .s-head p{color:#9fb3a6}
+.node .kicker{color:var(--bright)}
+.node-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,1fr);gap:18px}
+@media (max-width:980px){.node-grid{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;border:1px solid var(--ink-line);border-radius:var(--r-lg);background:radial-gradient(90% 70% at 50% 30%,var(--ink-g2),var(--ink-2));overflow:hidden;min-height:520px}
+#rack3d{position:absolute;inset:0;width:100%;height:100%;cursor:pointer;touch-action:pan-y}
+.stage-cap{position:absolute;left:14px;right:14px;bottom:12px;display:flex;justify-content:space-between;gap:10px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-muted);pointer-events:none;flex-wrap:wrap}
+.legend{display:flex;align-items:center;gap:8px}
+.legend i{display:block;width:90px;height:6px;border-radius:3px;background:linear-gradient(90deg,#2b5f9e,#1a8f8f,#1be480,#c99a2e,#e0583a)}
+.tele{border:1px solid var(--ink-line);border-radius:var(--r-lg);background:var(--ink-2);padding:18px;display:flex;flex-direction:column;gap:14px}
+.tele-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.tele-h b{font-size:16px;font-weight:600}
+.tele-h span{font-family:var(--font-mono);font-size:12px;color:var(--ink-muted)}
+.gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.g{border:1px solid var(--ink-line);border-radius:10px;padding:8px 10px}
+.g .k{font-size:11.5px;color:var(--ink-muted)}
+.g .v{font-family:var(--font-mono);font-size:18px;font-variant-numeric:tabular-nums}
+.g .v small{font-size:11px;color:var(--ink-muted)}
+@media (max-width:420px){.gauges{grid-template-columns:repeat(2,1fr)}}
+.tele canvas{width:100%;border-radius:8px;background:var(--ink)}
+#smMap{height:150px}
+#powerChart{height:96px}
+.tlabel{font-size:12px;color:var(--ink-muted);display:flex;justify-content:space-between;margin-bottom:6px}
+.smi{font-family:var(--font-mono);font-size:11.5px;line-height:1.55;color:var(--ink-muted);background:var(--ink);border-radius:8px;padding:10px 12px;white-space:pre;overflow-x:auto;margin:0}
+.gpu-pick{display:flex;gap:6px;flex-wrap:wrap}
+.gpu-pick button{width:34px;height:28px;border-radius:7px;border:1px solid var(--ink-line);background:var(--ink-3);color:var(--ink-fg);font-family:var(--font-mono);font-size:12px;cursor:pointer}
+.gpu-pick button[aria-pressed="true"]{border-color:var(--bright);color:var(--bright)}
+.sim-tag{font-family:var(--font-mono);font-size:11px;color:var(--gold);border:1px solid rgba(201,154,46,.35);border-radius:6px;padding:1px 7px}
+
+/* ── math ── */
+.math-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:1020px){.math-grid{grid-template-columns:1fr}}
+.mcard{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--card);overflow:hidden;box-shadow:0 1px 2px rgba(26,33,24,.05),0 14px 36px -28px rgba(26,33,24,.3)}
+.mcard .top{padding:20px 20px 0}
+.mcard h3{font-family:var(--font-display);font-size:21px;letter-spacing:-.01em;margin:0 0 6px;line-height:1.2}
+.mcard p{color:var(--muted);font-size:14.5px;margin:0 0 12px}
+.eq{font-family:"Bricolage Grotesque",Georgia,serif;font-size:18px;padding:12px 14px;border-radius:10px;background:var(--bg-soft);overflow-x:auto;white-space:nowrap}
+.eq var{font-style:italic}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.9em;margin:0 .15em}
+.frac > span:first-child{border-bottom:1px solid currentColor;padding:0 .2em}
+.frac > span:last-child{padding:0 .2em}
+.mcard canvas{width:100%;height:210px;margin-top:12px}
+.sliders{padding:12px 20px 20px;display:grid;gap:10px;margin-top:auto}
+.sl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:13.5px;align-items:center}
+.sl output{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.sl input{grid-column:1/-1;width:100%;accent-color:var(--brand)}
+.read{font-family:var(--font-mono);font-size:13px;color:var(--fg);background:var(--wash);border-radius:8px;padding:8px 10px}
+
+/* ── compare ── */
+.cmp{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--card)}
+.cmp table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:720px}
+.cmp th,.cmp td{padding:13px 16px;border-bottom:1px solid var(--border);text-align:center}
+.cmp th:first-child,.cmp td:first-child{text-align:left}
+.cmp thead th{font-weight:600;font-size:13px;color:var(--muted)}
+.cmp .om{background:var(--wash);color:var(--brand);font-weight:600}
+.cmp tr:last-child td{border-bottom:0}
+.cmp .no{color:var(--subtle)}
+.foot{font-size:13px;color:var(--subtle);margin-top:12px}
+
+/* ── roadmap ── */
+.road{list-style:none;margin:0;padding:0;position:relative}
+.road::before{content:"";position:absolute;left:15px;top:10px;bottom:10px;width:2px;background:var(--border-strong)}
+.road li{position:relative;display:grid;grid-template-columns:32px 120px 1fr 1fr;gap:16px;padding:14px 0;align-items:baseline}
+.road .pin{width:12px;height:12px;border-radius:50%;border:2px solid var(--border-strong);background:var(--bg);margin-left:10px;position:relative;top:2px}
+.road .done .pin{background:var(--brand);border-color:var(--brand)}
+.road .now .pin{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 5px rgba(201,154,46,.2)}
+.road .st{font-family:var(--font-mono);font-size:13.5px}
+.road .now .st{color:var(--gold)}
+.road .done .st{color:var(--brand)}
+.road .wh{font-size:15px}
+.road .gt{font-size:14px;color:var(--muted)}
+@media (max-width:760px){.road li{grid-template-columns:32px 1fr}.road .wh,.road .gt{grid-column:2}}
+
+/* ── faq ── */
+.faq{max-width:820px}
+.faq details{border-bottom:1px solid var(--border)}
+.faq summary{cursor:pointer;list-style:none;padding:20px 0;font-weight:600;font-size:17px;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-family:var(--font-mono);color:var(--subtle);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{margin:0 0 20px;color:var(--muted);max-width:68ch}
+.faq code{font-family:var(--font-mono);font-size:.9em;background:var(--bg-soft);padding:1px 5px;border-radius:5px}
+
+/* ── cta / footer ── */
+.cta{background:var(--ink);color:var(--ink-fg);text-align:left;position:relative;overflow:hidden}
+.cta h2{font-family:var(--font-display);font-weight:800;font-size:clamp(40px,6vw,84px);letter-spacing:-.035em;line-height:.95;margin:0 0 18px}
+.cta p{color:#9fb3a6;max-width:52ch;font-size:17.5px;margin:0 0 28px}
+.cta-ring{position:absolute;right:-120px;top:50%;width:520px;height:520px;transform:translateY(-50%);opacity:.5;pointer-events:none}
+@media (max-width:760px){.cta-ring{opacity:.18}}
+footer{background:var(--ink);color:var(--ink-muted);border-top:1px solid var(--ink-line);padding:48px 0 calc(32px + env(safe-area-inset-bottom,0px));font-size:14px}
+.f-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:28px}
+@media (max-width:760px){.f-grid{grid-template-columns:1fr 1fr}}
+footer h4{color:var(--ink-fg);font-size:13.5px;font-weight:600;margin:0 0 10px}
+footer a{display:block;text-decoration:none;padding:3px 0}
+footer a:hover{color:var(--ink-fg)}
+.f-bot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:40px;padding-top:20px;border-top:1px solid var(--ink-line);font-family:var(--font-mono);font-size:12px}
+.no3d-msg{display:none;position:absolute;inset:0;place-items:center;color:var(--ink-muted);font-size:14px;text-align:center;padding:20px}
+.no3d .no3d-msg{display:grid}
+.hero .no3d-msg{z-index:0}
+
+/* ── reveal-on-scroll ── */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}
+.kicker b{opacity:.5;margin-right:10px;font-weight:400}
+.s-head h2::after{content:"";display:block;width:64px;height:3px;border-radius:2px;margin-top:18px;background:linear-gradient(90deg,var(--brand),var(--turq),transparent)}
+.grain{position:fixed;inset:0;z-index:95;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+/* roadmap → timeline */
+.road{padding:8px 0}
+.road::before{content:"";position:absolute;left:44px;top:30px;bottom:30px;width:2px;border-radius:2px;background:linear-gradient(180deg,var(--brand),color-mix(in srgb,var(--brand) 22%,transparent))}
+.road li{display:grid;grid-template-columns:26px 132px 1.2fr 1fr;gap:16px;align-items:start;padding:15px 22px 15px 12px;border-bottom:1px solid var(--border);position:relative}
+.road li:last-child{border-bottom:0}
+.road .pin{margin:6px auto 0;width:12px;height:12px;border-radius:50%;border:2.5px solid var(--border-strong);background:var(--card);box-shadow:0 0 0 4px var(--card)}
+.road .st{font-family:var(--font-mono);font-size:12.5px;color:var(--muted);padding-top:4px}
+.road .wh{font-size:14.5px;color:var(--fg);padding-top:1px}
+.road .gt{font-size:13px;color:var(--muted);padding-top:2px;display:flex;gap:6px;align-items:flex-start}
+.road .gt::before{content:"⤳";color:var(--subtle)}
+.road li.done .pin{border-color:var(--brand);background:var(--brand)}
+.road li.done .st{color:var(--brand)}
+.road li.now{background:var(--wash);border-radius:14px}
+.road li.now .pin{border-color:var(--gold);background:var(--gold);box-shadow:0 0 0 4px var(--card),0 0 0 8px rgba(201,154,46,.22);animation:focus-fade 2s infinite}
+@keyframes focus-fade{50%{box-shadow:0 0 0 4px var(--card),0 0 0 10px rgba(201,154,46,.14)}}
+/* math accent strips */
+.mcard .top::before{content:"";display:block;width:52px;height:3px;border-radius:2px;margin-bottom:14px;background:linear-gradient(90deg,var(--brand),transparent)}
+.math-grid .mcard:nth-child(2) .top::before{background:linear-gradient(90deg,var(--gold),transparent)}
+.math-grid .mcard:nth-child(3) .top::before{background:linear-gradient(90deg,var(--lapis),transparent)}
+/* use steps */
+.step{transition:transform .25s var(--ease),border-color .25s}
+.step:hover{transform:translateY(-3px)}
+.step .n{color:var(--brand);border:1px solid color-mix(in srgb,var(--brand) 40%,var(--border));border-radius:99px;padding:2px 9px;display:inline-block}
+/* footer watermark */
+.f-pos{position:relative;overflow:hidden}
+.f-mark{font-family:var(--font-display);font-weight:800;font-size:clamp(90px,15vw,220px);line-height:.82;letter-spacing:-.04em;color:var(--ink-fg);opacity:.05;text-align:center;user-select:none;pointer-events:none;white-space:nowrap;margin-bottom:-.16em}
+@keyframes focus-fade2{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .intro{opacity:1;transform:none}
+  .rv{opacity:1!important;transform:none!important}
+}
+
+/* ── nav-scoped ghost button follows theme ── */
+.nav .btn-ghost{border-color:color-mix(in srgb,var(--nav-fg) 26%,transparent);color:var(--nav-fg);background:transparent}
+.nav .btn-ghost:hover{background:var(--nav-hover)}
+
+/* ── theme crossfade ── */
+html.swapping,html.swapping *,html.swapping *::before,html.swapping *::after{
+  transition:background-color .4s ease,color .4s ease,border-color .4s ease,fill .4s,stroke .4s,box-shadow .4s!important}
+
+/* ── theme icon swap ── */
+.icon-btn .i-sun{display:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .i-sun{display:block}:root:not([data-theme="light"]) .i-moon{display:none}}
+:root[data-theme="dark"] .i-sun{display:block}
+:root[data-theme="dark"] .i-moon{display:none}
+
+/* ── card hover lift ── */
+.panel,.mcard,.cmp,.btn-ghost{transition:box-shadow .35s var(--ease),transform .25s var(--ease),border-color .25s,background .25s}
+.panel:hover,.mcard:hover{transform:translateY(-2px);box-shadow:0 22px 50px -30px rgba(15,42,30,.38)}
+.dev{transition:border-color .25s,background .25s}
+.dev:hover{border-color:color-mix(in srgb,var(--brand) 45%,var(--border))}
+
+/* ── premium primary button ── */
+.btn-brand{background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 86%,#fff) 0%,var(--brand) 55%,color-mix(in srgb,var(--brand) 90%,#000 10%) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 14px 34px -14px rgba(27,228,128,.55)}
+.btn-brand:hover{background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 92%,#fff) 0%,var(--brand) 60%,var(--brand-lo) 100%);transform:translateY(-1px)}
+.btn-brand:active{transform:translateY(0)}
+
+/* ── scrollbars ── */
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:rgba(127,140,131,.5);border:3.5px solid transparent;background-clip:content-box;border-radius:9px}
+::-webkit-scrollbar-thumb:hover{background:rgba(127,140,131,.8);background-clip:content-box}
+
+/* ── kicker polish ── */
+.kicker{font-size:11.5px;text-transform:uppercase;letter-spacing:.16em;font-weight:500}
+
+/* ═══ PREMIUM PASS — grok/chatgpt darajasi: ozg'artirilgan ritm + yumshoq sirt ═══ */
+:root{--r-lg:22px}
+section.s{padding:clamp(96px,10vw,150px) 0}
+.s-head{max-width:660px;margin-bottom:64px}
+.s-head h2{font-weight:640;font-size:clamp(34px,4.6vw,60px);letter-spacing:-.038em;line-height:1.02;margin:0 0 18px}
+.s-head h2::after{width:56px;margin-top:20px}
+.s-head p{font-size:17.5px;line-height:1.65;max-width:58ch}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;margin:0 0 22px}
+.kicker b{background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand);border-radius:99px;padding:3px 9px;font-size:10.5px;opacity:1;margin-right:0;letter-spacing:.05em}
+.kicker span{color:var(--brand)}
+.hero h1{letter-spacing:-.042em}
+.hero-center{width:min(680px,100%)}
+.nav-in{transition:height .35s var(--ease)}
+.nav.solid .nav-in{height:54px}
+.panel,.mcard{border-radius:var(--r-lg)}
+.panel,.mcard,.cmp,.dev{border-color:color-mix(in srgb,var(--fg) 9%,transparent)}
+.btn{border-radius:12px;height:44px}
+.btn-sm{height:38px}
+.faq{max-width:740px}
+.faq details{margin-bottom:10px;border-radius:16px}
+.faq details summary{list-style:none;position:relative;padding:17px 58px 17px 20px;font-weight:600;font-size:15.5px}
+.faq details summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:16px;top:50%;width:28px;height:28px;transform:translateY(-50%);border-radius:50%;display:grid;place-items:center;border:1px solid var(--border-strong);color:var(--muted);font-family:var(--font-mono);font-size:15px;line-height:1;transition:transform .3s var(--ease),background .2s,color .2s,border-color .2s}
+.faq details[open] summary::after{content:"×";transform:translateY(-50%) rotate(180deg);color:var(--brand);border-color:color-mix(in srgb,var(--brand) 45%,transparent);background:var(--wash)}
+.faq details p{padding:0 20px 18px;margin:0;color:var(--muted);font-size:14.5px;line-height:1.7}
+.road li{display:grid;grid-template-columns:26px 132px 1.2fr 1fr;gap:16px;align-items:start;padding:16px 22px 16px 12px}
+.road .st{border:1px solid var(--border);border-radius:99px;padding:3px 10px;display:inline-block;font-size:11.5px;background:var(--bg-soft);color:var(--fg)}
+.road li.now .st{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 40%,transparent);background:color-mix(in srgb,var(--gold) 8%,transparent)}
+.road .gt{color:var(--subtle)}
+.cmp th,.cmp td{padding:12px 16px}
+.cmp thead th{font-size:11px;letter-spacing:.09em;text-transform:uppercase}
+.cmp tbody tr:hover td{background:var(--wash)}
+.cta .wrap{display:flex;flex-direction:column;align-items:center;text-align:center}
+.cta .hero-actions{justify-content:center}
+.cta .cta-ring{opacity:.2}
+.grain{opacity:.04}
+.a-txt{font-size:16.5px}
+@media (max-width:820px){
+  .road li{grid-template-columns:26px 1fr;grid-template-rows:auto auto auto}
+  .road .pin{grid-row:1/4;margin-top:6px}
+  .road .st,.road .wh,.road .gt{grid-column:2}
+}
+
+/* ═══bble PREMIUM PASS·2 — Linear / Cursor / Grok uslub ═══ */
+/* edge-lighting: kursor qayerda — shu yerdagi chegara yonadi */
+.glowable{position:relative}
+.glowable::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .45s var(--ease);padding:1px;
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--brand) 55%,transparent),transparent 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+.glowable:hover::before{opacity:1}
+
+/* ═══ 2 · Vercel: XY-grid markaz nur parallax bilan ═══ */
+.hero .xy{position:absolute;inset:0;z-index:0;pointer-events:none;will-change:transform}
+.hero .xy-grid{position:absolute;inset:-2px;
+  background-image:linear-gradient(color-mix(in srgb,var(--ink-fg) 5%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--ink-fg) 5%,transparent) 1px,transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(72% 62% at 50% 42%,#000 28%,transparent 76%);
+  mask-image:radial-gradient(72% 62% at 50% 42%,#000 28%,transparent 76%)}
+.hero .xy-glow{position:absolute;left:50%;top:-22%;width:1040px;height:740px;transform:translateX(-50%);
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--bright) 10%,transparent),transparent 72%)}
+/* ═══ 3 · Grok: mono spec-chiplar (parallax flot) ═══ */
+.hero-chips{position:absolute;z-index:2;inset:0;pointer-events:none}
+.hchip{position:absolute;display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);
+  background:color-mix(in srgb,var(--ink) 74%,transparent);border:1px solid var(--ink-line);padding:7px 12px;border-radius:99px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);white-space:nowrap;animation:chipFloat 7s ease-in-out infinite}
+.hchip b{color:var(--ink-fg);font-weight:500}
+.hchip i{width:6px;height:6px;border-radius:50%;background:var(--bright);box-shadow:0 0 10px var(--bright);flex:none}
+.hchip:nth-child(1){left:5%;top:23%}
+.hchip:nth-child(2){right:5%;top:29%;animation-delay:-2.1s}
+.hchip:nth-child(3){left:9%;bottom:27%;animation-delay:-4.2s}
+.hchip:nth-child(4){right:7%;bottom:31%;animation-delay:-5.6s}
+@keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@media (max-width:1020px){.hero-chips{display:none}}
+
+/* ═══ 4 · OpenAI: statement-to'xtash (katta markaziy bayonot) ═══ */
+.st8{text-align:center;padding-top:clamp(70px,9vw,120px)!important;padding-bottom:clamp(70px,9vw,120px)!important}
+.st8 h2{font-family:var(--font-display);font-weight:640;font-size:clamp(34px,5.4vw,64px);letter-spacing:-.035em;line-height:1.06;text-wrap:balance;text-align:center;max-width:900px;margin:0 auto;
+  background:linear-gradient(100deg,var(--fg) 45%,var(--brand) 88%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.st8 .st8-sub{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--subtle);margin:26px 0 0}
+/* ═══ 5 · Grok mini-HUD: halqa telemetriyasi doim ko'rinadi ═══ */
+.mini-hud{position:fixed;right:16px;bottom:16px;z-index:65;display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:11px;color:var(--fg);
+  background:color-mix(in srgb,var(--bg) 84%,transparent);border:1px solid var(--border);border-radius:12px;padding:9px 13px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;translate:0 8px;transition:opacity .4s,translate .4s;pointer-events:none}
+.mini-hud.on{opacity:1;translate:0 0}
+.mini-hud i{width:7px;height:7px;border-radius:50%;background:var(--bright);animation:pulse 2.4s infinite;flex:none}
+.mini-hud b{color:var(--brand);font-weight:500}
+.mini-hud span{color:var(--muted)}
+@media (max-width:760px){.mini-hud{display:none}}
+/* askbox kbd hint (Cursor) */
+.askbox{position:relative}
+.ask-hint{position:absolute;right:76px;bottom:8px;font-family:var(--font-mono);font-size:10px;color:color-mix(in srgb,var(--ink-fg) 52%,transparent);pointer-events:none}
+</style>
+</head>
+<body>
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="#top" aria-label="Omnarc home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#1be480" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="38 18.5" transform="rotate(-90 12 12)"/><circle cx="12" cy="12" r="9" fill="none" stroke="#c99a2e" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="9 47.5" transform="rotate(150 12 12)"/><circle cx="19" cy="7.5" r="2.4" fill="#1be480"/></svg>
+      Omnarc
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#story" data-i="nav.story">How it works</a>
+      <a href="#lab" data-i="nav.lab">Partition lab</a>
+      <a href="#node" data-i="nav.node">Inside a node</a>
+      <a href="#math" data-i="nav.math">The math</a>
+      <a href="#roadmap" data-i="nav.road">Roadmap</a>
+      <a href="#faq" data-i="nav.faq">FAQ</a>
+    </nav>
+    <div class="nav-r">
+      <div class="lang" role="group" aria-label="Language" id="langSeg"><button type="button" data-l="en" aria-pressed="true">EN</button><button type="button" data-l="uz">UZ</button><button type="button" data-l="ru">RU</button></div>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch colour theme">
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="icon-btn gh" href="https://github.com/HumoyunDavronov2001/omnarc" aria-label="Omnarc on GitHub" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.7.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.2c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg>
+        <span class="gh-n" id="ghStars" hidden></span>
+      </a>
+      <a class="btn btn-brand btn-sm nav-cta" href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/README.md" data-i="nav.start" target="_blank" rel="noopener">Get started</a>
+    </div>
+  </div>
+</header>
+<div class="prog" id="prog"></div>
+
+<div class="grain" aria-hidden="true"></div>
+<main>
+<!-- HERO -->
+<section class="hero" id="top">
+  <canvas id="hero3d" aria-label="A ring of seven devices running one model; light trails are tokens moving between them"></canvas>
+  <div class="xy" aria-hidden="true"><div class="xy-glow"></div><div class="xy-grid"></div></div>
+  <div class="hero-chips" aria-hidden="true">
+    <span class="hchip"><i></i><b>80</b> layers · ring of 7</span>
+    <span class="hchip"><i></i>QUIC hop · <b>0.3 ms</b></span>
+    <span class="hchip"><i></i><b>16 KB</b> per token hop</span>
+    <span class="hchip"><i></i>TOPLOC proof ✓</span>
+  </div>
+  <div class="hero-labels" id="heroLabels" aria-hidden="true"></div>
+  <div class="hero-in">
+    <div class="hero-center" id="heroCenter">
+      <span class="status intro i1"><span class="dot"></span><span data-i="hero.status">pre-alpha, stage B1 in progress</span></span>
+      <h1 class="intro i2"><span data-i="hero.h1a">Every device is an arc.</span> <span class="l2" data-i="hero.h1b">Together, one mind.</span></h1>
+      <div class="ask intro i3">
+        <div class="answer" id="answer" aria-live="polite">
+          <div class="a-meta"><span id="aMeta"></span><span class="sim-tag" data-i="sim">simulated</span></div>
+          <p class="a-q" id="aQ"></p>
+          <div class="a-txt" id="aTxt"></div>
+        </div>
+        <form class="askbox" id="askForm" autocomplete="off">
+          <label class="sr" for="askIn" data-i="hero.ph">Ask the ring anything…</label>
+          <textarea id="askIn" rows="1" data-ip="hero.ph" placeholder="Ask the ring anything…"></textarea>
+          <button class="send" id="askSend" type="submit" aria-label="Send" disabled>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </button>
+          <span class="ask-hint" aria-hidden="true">⏎</span>
+        </form>
+        <div class="chips" id="chips">
+          <button type="button" class="chip" data-k="ring" data-i="chip.ring">How does a ring run one model?</button>
+          <button type="button" class="chip" data-k="phone" data-i="chip.phone">Can my old phone really help?</button>
+          <button type="button" class="chip" data-k="privacy" data-i="chip.privacy">Does my prompt leave my house?</button>
+        </div>
+        <p class="sim-note" data-i="hero.sim">Answers here are simulated; the light shows each token’s trip around the ring.</p>
+      </div>
+    </div>
+  </div>
+  <div class="hero-foot intro i4">
+    <div class="hud">
+      <div><span data-i="hud.speed">ring speed</span><b id="hudTok">8.4 tok/s</b></div>
+      <div><span data-i="hud.arcs">arcs</span><b>7</b></div>
+      <div><span data-i="hud.layers">layers</span><b>81</b></div>
+      <div><span data-i="hud.flight">in flight</span><b id="hudFlight">3</b></div>
+    </div>
+    <div class="clone">
+      <code id="cloneCmd">git clone https://github.com/HumoyunDavronov2001/omnarc.git</code>
+      <button type="button" id="copyBtn" data-i="copy">Copy</button>
+    </div>
+  </div>
+  <div class="no3d-msg">3D view needs WebGL.</div>
+</section>
+
+<!-- STORY -->
+<section class="story" id="story" aria-label="How Omnarc works, in four steps">
+  <div class="story-stick">
+    <canvas id="story3d" aria-hidden="true"></canvas>
+    <div class="story-shade"></div>
+    <div class="caps">
+      <div class="cap on" data-s="0"><span class="n">1 / 4</span><h2 data-i="s1.h">Seven devices, one model.</h2><p data-i="s1.p">Each arc is one device’s share of the model’s 80 layers, sized by its measured memory bandwidth.</p></div>
+      <div class="cap" data-s="1"><span class="n">2 / 4</span><h2 data-i="s2.h">Inside an arc, a window of layers.</h2><p data-i="s2.p">The token’s hidden state climbs through every layer the device holds. Weights never move; only the state does.</p></div>
+      <div class="cap" data-s="2"><span class="n">3 / 4</span><h2 data-i="s3.h">Then 16 KB hops to the next device.</h2><p data-i="s3.p">For a 70B model, that is all that crosses the network per token, encrypted over QUIC.</p></div>
+      <div class="cap" data-s="3"><span class="n">4 / 5</span><h2 data-i="s4.h">From one home to the world.</h2><p data-i="s4.p">Idle devices behind any NAT can join one ring. That is the goal of stage B6, not a shipped feature.</p></div>
+      <div class="cap" data-s="4"><span class="n">5 / 5</span><h2 data-i="s5.h">Proof, not opinion.</h2><p data-i="s5.p">Four arcs answer in parallel; their hidden states vote, and every public-network answer carries a TOPLOC proof that your ring produced it. Disagreement is a feature: you see the split instead of a confident mistake.</p></div>
+    </div>
+    <div class="story-prog" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+  </div>
+</section>
+
+<!-- LAB -->
+<section class="s soft" id="lab">
+  <div class="wrap">
+    <div class="s-head rv">
+      <p class="kicker"><b>01</b><span data-i="nav.lab">Partition lab</span></p>
+      <h2 data-i="lab.h">Build a ring, see where every layer lands.</h2>
+      <p data-i="lab.p">Pick a model and your devices, or measure this browser. The planner solves the same balancing problem as the scheduler.</p>
+    </div>
+    <div class="lab">
+      <div class="panel rv">
+        <h3>Model and network</h3>
+        <p class="sub">Quantised to 4 bits, the usual way to run models at home.</p>
+        <div class="ctrl-row">
+          <div class="seg" role="group" aria-label="Model" id="modelSeg">
+            <button type="button" data-m="8b">Llama 8B</button>
+            <button type="button" data-m="70b" aria-pressed="true">Llama 70B</button>
+            <button type="button" data-m="405b">Llama 405B</button>
+          </div>
+          <div class="seg" role="group" aria-label="Network" id="netSeg">
+            <button type="button" data-n="lan" aria-pressed="true">2.5 GbE</button>
+            <button type="button" data-n="wifi">Wi-Fi 6</button>
+            <button type="button" data-n="wan">Internet</button>
+          </div>
+        </div>
+        <div class="measure" id="measure">
+          <div class="m-top"><div><h3 data-i="m.t">This browser</h3><p class="sub" data-i="m.d">Measure real memory bandwidth here, then add this tab to the ring.</p></div>
+          <button type="button" class="btn btn-brand btn-sm" id="measureBtn" data-i="m.b">Measure this browser</button></div>
+          <div class="m-out" id="mOut" hidden>
+            <div><span data-i="m.k1">Backend</span><b id="mBack">—</b></div>
+            <div><span data-i="m.k2">Copy bandwidth</span><b id="mBw">—</b></div>
+            <div><span data-i="m.k3">Memory budget</span><b id="mMem">—</b></div>
+          </div>
+          <p class="m-status" id="mStatus" aria-live="polite"></p>
+        </div>
+        <h3>Devices</h3>
+        <p class="sub">Memory bandwidth and free memory for each.</p>
+        <div class="devs" id="devList"></div>
+        <div class="formula">
+          <p class="c">Stage time for device <var>i</var> holding <var>ℓ<sub>i</sub></var> layers of size <var>m</var>, with bandwidth <var>β<sub>i</sub></var>, hidden state <var>h</var>, link <var>B</var> and round trip <var>r</var>:</p>
+          <var>τ<sub>i</sub></var> = <var>ℓ<sub>i</sub></var>·<var>m</var> / <var>β<sub>i</sub></var> + <var>h</var> / <var>B</var> + <var>r</var><br>
+          <p class="c" style="margin-top:8px">The planner minimises the slowest stage, subject to memory:</p>
+          min max<sub><var>i</var></sub> <var>τ<sub>i</sub></var> &nbsp; s.t. &nbsp; Σ<var>ℓ<sub>i</sub></var> = <var>L</var>, &nbsp; <var>ℓ<sub>i</sub></var>·<var>m</var> ≤ <var>M<sub>i</sub></var><br>
+          <p class="c" style="margin-top:8px">which water-fills to</p>
+          <var>ℓ<sub>i</sub></var> = min( <var>M<sub>i</sub></var>/<var>m</var>, &nbsp;λ·<var>β<sub>i</sub></var>/<var>m</var> ), &nbsp; λ chosen so Σ<var>ℓ<sub>i</sub></var> = <var>L</var>
+        </div>
+      </div>
+      <div class="panel result rv d1" aria-live="polite">
+        <h3>Plan</h3>
+        <p class="sub" id="planSub">—</p>
+        <div class="ring-wrap">
+          <canvas id="labRing" width="240" height="240" aria-label="Layer allocation ring"></canvas>
+          <div class="kpis">
+            <div class="kpi"><div class="k" data-i="lab.k1">one request</div><div class="v" id="kSingle">—</div></div>
+            <div class="kpi"><div class="k" data-i="lab.k2">many requests</div><div class="v" id="kMulti">—</div></div>
+            <div class="kpi"><div class="k" data-i="lab.k3">slowest stage</div><div class="v" id="kBottle">—</div></div>
+            <div class="kpi"><div class="k" data-i="lab.k4">memory used</div><div class="v" id="kMem">—</div></div>
+          </div>
+        </div>
+        <div class="warn" id="labWarn"></div>
+        <div class="tbl-scroll">
+          <table class="alloc">
+            <thead><tr><th data-i="thr.dev">Device</th><th data-i="thr.layers">Layers</th><th data-i="thr.mem">Memory</th><th data-i="thr.stage">Stage</th><th data-i="thr.time">Share of time</th></tr></thead>
+            <tbody id="allocBody"></tbody>
+          </table>
+        </div>
+        <p class="note">Estimate for memory-bound decoding at batch 1, not a benchmark. Real numbers come from omnarc-gate on your hardware.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATEMENT -->
+<section class="s st8">
+  <div class="wrap">
+    <h2 data-i="st8.h">One prompt. Seven computers. Zero servers.</h2>
+    <p class="st8-sub mono" data-i="st8.s">16 KB · hop to hop · QUIC · encrypted</p>
+  </div>
+</section>
+
+<!-- NODE -->
+<section class="s node" id="node">
+  <div class="wrap">
+    <div class="s-head rv">
+      <p class="kicker"><b>02</b><span data-i="nav.node">Inside a node</span></p>
+      <h2 data-i="node.h">When the arc is a server rack.</h2>
+      <p data-i="node.p">A ring can hold a whole rack as one arc. Each GPU takes its own window of layers, and heat follows load. Pick a GPU to read it.</p>
+    </div>
+    <div class="node-grid">
+      <div class="stage rv" id="stage">
+        <canvas id="rack3d" aria-label="3D server rack with four nodes of eight GPUs; colour shows temperature"></canvas>
+        <div class="no3d-msg">3D view needs WebGL.</div>
+        <div class="stage-cap"><span class="legend">30 °C <i></i> 85 °C</span><span data-i="node.drag">Drag to turn. Click a GPU.</span></div>
+      </div>
+      <div class="tele rv d1">
+        <div class="tele-h"><b id="gpuName">node 1, GPU 0</b><span class="sim-tag">simulated</span></div>
+        <div class="gpu-pick" id="gpuPick" role="group" aria-label="GPU in this node"></div>
+        <div class="gauges">
+          <div class="g"><div class="k">load</div><div class="v" id="gUtil">—</div></div>
+          <div class="g"><div class="k">power</div><div class="v" id="gPow">—</div></div>
+          <div class="g"><div class="k">temp</div><div class="v" id="gTemp">—</div></div>
+          <div class="g"><div class="k">HBM</div><div class="v" id="gMem">—</div></div>
+        </div>
+        <div>
+          <div class="tlabel"><span data-i="node.sm">132 streaming multiprocessors</span><span id="smAvg">—</span></div>
+          <canvas id="smMap" aria-label="Streaming multiprocessor occupancy heatmap"></canvas>
+        </div>
+        <div>
+          <div class="tlabel"><span data-i="node.pw">Power, last 60 s</span><span data-i="node.lim">limit 700 W</span></div>
+          <canvas id="powerChart" aria-label="Power draw over time"></canvas>
+        </div>
+        <pre class="smi" id="smi"></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MATH -->
+<section class="s" id="math">
+  <div class="wrap">
+    <div class="s-head rv">
+      <p class="kicker"><b>03</b><span data-i="nav.math">The math</span></p>
+      <h2 data-i="math.h">Three formulas behind the ring.</h2>
+      <p data-i="math.p">Each one decides a design choice in Omnarc. Move the sliders and watch the trade-off.</p>
+    </div>
+    <div class="math-grid">
+      <article class="mcard rv">
+        <div class="top">
+          <h3>Speculative decoding</h3>
+          <p>A small draft model guesses <var>k</var> tokens; the ring checks them in one pass. With acceptance rate <var>α</var>, tokens gained per pass:</p>
+          <div class="eq"><var>E</var>[<var>n</var>] = <span class="frac"><span>1 − <var>α</var><sup><var>k</var>+1</sup></span><span>1 − <var>α</var></span></span>, &nbsp; speed-up = <span class="frac"><span><var>E</var>[<var>n</var>]</span><span>1 + <var>k</var>·<var>c</var></span></span></div>
+          <canvas id="plotSpec" aria-label="Speed-up versus draft length"></canvas>
+        </div>
+        <div class="sliders">
+          <label class="sl">Acceptance rate α<output id="oA"></output><input type="range" id="sA" min="0.3" max="0.95" step="0.01" value="0.71"></label>
+          <label class="sl">Draft cost ratio c<output id="oC"></output><input type="range" id="sC" min="0.01" max="0.3" step="0.01" value="0.05"></label>
+          <div class="read" id="rSpec"></div>
+        </div>
+      </article>
+      <article class="mcard rv d1">
+        <div class="top">
+          <h3>Replicas and uptime</h3>
+          <p>Each of <var>W</var> layer windows lives on <var>r</var> devices that are each online with probability <var>p</var>. The ring answers when every window has a copy:</p>
+          <div class="eq"><var>P</var><sub>ring</sub> = ( 1 − (1 − <var>p</var>)<sup><var>r</var></sup> )<sup><var>W</var></sup></div>
+          <canvas id="plotRep" aria-label="Ring availability versus replica count"></canvas>
+        </div>
+        <div class="sliders">
+          <label class="sl">Device uptime p<output id="oP"></output><input type="range" id="sP" min="0.5" max="0.99" step="0.01" value="0.85"></label>
+          <label class="sl">Windows W<output id="oW"></output><input type="range" id="sW" min="2" max="16" step="1" value="6"></label>
+          <div class="read" id="rRep"></div>
+        </div>
+      </article>
+      <article class="mcard rv d2">
+        <div class="top">
+          <h3>Accuracy mode</h3>
+          <p>Several devices answer the same question and vote. If each is right with probability <var>q</var>, the majority of <var>n</var> is right with:</p>
+          <div class="eq"><var>P</var><sub>maj</sub> = Σ<sub><var>j</var>&gt;<var>n</var>/2</sub> C(<var>n</var>,<var>j</var>) <var>q</var><sup><var>j</var></sup>(1 − <var>q</var>)<sup><var>n</var>−<var>j</var></sup></div>
+          <canvas id="plotVote" aria-label="Majority accuracy versus number of voters"></canvas>
+        </div>
+        <div class="sliders">
+          <label class="sl">Single-answer accuracy q<output id="oQ"></output><input type="range" id="sQ" min="0.5" max="0.9" step="0.01" value="0.68"></label>
+          <label class="sl">Error correlation ρ<output id="oR"></output><input type="range" id="sR" min="0" max="0.8" step="0.05" value="0.2"></label>
+          <div class="read" id="rVote"></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- USE -->
+<section class="s soft" id="use">
+  <div class="wrap">
+    <div class="s-head rv">
+      <p class="kicker"><b>04</b><span data-i="use.k">who is it for</span></p>
+      <h2 data-i="use.h">One mind for what you do.</h2>
+      <p data-i="use.p">Goals of the roadmap — stages B4, B7 and B8.</p>
+    </div>
+    <div class="steps">
+      <div class="step rv"><span class="n">B8</span><h3 data-i="use.a.h">Agents on your own model</h3><p data-i="use.a.p">OpenClaw, OpenCode and other agents run on a frontier-class open model spread across your own computers — no per-token bill, no rate limit. One computer can only stream such a model from disk; a cluster keeps all of it in memory.</p></div>
+      <div class="step rv d1"><span class="n">B7</span><h3 data-i="use.b.h">The family ring</h3><p data-i="use.b.p">A family or a team shares one assistant that speaks their language; a weak phone joins by voice and computes nothing.</p></div>
+      <div class="step rv d2"><span class="n">B4</span><h3 data-i="use.c.h">Accuracy mode</h3><p data-i="use.c.p">Several devices answer the same question and check each other; the answer shows how many agreed — a single device’s mistake is caught before you read it.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section class="s soft" id="compare">
+  <div class="wrap">
+    <div class="s-head rv">
+      <p class="kicker"><b>05</b><span data-i="cmp.k">the comparison</span></p>
+      <h2 data-i="cmp.h">Four ways to spread a model.</h2>
+      <p data-i="cmp.p">Today’s tools each cover one corner of the world’s idle compute.</p>
+    </div>
+    <div class="cmp rv">
+      <table>
+        <thead><tr><th></th><th>exo</th><th>prima.cpp</th><th>GPUStack</th><th class="om">Omnarc (goal)</th></tr></thead>
+        <tbody>
+          <tr><td>Phones: Android, iOS</td><td class="no">—</td><td>Termux only</td><td class="no">—</td><td class="om">native apps</td></tr>
+          <tr><td>Browsers join with a QR code</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="om">✓</td></tr>
+          <tr><td>Windows, Linux, macOS</td><td>macOS</td><td>Linux, macOS</td><td>Linux</td><td class="om">✓</td></tr>
+          <tr><td>CUDA, ROCm/Vulkan, Metal, OpenCL, NPU</td><td>Metal</td><td>CUDA</td><td>server GPUs</td><td class="om">✓</td></tr>
+          <tr><td>Devices join and leave at runtime</td><td>✓</td><td class="no">—</td><td>✓</td><td class="om">✓</td></tr>
+          <tr><td>Across the internet, behind NAT</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="om">✓</td></tr>
+          <tr><td>Inference and training</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="om">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="foot">The Omnarc column lists roadmap goals, not shipped features. exo, prima.cpp and GPUStack are great tools, each built for one corner.</p>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="s" id="roadmap">
+  <div class="wrap">
+    <div class="s-head rv">
+      <p class="kicker"><b>06</b><span data-i="road.k">the plan</span></p>
+      <h2 data-i="road.h">Nine stages. Nine gates.</h2>
+      <p data-i="road.p">A stage is done when its public gate passes, not when a blog post ships.</p>
+    </div>
+    <div class="road-legend"><span class="pill-b ok">B0 ✓</span><span class="pill-b now">B1 ← now</span><span class="pill-b">B2 … B9 next</span></div>
+    <ol class="road rv">
+      <li class="done"><span class="pin"></span><span class="st">B0 foundation</span><span class="wh">Monorepo, CI, protocol v1, design system</span><span class="gt">CI green on 6 platforms</span></li>
+      <li class="now"><span class="pin"></span><span class="st">B1 engine</span><span class="wh">llama.cpp and prima.cpp piped ring, Windows, Vulkan</span><span class="gt">A 70B model across Linux and Windows machines</span></li>
+      <li><span class="pin"></span><span class="st">B2 network</span><span class="wh">iroh P2P, QR pairing, peer-to-peer model distribution</span><span class="gt">Two networks behind NAT form one cluster</span></li>
+      <li><span class="pin"></span><span class="st">B3 scheduler</span><span class="wh">Placement, live join and leave, replicas</span><span class="gt">Recovery within 1 s</span></li>
+      <li><span class="pin"></span><span class="st">B4 speed</span><span class="wh">Pipelined speculation, MoE, sparse FFN, accuracy mode</span><span class="gt">Single-request speed grows with device count</span></li>
+      <li><span class="pin"></span><span class="st">B5 devices</span><span class="wh">Desktop, Android, iOS, browser, NPU</span><span class="gt">Join from a browser in 30 s</span></li>
+      <li><span class="pin"></span><span class="st">B6 scale</span><span class="wh">Organisations, public network, credits</span><span class="gt">1,000+ nodes</span></li>
+      <li><span class="pin"></span><span class="st">B7 modalities</span><span class="wh">Speech, images, LoRA, RL, the family ring</span><span class="gt">Distributed LoRA over the internet</span></li>
+      <li><span class="pin"></span><span class="st">B8 islands + API</span><span class="wh">MLX, vLLM/SGLang, OpenAI, Claude and Ollama APIs</span><span class="gt">Throughput on par with vLLM on NVIDIA</span></li>
+      <li><span class="pin"></span><span class="st">B9 benchmark</span><span class="wh">Open benchmarks against exo, prima.cpp, Parallax and others</span><span class="gt">v1.0</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="s soft" id="faq">
+  <div class="wrap">
+    <div class="s-head rv"><p class="kicker"><b>07</b><span data-i="faq.k">questions</span></p>
+      <h2 data-i="faq.h">Questions</h2></div>
+    <div class="faq">
+      <details class="rv"><summary>Is Omnarc ready to use?</summary><p>Not yet; it is pre-alpha. Stage B0 is complete and B1 is in progress: devices can already run one model together as a ring wired by hand. Discovery, QR pairing and planning arrive in B2 and B3.</p></details>
+      <details class="rv"><summary>Are the numbers on this page real?</summary><p>The partition lab uses a bandwidth model of decoding, and the rack view is a simulation. They show how the planner reasons, not measured results. Measured results come from <code>omnarc-gate</code> on your own hardware.</p></details>
+      <details class="rv"><summary>Does my data leave my devices?</summary><p>All traffic is encrypted. On your own network everything stays inside it. On the public network raw text never leaves your device, and every answer carries a TOPLOC proof that your ring produced it. There is no telemetry.</p></details>
+      <details class="rv"><summary>Can it really run a 70B model on phones and laptops?</summary><p>Layers split in proportion to each device’s measured power: a phone holds a few, a PC holds many. The B1 gate is a 70B model across Linux and Windows machines, and omnarc-gate checks every split against the whole model.</p></details>
+      <details class="rv"><summary>How do I try it today?</summary><p>Clone the repo, run <code>cargo test --workspace</code>, then <code>cargo run -p omnarc-node -- info</code>. With the engine built, <code>omnarc-node ring</code> joins two nodes into a ring. The README has the full walkthrough.</p></details>
+      <details class="rv"><summary>Is it free?</summary><p>Yes. Apache 2.0, no account, no telemetry. Credits for the public network arrive only in stage B6.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="s cta">
+  <svg class="cta-ring" viewBox="0 0 200 200" aria-hidden="true"><g fill="none" stroke-width="5" stroke-linecap="round" transform="rotate(-90 100 100)"><circle cx="100" cy="100" r="80" stroke="#118d4f" stroke-dasharray="150 352"/><circle cx="100" cy="100" r="80" stroke="#c99a2e" stroke-dasharray="60 442" stroke-dashoffset="-160"/><circle cx="100" cy="100" r="80" stroke="#2b5f9e" stroke-dasharray="90 412" stroke-dashoffset="-230"/><circle cx="100" cy="100" r="80" stroke="#1a8f8f" stroke-dasharray="150 352" stroke-dashoffset="-330"/></g></svg>
+  <div class="wrap" style="position:relative">
+    <h2 class="rv" data-i="cta.h">Form your ring<br>tonight.</h2>
+    <p class="rv d1" data-i="cta.p">Start with two devices: clone, build, and run a ring wired by hand. Everything runs on your machines.</p>
+    <div class="hero-actions rv d2">
+      <a class="btn btn-brand" href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/README.md" data-i="cta.b1" target="_blank" rel="noopener">Read the README</a>
+      <a class="btn btn-ghost" href="https://github.com/HumoyunDavronov2001/omnarc" data-i="cta.b2" target="_blank" rel="noopener">Star on GitHub</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="f-pos">
+  <div class="wrap">
+    <div class="f-mark" aria-hidden="true">OMNARC</div>
+    <div class="f-grid">
+      <div><a class="logo" href="#top" style="color:var(--ink-fg)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#1be480" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="38 18.5" transform="rotate(-90 12 12)"/><circle cx="12" cy="12" r="9" fill="none" stroke="#c99a2e" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="9 47.5" transform="rotate(150 12 12)"/></svg>Omnarc</a><p style="max-width:30ch;margin:12px 0 0">Computers, phones, servers and browsers as one AI cluster.</p></div>
+      <div><h4>Project</h4><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/README.md" target="_blank" rel="noopener">README</a><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/PLAN.md" target="_blank" rel="noopener">Plan</a><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/REQUIREMENTS.md" target="_blank" rel="noopener">Requirements</a><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/SPEC.md" target="_blank" rel="noopener">Specification</a></div>
+      <div><h4>Code</h4><a href="https://github.com/HumoyunDavronov2001/omnarc" target="_blank" rel="noopener">Repository</a><a href="https://github.com/HumoyunDavronov2001/omnarc/tree/main/design" target="_blank" rel="noopener">Design</a><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/UPSTREAM.md" target="_blank" rel="noopener">Upstream</a><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/SECURITY.md" target="_blank" rel="noopener">Security</a></div>
+      <div><h4>Community</h4><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener">Code of conduct</a><a href="https://github.com/HumoyunDavronov2001/omnarc/issues" target="_blank" rel="noopener">Report a bug</a></div>
+    </div>
+    <div class="f-bot"><span>© 2026 Omnarc, Apache 2.0. Built on llama.cpp and prima.cpp.</span><span>b0 passed, b1 in progress</span></div>
+  </div>
+</footer>
+<div class="mini-hud" id="miniHud" aria-hidden="true"><i></i><b id="mhTok">— tok/s</b><span>7 arcs</span><span>hop 0.3 ms</span><span>80 layers</span></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+"use strict";
+const $=s=>document.querySelector(s);
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function whenVisible(el,cb){
+  if(!('IntersectionObserver' in window)){cb(true);return;}
+  new IntersectionObserver(es=>es.forEach(e=>cb(e.isIntersecting)),{rootMargin:'120px'}).observe(el);
+}
+/* smooth value noise, used for telemetry */
+function noise1(x){const i=Math.floor(x),f=x-i,h=n=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s);};const u=f*f*(3-2*f);return lerp(h(i),h(i+1),u);}
+
+/* ───────── theme, nav, copy ───────── */
+const root=document.documentElement;
+try{const t=localStorage.getItem('omnarc-theme');if(t)root.dataset.theme=t;}catch(e){}
+function isDark(){return root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;}
+$('#themeBtn').addEventListener('click',()=>{
+  root.classList.add('swapping');
+  root.dataset.theme=isDark()?'light':'dark';
+  try{localStorage.setItem('omnarc-theme',root.dataset.theme);}catch(e){}
+  dispatchEvent(new Event('omnarc-theme'));
+  setTimeout(()=>root.classList.remove('swapping'),480);
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>dispatchEvent(new Event('omnarc-theme')));
+const nav=$('#nav'),prog=$('#prog');
+const onScroll=()=>{
+  nav.classList.toggle('solid',scrollY>30);
+  const span=document.documentElement.scrollHeight-innerHeight;
+  if(prog)prog.style.width=(span>0?Math.min(100,scrollY/span*100):0)+'%';
+};
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+/* scrollspy — the nav knows where you are */
+{const links=[...document.querySelectorAll('.nav-links a[href^="#"]')];
+ const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+ if(links.length&&'IntersectionObserver' in window){
+  const spy=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const a=map.get(e.target.id);
+    if(a){links.forEach(x=>x.classList.remove('on'));a.classList.add('on');}}});},{rootMargin:'-45% 0px -50% 0px'});
+  map.forEach((a,id)=>{const s=document.getElementById(id);if(s)spy.observe(s);});}}
+$('#copyBtn').addEventListener('click',async e=>{
+  const txt=$('#cloneCmd').textContent;
+  try{await navigator.clipboard.writeText(txt);}catch(err){
+    try{
+      const r=document.createRange();r.selectNodeContents($('#cloneCmd'));
+      const s=getSelection();s.removeAllRanges();s.addRange(r);
+      if(document.execCommand)document.execCommand('copy');
+    }catch(e2){}
+    getSelection().removeAllRanges();
+  }
+});
+
+/* ───────── shared three helpers ───────── */
+const HAS3D=!!window.THREE&&(()=>{try{const c=document.createElement('canvas');return !!(c.getContext('webgl2')||c.getContext('webgl'));}catch(e){return false;}})();
+function makeRenderer(canvas){
+  const r=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
+  r.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
+  r.outputEncoding=THREE.sRGBEncoding;
+  r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
+  r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;
+  return r;
+}
+function glowShader(){
+  return new THREE.ShaderMaterial({
+    uniforms:{uPR:{value:Math.min(devicePixelRatio||1,1.75)},uMul:{value:new THREE.Vector3(1,1,1)},uO:{value:1}},
+    vertexShader:`attribute float size;attribute float alpha;attribute vec3 aColor;varying vec3 vC;varying float vA;uniform float uPR;
+      void main(){vC=aColor;vA=alpha;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*uPR*(260.0/-mv.z);gl_Position=projectionMatrix*mv;}`,
+    fragmentShader:`varying vec3 vC;varying float vA;uniform vec3 uMul;uniform float uO;
+      void main(){vec2 c=gl_PointCoord-0.5;float d=length(c);float a=smoothstep(0.5,0.0,d);a*=a;if(a<0.01)discard;gl_FragColor=vec4(vC*1.5*uMul,a*vA*uO);}`,
+    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending
+  });
+}
+function pointCloud(n){
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(n*3),3));
+  g.setAttribute('aColor',new THREE.BufferAttribute(new Float32Array(n*3),3));
+  g.setAttribute('size',new THREE.BufferAttribute(new Float32Array(n),1));
+  g.setAttribute('alpha',new THREE.BufferAttribute(new Float32Array(n),1));
+  const p=new THREE.Points(g,glowShader());p.frustumCulled=false;return p;
+}
+function studioEnv(renderer){
+  const s=new THREE.Scene();s.background=new THREE.Color(0x0b0f0d);
+  [[0xbfffe0,0,7,0,4,0],[0xffffff,-6,2.5,3,3,0],[0x9fd6ff,6,3,2,2.6,0],[0xffd9a0,4,1,-4,2.4,0],[0x123024,0,-6,0,5,0]].forEach(([c,x,y,z,sz])=>{
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(sz,sz),new THREE.MeshBasicMaterial({color:c}));
+    m.position.set(x,y,z);m.lookAt(0,0,0);s.add(m);});
+  const p=new THREE.PMREMGenerator(renderer);const t=p.fromScene(s,0,.06,60).texture;p.dispose();return t;}
+function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;}
+function radialTex(inner,outer){return canvasTex(256,256,(g,w,h)=>{const gr=g.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);gr.addColorStop(0,inner);gr.addColorStop(1,outer);g.fillStyle=gr;g.fillRect(0,0,w,h);});}
+function dragYaw(canvas,state,onMove){
+  let down=false,lx=0,ly=0;
+  canvas.addEventListener('pointerdown',e=>{down=true;lx=e.clientX;ly=e.clientY;state.moved=0;state.dragging=true;});
+  addEventListener('pointerup',()=>{down=false;state.dragging=false;});
+  canvas.addEventListener('pointercancel',()=>{down=false;state.dragging=false;});
+  canvas.addEventListener('pointermove',e=>{
+    const r=canvas.getBoundingClientRect();state.mx=(e.clientX-r.left)/r.width*2-1;state.my=(e.clientY-r.top)/r.height*2-1;
+    if(!down)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;
+    state.moved+=Math.abs(dx)+Math.abs(dy);state.yaw+=dx*0.006;state.pitch=clamp(state.pitch+dy*0.002,-0.25,0.3);onMove&&onMove();
+  });
+}
+function loop(el,frame){
+  let on=false,last=0,raf=0,vis=false;
+  const tick=t=>{const dt=Math.min(0.05,(t-last)/1000||0);last=t;frame(dt,t/1000);if(on&&!reduceMotion)raf=requestAnimationFrame(tick);};
+  const start=()=>{if(on)return;on=true;last=performance.now();raf=requestAnimationFrame(tick);};
+  const stop=()=>{on=false;cancelAnimationFrame(raf);};
+  const sync=()=>{(vis&&!document.hidden&&!reduceMotion)?start():stop();};
+  whenVisible(el,v=>{vis=v;sync();});
+  document.addEventListener('visibilitychange',sync);
+  return {once:()=>requestAnimationFrame(t=>frame(0,t/1000)),start};
+}
+
+  const brushed=canvasTex(128,128,(g2,w2,h2)=>{g2.fillStyle='#4a5a50';g2.fillRect(0,0,w2,h2);
+    for(let i=0;i<240;i++){g2.fillStyle=`rgba(255,255,255,${(.02+Math.random()*.05).toFixed(3)})`;g2.fillRect(0,Math.random()*h2,w2,1);}
+    for(let i=0;i<90;i++){g2.fillStyle='rgba(0,0,0,.07)';g2.fillRect(0,Math.random()*h2,w2,1);}});
+  brushed.wrapS=brushed.wrapT=THREE.RepeatWrapping;brushed.repeat.set(2.5,1);
+  const M={
+    metal:new THREE.MeshStandardMaterial({color:0x74897c,metalness:.62,roughness:.4,map:brushed}),
+    alu:new THREE.MeshStandardMaterial({color:0x6f7d76,metalness:.85,roughness:.3}),
+    bezel:new THREE.MeshStandardMaterial({color:0x0b1310,metalness:.4,roughness:.5}),
+    glass:new THREE.MeshStandardMaterial({color:0x9fe6c3,metalness:.1,roughness:.05,transparent:true,opacity:.16}),
+    ledG:new THREE.MeshBasicMaterial({color:0x1be480}),ledO:new THREE.MeshBasicMaterial({color:0xe2b13c}),
+  };
+  const box=(w,h,d,m)=>{const me=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);me.castShadow=true;me.receiveShadow=true;return me;};
+  function screenTex(kind,col){return canvasTex(512,320,(g,w,h)=>{
+    const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#0d231a');gr.addColorStop(1,'#06120d');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    const c='#'+col.toString(16).padStart(6,'0');
+    if(kind==='code'){for(let i=0;i<14;i++){let x=24+((i*37)%5)*18;const y=26+i*20;for(let k=0;k<1+(i*7)%4;k++){const ww=30+((i*13+k*29)%90);g.fillStyle=k%2?c:'#4f7a63';g.globalAlpha=k%2?.9:.7;g.fillRect(x,y,ww,8);x+=ww+12;}}g.globalAlpha=1;}
+    if(kind==='chat'){for(let i=0;i<5;i++){const me=i%2;g.fillStyle=me?c:'#1d3a2c';const bw=160+((i*53)%140),x=me?w-bw-24:24;g.beginPath();g.roundRect?g.roundRect(x,22+i*58,bw,40,14):g.rect(x,22+i*58,bw,40);g.fill();}}
+    if(kind==='ring'){g.lineWidth=18;g.lineCap='round';[[c,0,2.2],['#c99a2e',2.5,3.6],['#2b5f9e',3.9,5.9]].forEach(([s,a0,a1])=>{g.strokeStyle=s;g.beginPath();g.arc(w/2,h/2,100,a0,a1);g.stroke();});g.fillStyle='#d7e8dd';g.font='600 34px monospace';g.textAlign='center';g.fillText('8.4',w/2,h/2+12);}
+    if(kind==='chart'){g.strokeStyle=c;g.lineWidth=5;g.beginPath();for(let x=0;x<w;x+=8){const y=h*.6-Math.sin(x/40)*40-x/w*90;x?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();g.fillStyle='#4f7a63';for(let i=0;i<8;i++)g.fillRect(30+i*58,h-40,34,-20-((i*37)%70));}
+  });}
+  const screen=(w,h,tex)=>new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex,toneMapped:false}));
+
+  const liveScreens=[];let browserScr=null,tokNow=8.4;
+  function liveTex(w,h,drawF,opts){const o=Object.assign({auto:true,every:.6},opts||{});
+    const c=document.createElement('canvas');c.width=w;c.height=h;const g2=c.getContext('2d');
+    const t2=new THREE.CanvasTexture(c);t2.encoding=THREE.sRGBEncoding;t2.anisotropy=4;
+    const ref={tex:t2,every:o.every,auto:o.auto,acc:Math.random()*.25,redraw(){drawF(g2,w,h);t2.needsUpdate=true;}};
+    ref.redraw();liveScreens.push(ref);return ref;}
+  function drawCodeScreen(g,w,h,colHex,step){
+    const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#0d231a');gr.addColorStop(1,'#06120d');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    const c='#'+colHex.toString(16).padStart(6,'0');const WS=[42,86,64,110,52,96,70,38,84,58],LH=20;
+    for(let row=0;row<15;row++){
+      const idx=((step+row)%11+11)%11,y=22+row*LH-((step*7)%LH);
+      if(y<12||y>h-8)continue;
+      let x=24+((idx*37)%5)*18;
+      for(let k=0;k<1+(idx*7)%4;k++){const ww=WS[(idx+k+9)%10];g.fillStyle=k%2?c:'#4f7a63';g.globalAlpha=k%2?.9:.65;g.fillRect(x,y,ww,7);x+=ww+12;}
+    }
+    g.globalAlpha=1;
+    const cy=22+8*LH-((step*7)%LH);
+    if(cy>10&&cy<h-8){g.fillStyle='#1be480';g.globalAlpha=.9;g.fillRect(150,cy-11,7,12);g.globalAlpha=1;}
+  }
+  function drawRingScreen(g,w,h,colHex,tok){
+    const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#0d231a');gr.addColorStop(1,'#06120d');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    g.lineWidth=18;g.lineCap='round';const c='#'+colHex.toString(16).padStart(6,'0');
+    [[c,0,2.2],['#c99a2e',2.5,3.6],['#2b5f9e',3.9,5.9]].forEach(([s,a0,a1])=>{g.strokeStyle=s;g.beginPath();g.arc(w/2,h/2,100,a0,a1);g.stroke();});
+    g.fillStyle='#d7e8dd';g.font='600 40px monospace';g.textAlign='center';g.fillText(tok.toFixed(1),w/2,h/2+10);
+    g.font='500 16px monospace';g.fillStyle='#7d9384';g.fillText('tok/s',w/2,h/2+38);
+  }
+  function rslab(w,h,r,mat){
+    const s=new THREE.Shape();const x=-w/2,y=-h/2;
+    s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);
+    s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);
+    s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
+    const g=new THREE.ExtrudeGeometry(s,{depth:.05,bevelEnabled:true,bevelThickness:.014,bevelSize:.014,bevelSegments:2,curveSegments:5});
+    const me=new THREE.Mesh(g,mat);me.castShadow=true;me.receiveShadow=true;return me;}
+  const glassMat=new THREE.MeshPhysicalMaterial({color:0xdfeee6,metalness:0,roughness:.06,transparent:true,opacity:.14});
+
+  function makeDevice(id,color,reg){
+    const leds=reg.leds||[],fans=reg.fans||[],floaters=reg.floaters||[];
+    const B={
+    server(c){const g=new THREE.Group();
+      const chas=box(1.18,1.55,.95,M.metal);chas.position.y=.78;g.add(chas);
+      /* yon rayl */
+      [-.565,.565].forEach(rx=>{const rail=box(.05,1.5,.9,new THREE.MeshStandardMaterial({color:0x2a3a31,metalness:.7,roughness:.4}));rail.position.set(rx,.78,0);g.add(rail);});
+      for(let i=0;i<4;i++){
+        const y=.28+i*.245;
+        const frame=box(1.06,.2,.03,M.bezel);frame.position.set(0,y,.47);g.add(frame);
+        [-.44,.4].forEach(hx=>{const hnd=box(.035,.045,.05,M.alu);hnd.position.set(hx,y,.485);g.add(hnd);});
+        /* disk caddy 2 ta, har biri LED */
+        [-.28,.06].forEach((dx,di)=>{
+          const caddy=box(.3,.12,.02,new THREE.MeshStandardMaterial({color:0x1f2b24,metalness:.4,roughness:.5}));caddy.position.set(dx,y,.487);g.add(caddy);
+          const cl=box(.02,.02,.015,di%2?M.ledG.clone():M.ledO.clone());cl.position.set(dx-.11,y,.49);g.add(cl);leds.push({m:cl,ph:i*1.9+di*2.7});
+        });
+        /* ethernet strip — 4 port, Aktiv portlar miltillaydi */
+        for(let k=0;k<4;k++){
+          const port=box(.028,.03,.015,M.bezel);port.position.set(-.02+k*.036,y-.04,.49);g.add(port);
+          const pl=box(.018,.014,.011,k%3===0?M.ledO.clone():M.ledG.clone());pl.position.set(-.02+k*.036,y-.04+ -.012,.496);g.add(pl);leds.push({m:pl,ph:i*2.1+k*1.7});
+        }
+      }
+      /* PSU — right block, spinning fan */
+      const psu=box(.24,1.4,.03,M.alu);psu.position.set(.44,.78,.485);g.add(psu);
+      const fan=new THREE.Mesh(new THREE.TorusGeometry(.07,.01,6,20),new THREE.MeshBasicMaterial({color:c}));
+      fan.position.set(.44,1.3,.492);g.add(fan);fans.push(fan);
+      /* kabel — tepadan chiqib pedestalga */
+      {const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(.4,1.62,.4),new THREE.Vector3(.62,1.78,.42),new THREE.Vector3(.72,1.35,.5),new THREE.Vector3(.62,.5,.55)]);
+       const cable=new THREE.Mesh(new THREE.TubeGeometry(curve,14,.022,6),new THREE.MeshStandardMaterial({color:0x151f1a,roughness:.6}));
+       g.add(cable);}
+      return g;},
+    pc(c){const g=new THREE.Group();g.add(box(.58,1.2,1.05,M.metal).translateY(.6));
+      const gl=box(.012,1.05,.9,M.glass);gl.position.set(.3,.6,0);g.add(gl);
+      const gpu=box(.06,.22,.72,new THREE.MeshStandardMaterial({color:0x1a1f1d,emissive:c,emissiveIntensity:.35}));gpu.position.set(.18,.55,0);g.add(gpu);
+      [-.18,.18].forEach(z=>{const f=new THREE.Mesh(new THREE.TorusGeometry(.09,.012,6,24),new THREE.MeshBasicMaterial({color:c}));f.position.set(.22,.55,z);f.rotation.y=Math.PI/2;g.add(f);
+        const bl=box(.005,.16,.02,new THREE.MeshBasicMaterial({color:c}));bl.position.set(.22,.55,z);g.add(bl);fans.push(bl);});
+      const strip=box(.01,1.0,.02,new THREE.MeshBasicMaterial({color:c}));strip.position.set(.3,.6,.46);g.add(strip);
+      const front=box(.5,.08,.01,M.ledG.clone());front.position.set(0,1.05,.53);g.add(front);leds.push({m:front,ph:3});
+      return g;},
+    nas(c){const g=new THREE.Group();
+      const body=box(.75,.8,.85,M.metal);body.position.y=.4;g.add(body);
+      const face=rslab(.72,.76,.04,M.bezel);face.position.set(0,.4,.428);g.add(face);
+      for(let i=0;i<4;i++){
+        const tray=box(.15,.56,.02,M.metal);tray.position.set(-.24+i*.16,.42,.442);g.add(tray);
+        const hnd=box(.05,.02,.012,M.alu);hnd.position.set(-.24+i*.16,.62,.452);g.add(hnd);
+        const l=box(.028,.028,.012,i%2?M.ledG.clone():M.ledO.clone());l.position.set(-.24+i*.16,.18,.452);g.add(l);leds.push({m:l,ph:i*1.3});
+      }
+      const pwr=new THREE.Mesh(new THREE.CircleGeometry(.03,14),M.ledG);pwr.position.set(.3,.06,.455);g.add(pwr);
+      const tag=screen(.24,.11,canvasTex(256,128,(gg)=>{gg.fillStyle='#0d1a14';gg.fillRect(0,0,256,128);gg.fillStyle='#1be480';gg.font='600 40px monospace';gg.textAlign='center';gg.fillText('omnarc',128,80);}));
+      tag.position.set(-.12,.05,.455);g.add(tag);
+      return g;},
+    laptop(c){const g=new THREE.Group();g.add(box(1.42,.055,.95,M.alu).translateY(.03));
+      const kbBase=box(1.24,.012,.5,M.bezel);kbBase.position.set(0,.06,.12);g.add(kbBase);
+      const kg=new THREE.BoxGeometry(.06,.014,.06),km=new THREE.MeshStandardMaterial({color:0x24332b,metalness:.25,roughness:.55});
+      const keys=new THREE.InstancedMesh(kg,km,70);const mt=new THREE.Matrix4();let ki=0;
+      for(let rr=0;rr<5;rr++)for(let kx=0;kx<14;kx++){mt.setPosition(-.55+kx*.084,.075,-.1+rr*.076);keys.setMatrixAt(ki++,mt);}
+      keys.instanceMatrix.needsUpdate=true;g.add(keys);
+      const tpad=box(.4,.006,.24,new THREE.MeshStandardMaterial({color:0x8fa398,metalness:.55,roughness:.35}));tpad.position.set(0,.063,.44);g.add(tpad);
+      const hinge=box(1.32,.02,.05,M.bezel);hinge.position.set(0,.052,-.45);g.add(hinge);
+      let codeStep=0;
+      const codeRef=liveTex(512,320,(g2,w2,h2)=>drawCodeScreen(g2,w2,h2,c,codeStep++),{every:.5});
+      const lid=new THREE.Group();lid.position.set(0,.05,-.47);lid.rotation.x=-.3;
+      const lidBody=rslab(1.34,.88,.05,M.alu);lidBody.position.y=.43;lid.add(lidBody);
+      const bez=rslab(1.24,.8,.04,M.bezel);bez.position.set(0,.43,.009);lid.add(bez);
+      const sc=screen(1.15,.72,codeRef.tex);sc.position.set(0,.43,.03);lid.add(sc);
+      const gls=new THREE.Mesh(new THREE.PlaneGeometry(1.18,.76),glassMat);gls.position.set(0,.43,.045);lid.add(gls);
+      g.add(lid);
+      return g;},
+    tablet(c){const g=new THREE.Group();const s=new THREE.Group();s.position.y=.42;s.rotation.x=-.25;
+      const body=rslab(.98,.7,.07,M.alu);s.add(body);
+      const bez=rslab(.9,.62,.06,M.bezel);bez.position.z=.008;s.add(bez);
+      const sc=screen(.84,.56,screenTex('chart',c));sc.position.z=.028;s.add(sc);
+      const camT=new THREE.Mesh(new THREE.CircleGeometry(.012,10),M.ledG);camT.position.set(0,.345,.032);s.add(camT);
+      g.add(s);
+      g.add(box(.5,.045,.35,M.alu).translateY(.02));const st=box(.06,.42,.04,M.alu);st.position.set(0,.22,-.08);st.rotation.x=.3;g.add(st);
+      return g;},
+    phone(c){const g=new THREE.Group();const s=new THREE.Group();s.position.y=.5;s.rotation.x=-.18;
+      const body=rslab(.42,.86,.1,M.glass===undefined?M.bezel:M.bezel);s.add(body);
+      const sc=screen(.37,.78,screenTex('chat',c));sc.position.z=.034;s.add(sc);
+      const gls=new THREE.Mesh(new THREE.PlaneGeometry(.36,.74),glassMat);gls.position.z=.044;s.add(gls);
+      const notc=new THREE.Mesh(new THREE.CircleGeometry(.026,14),M.bezel);notc.position.set(0,.39,.032);s.add(notc);
+      const camDot=new THREE.Mesh(new THREE.CircleGeometry(.009,10),M.ledG);camDot.position.set(.062,.39,.033);s.add(camDot);
+      for(let i=0;i<4;i++){const sp=new THREE.Mesh(new THREE.CircleGeometry(.008,8),M.ledG.clone());sp.position.set(-.05+i*.033,-.38,.031);s.add(sp);}
+      /* yon tugmalar */
+      [-.18,.02].forEach(yy=>{const b=box(.012,.06,.012,M.alu);b.position.set(.215,yy+ .05,0);s.add(b);});
+      /* orqa kamera oroli */
+      const isl=rslab(.14,.14,.04,new THREE.MeshStandardMaterial({color:0x1a2521,metalness:.6,roughness:.3}));
+      isl.rotation.y=Math.PI;isl.position.set(0,.28,-.028);s.add(isl);
+      [[-.03,.03],[.03,.03],[0,-.01]].forEach(([lx,ly],i)=>{const lens=new THREE.Mesh(new THREE.CircleGeometry(.025,12),new THREE.MeshStandardMaterial({color:0x0a0f0d,metalness:.9,roughness:.15}));lens.rotation.y=Math.PI;lens.position.set(lx,ly,-.045);lens.position.z=-.041;s.add(lens);});
+      const fl=new THREE.Mesh(new THREE.CircleGeometry(.01,8),M.ledO.clone());fl.rotation.y=Math.PI;fl.position.set(0,.035,-.042);s.add(fl);
+      g.add(s);g.add(box(.34,.05,.26,M.alu).translateY(.025));
+      return g;},
+    browser(c){const g=new THREE.Group();const w=new THREE.Group();w.position.y=.85;floaters.push(w);
+      const body=rslab(1.36,.9,.06,new THREE.MeshPhysicalMaterial({color:0x243329,metalness:.3,roughness:.4}));
+      body.position.y=-.02;w.add(body);
+      const bar=box(1.3,.09,.03,new THREE.MeshStandardMaterial({color:0x35473e,metalness:.3,roughness:.5}));bar.position.y=.38;w.add(bar);
+      [0xe0583a,0xe2b13c,0x1be480].forEach((cc,i)=>{const d=new THREE.Mesh(new THREE.CircleGeometry(.02,16),new THREE.MeshBasicMaterial({color:cc}));d.position.set(-.6+i*.06,.38,.017);w.add(d);});
+      const ub=box(1.14,.055,.02,M.glass===undefined?M.bezel:M.bezel);ub.position.set(.06,.38,.016);w.add(ub);
+      const lock=new THREE.Mesh(new THREE.CircleGeometry(.008,10),M.ledG);lock.position.set(-.5,.38,.026);w.add(lock);
+      browserScr=liveTex(512,320,(g2,w2,h2)=>drawRingScreen(g2,w2,h2,c,tokNow),{auto:false});
+      const sc=screen(1.2,.72,browserScr.tex);sc.position.set(0,-.06,.016);w.add(sc);
+      g.add(w);
+      return g;},
+  };
+  const g=B[id](color);
+  if(id==='browser')g.userData.screenRef=browserScr;
+  return g;
+  }
+
+/* ───────── HERO: the ring ───────── */
+function hero(){
+  let api={spawn(){},busy(){} };
+  const canvas=$('#hero3d'),host=$('#top'),labelsEl=$('#heroLabels');
+  if(!HAS3D){host.classList.add('no3d');return api;}
+  const renderer=makeRenderer(canvas);
+  const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x07110d,16,36);
+  const cam=new THREE.PerspectiveCamera(34,1,.1,120);
+  scene.add(new THREE.HemisphereLight(0xcfeedd,0x04100a,.55));
+  const key=new THREE.DirectionalLight(0xffffff,1.05);key.position.set(6,10,8);scene.add(key);
+  const fill=new THREE.DirectionalLight(0x7fd6ff,.35);fill.position.set(-8,3,-4);scene.add(fill);
+  const core=new THREE.PointLight(0x1be480,2.4,16,1.6);core.position.set(0,1.4,0);scene.add(core);
+  const world=new THREE.Group();scene.add(world);
+  let innerMat=null;
+  const R=6.0;
+  const DEVS=[
+    {id:'server',label:'server',layers:24,speed:1.00,color:0x1be480},
+    {id:'pc',label:'pc',layers:20,speed:.88,color:0x2fc983},
+    {id:'nas',label:'nas',layers:15,speed:.52,color:0x9fbf3a},
+    {id:'laptop',label:'laptop',layers:10,speed:.56,color:0x1a8f8f},
+    {id:'tablet',label:'tablet',layers:5,speed:.42,color:0x2b5f9e},
+    {id:'phone',label:'phone',layers:4,speed:.36,color:0x5b8fd0},
+    {id:'browser',label:'browser',layers:3,speed:.30,color:0xc99a2e},
+  ];
+  const GAP=.07,TOTAL=DEVS.reduce((s,d)=>s+d.layers,0),SPAN=Math.PI*2-GAP*DEVS.length;
+  let a=-Math.PI/2+.4,lay=0;
+  class Arc extends THREE.Curve{constructor(r,a0,a1){super();this.r=r;this.a0=a0;this.a1=a1;}getPoint(t,o=new THREE.Vector3()){const x=this.a0+(this.a1-this.a0)*t;return o.set(Math.cos(x)*this.r,0,Math.sin(x)*this.r);}}
+  DEVS.forEach(d=>{d.a0=a;d.a1=a+SPAN*d.layers/TOTAL;d.mid=(d.a0+d.a1)/2;d.l0=lay;d.l1=lay+d.layers;lay+=d.layers;a=d.a1+GAP;});
+  DEVS.forEach(d=>{d.frac=(d.a1-d.a0)/(Math.PI*2);d.flash=0;});
+  const TAU=Math.PI*2,OMEGA=2.42,AVGFR=1/7,lapT=[];
+  /* arcs */
+  DEVS.forEach(d=>{
+    const mat=new THREE.MeshBasicMaterial({color:d.color,toneMapped:false});d.base=new THREE.Color(d.color);
+    const m=new THREE.Mesh(new THREE.TubeGeometry(new Arc(R,d.a0,d.a1),Math.max(12,d.layers*3),.075,10,false),mat);
+    world.add(m);d.arcMat=mat;d.arcGeo=m.geometry;d.caps=[];
+    /* caps */
+    [d.a0,d.a1].forEach(x=>{const s=new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),mat);s.position.set(Math.cos(x)*R,0,Math.sin(x)*R);world.add(s);d.caps.push(s);});
+  });
+  /* layer ticks */
+  {const pts=[];DEVS.forEach(d=>{for(let i=0;i<=d.layers;i++){const x=lerp(d.a0,d.a1,i/d.layers),big=i===0||i===d.layers,r1=R+.2,r2=R+(big?.52:.32);pts.push(Math.cos(x)*r1,0,Math.sin(x)*r1,Math.cos(x)*r2,0,Math.sin(x)*r2);}});
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+    var tickMat=new THREE.LineBasicMaterial({color:0x4d7a62,transparent:true,opacity:.55});world.add(new THREE.LineSegments(g,tickMat));}
+  {const inner=new THREE.Mesh(new THREE.TorusGeometry(R-.55,.008,6,256),new THREE.MeshBasicMaterial({color:0x2a5a42,transparent:true,opacity:.6}));inner.rotation.x=Math.PI/2;world.add(inner);innerMat=inner.material;}
+  /* floor */
+  const grid=new THREE.PolarGridHelper(11,28,9,128,0x1c3a2b,0x112419);grid.position.y=-.95;grid.material.transparent=true;grid.material.opacity=.55;world.add(grid);
+  const glow=new THREE.Mesh(new THREE.PlaneGeometry(16,16),new THREE.MeshBasicMaterial({map:radialTex('rgba(27,228,128,.28)','rgba(27,228,128,0)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+  glow.rotation.x=-Math.PI/2;glow.position.y=-.94;world.add(glow);
+
+  /* materials */
+  /* live screens — textures that redraw themselves */
+
+  const leds=[],fans=[],floaters=[];
+  const heroScreens=[];
+
+  const labels=[];
+  DEVS.forEach((d,i)=>{
+    const g=new THREE.Group();const rr=R+1.75;
+    g.position.set(Math.cos(d.mid)*rr,-.9,Math.sin(d.mid)*rr);
+    g.rotation.y=-d.mid+Math.PI/2;
+    const ped=new THREE.Mesh(new THREE.CylinderGeometry(.78,.84,.1,48),M.bezel);ped.position.y=.05;g.add(ped);
+    const ringMat=new THREE.MeshBasicMaterial({color:d.color,transparent:true,opacity:.6});
+    const pr=new THREE.Mesh(new THREE.TorusGeometry(.8,.014,6,64),ringMat);pr.rotation.x=Math.PI/2;pr.position.y=.1;g.add(pr);d.pedMat=ringMat;
+    const model=makeDevice(d.id,d.color,{leds,fans,floaters});
+    model.position.y=.1;model.scale.setScalar(.92);g.add(model);
+    if(model.userData.screenRef)heroScreens.push(model.userData.screenRef);
+    world.add(g);g.userData.devId=d.id;d.group=g;
+    /* link from arc to pedestal */
+    const lg=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(Math.cos(d.mid)*(R+.55),0,Math.sin(d.mid)*(R+.55)),new THREE.Vector3(Math.cos(d.mid)*(R+.95),-.8,Math.sin(d.mid)*(R+.95))]);
+    const lkMat=new THREE.LineBasicMaterial({color:d.color,transparent:true,opacity:.3});world.add(new THREE.Line(lg,lkMat));d.lkMat=lkMat;d.colBase=new THREE.Color(d.color);
+    const el=document.createElement('div');el.className='dlabel';el.innerHTML=`<b>${d.label}</b><span>layers ${d.l0}–${d.l1-1}</span><br><span class="ld"></span>`;
+    labelsEl.appendChild(el);labels.push({el,ld:el.querySelector('.ld'),d});
+    d.pulse=0;d.load=.5;
+  });
+  addEventListener('omnarc-lang',()=>{const lw=t('hud.layers');
+    labels.forEach(o=>{const s=o.el.querySelector('span');if(s)s.textContent=lw+' '+o.d.l0+'–'+(o.d.l1-1);});cardRefresh();});
+
+  /* device inspector — click a device, read its telemetry */
+  const card=document.createElement('div');card.className='dev-card';card.hidden=true;labelsEl.appendChild(card);
+  let selDev=null,hoverDev=null;
+  function cardBody(d){return `<b>${d.label}</b><span>${t('hud.layers')} ${d.l0}–${d.l1-1}</span><span>load ${Math.round(d.load*100)}% · ${Math.round(30+d.load*45)}° · ${Math.round(60+Math.pow(d.load,1.3)*520)} W</span>`;}
+  function cardRefresh(){if(selDev)card.innerHTML=cardBody(selDev);}
+  function cardUpdate(){labels.forEach(o=>o.el.classList.toggle('sel',o.d===selDev));
+    if(selDev){card.hidden=false;card.innerHTML=cardBody(selDev);}else card.hidden=true;}
+  const pickR=new THREE.Raycaster(),pickN=new THREE.Vector2(),pickTargets=DEVS.map(d=>d.group);
+  function pickAt(e){const r=canvas.getBoundingClientRect();pickN.set(((e.clientX-r.left)/r.width)*2-1,-(((e.clientY-r.top)/r.height)*2-1));
+    pickR.setFromCamera(pickN,cam);
+    const h=pickR.intersectObjects(pickTargets,true)[0];if(!h)return null;
+    let o=h.object;while(o&&!(o.userData&&o.userData.devId))o=o.parent;
+    return o?DEVS.find(d=>d.id===o.userData.devId):null;}
+  canvas.addEventListener('click',e=>{if(st.moved>6)return;const d=pickAt(e);selDev=d;cardUpdate();});
+  canvas.addEventListener('pointermove',e=>{if(st.dragging)return;const d=pickAt(e);if(d!==hoverDev){hoverDev=d;canvas.style.cursor=d?'pointer':'grab';}});
+  addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(e.target&&e.target.closest&&e.target.closest('form,textarea,input'))return;selDev=null;cardUpdate();});
+
+  leds.forEach(l=>l.base=l.m.material.color.getHex());
+  /* tokens */
+  const NC=30,TR=30;
+  const comets=pointCloud(NC*TR);world.add(comets);
+  const C=[];for(let i=0;i<NC;i++)C.push({on:false,a:0,trav:0,hist:[],amb:false,big:false});
+  const startA=DEVS[0].a0+.02;
+  for(let i=0;i<3;i++)Object.assign(C[i],{on:true,amb:true,a:startA+i*(Math.PI*2/3),w:OMEGA,laps:0});
+  api.spawn=(o={})=>{const c=C.find(c=>!c.on);if(!c)return;Object.assign(c,{on:true,a:startA,trav:0,amb:false,big:!!o.big,w:OMEGA*2.55,laps:0});c.hist.length=0;};
+  const colAt=x=>{const t=((x%(Math.PI*2))+Math.PI*2)%(Math.PI*2);for(const d of DEVS){const a0=((d.a0%(Math.PI*2))+Math.PI*2)%(Math.PI*2);let rel=t-a0;if(rel<0)rel+=Math.PI*2;if(rel<=d.a1-d.a0+GAP)return d;}return DEVS[0];};
+  /* dust */
+  const ND=650,dust=pointCloud(ND);world.add(dust);
+  {const p=dust.geometry.attributes.position.array,c=dust.geometry.attributes.aColor.array,s=dust.geometry.attributes.size.array,al=dust.geometry.attributes.alpha.array;
+    for(let i=0;i<ND;i++){const r=2+Math.pow(Math.random(),.7)*10,t=Math.random()*Math.PI*2;p[i*3]=Math.cos(t)*r;p[i*3+1]=-.9+Math.pow(Math.random(),2)*5;p[i*3+2]=Math.sin(t)*r;
+      const gold=Math.random()<.18;c[i*3]=gold?.8:.12;c[i*3+1]=gold?.6:.75;c[i*3+2]=gold?.2:.45;s[i]=.25+Math.random()*.75;al[i]=.15+Math.random()*.35;}}
+
+  /* studio env → real reflections on every metal part */
+  scene.environment=studioEnv(renderer);
+  Object.assign(M.metal,{envMapIntensity:.95});Object.assign(M.alu,{envMapIntensity:1.05});
+  M.bezel.envMapIntensity=.45;M.glass.envMapIntensity=.8;
+  /* realtime shadows */
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  key.castShadow=true;key.shadow.mapSize.set(1024,1024);Object.assign(key.shadow.camera,{left:-9,right:9,top:9,bottom:-9,far:40});key.shadow.bias=-.0004;
+  const shFloor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.ShadowMaterial({opacity:.42}));
+  shFloor.rotation.x=-Math.PI/2;shFloor.position.y=-.945;shFloor.receiveShadow=true;world.add(shFloor);
+  /* the token carries a real light around the ring */
+  const tokenLight=new THREE.PointLight(0xaaffd2,2.2,8,2);tokenLight.position.set(Math.cos(startA)*R,.5,Math.sin(startA)*R);world.add(tokenLight);
+  const st={yaw:0,pitch:0,mx:0,my:0,dragging:false,moved:0};
+  dragYaw(canvas,st,()=>reduceMotion&&L.once());
+  const t0Intro=performance.now();let W=1,H=1,camBase=new THREE.Vector3(),crect=null;const center=$('#heroCenter');
+  function resize(){W=canvas.clientWidth;H=canvas.clientHeight;renderer.setSize(W,H,false);cam.aspect=W/H;
+    if(W>960){world.position.set(0,-1.4,0);camBase.set(0,10.5,20.5);cam.fov=36;}
+    else if(W>600){world.position.set(0,-3,0);camBase.set(0,10,25);cam.fov=38;}
+    else{world.position.set(0,-6.4,0);camBase.set(0,7.6,25);cam.fov=40;}
+    crect=null;
+    cam.updateProjectionMatrix();}
+  new ResizeObserver(resize).observe(canvas);resize();
+  const v=new THREE.Vector3();let T=0,hudT=0;
+  const tokEl=$('#hudTok'),flightEl=$('#hudFlight');
+  function frame(dt,t){
+    T+=dt;
+    if(!st.dragging&&!reduceMotion)st.yaw+=dt*.05;
+    world.rotation.y=lerp(world.rotation.y,st.yaw,.08);
+    cam.position.set(camBase.x+st.mx*.8,camBase.y+st.pitch*8-st.my*.4,camBase.z);
+    cam.lookAt(0,world.position.y+.5,0);
+    const it=reduceMotion?1:clamp((performance.now()-t0Intro-300)/2200,0,1);
+    if(it<1||!DEVS.grown){DEVS.forEach((d,i)=>{const p=clamp(it*DEVS.length*.9-i*.8,0,1),cnt=d.arcGeo.index.count;d.arcGeo.setDrawRange(0,Math.floor(p*cnt/6)*6);d.caps[0].visible=p>0;d.caps[1].visible=p>=1;});if(it>=1)DEVS.grown=true;}
+    /* loads */
+    DEVS.forEach((d,i)=>{d.load=.45+.3*Math.sin(T*.7+i*1.9)+.15*noise1(T*.6+i*10);d.pulse=Math.max(0,d.pulse-dt*2.2);
+      d.group.position.y=-.9+d.pulse*.16;
+      d.flash=Math.max(0,d.flash-dt*2.4);
+      if(d.lkMat){d.lkMat.opacity=.24+.76*d.flash;d.lkMat.color.copy(d.colBase).multiplyScalar(.5+1.1*d.flash);}
+      d.arcMat.color.copy(d.base).multiplyScalar(.5+d.load*.45+d.pulse*.6);d.pedMat.opacity=.35+d.pulse*.65;});
+    /* comets */
+    const P=comets.geometry.attributes.position.array,Cc=comets.geometry.attributes.aColor.array,S=comets.geometry.attributes.size.array,A=comets.geometry.attributes.alpha.array;
+    let fl=0;
+    C.forEach((c,ci)=>{
+      if(!c.on){for(let j=0;j<TR;j++)A[ci*TR+j]=0;return;}
+      fl++;const prev=c.a;
+      /* bosqich-vaqt modeli: token har qurilmaning ulushiga proporsional vaqt o'tkazadi */
+      const dNow=colAt(c.a);
+      c.a+=dt*(c.w||OMEGA)*(AVGFR/dNow.frac);
+      c.trav+=c.a-prev;const d=colAt(c.a);
+      const rel=x=>((x-DEVS[0].a0)%TAU+TAU)%TAU,r0=rel(prev),r1=rel(c.a);
+      for(const dd of DEVS){
+        const bp=((dd.a0-DEVS[0].a0)%TAU+TAU)%TAU;
+        const crossed=r0<=r1?(bp>r0&&bp<=r1):(bp>r0||bp<=r1);
+        if(crossed){dd.pulse=Math.max(dd.pulse,c.amb?.7:1);dd.flash=1;}
+      }
+      if(r1<r0){c.laps=(c.laps||0)+1;if(c.amb)lapT.push(T);DEVS[0].pulse=Math.max(DEVS[0].pulse,.9);}
+      c.hist.unshift(c.a);if(c.hist.length>TR)c.hist.length=TR;
+      while(c.hist.length<TR)c.hist.push(c.hist[c.hist.length-1]);
+      const done=!c.amb&&c.trav>=Math.PI*2,fade=done?0:1;if(done)c.on=false;
+      const col=new THREE.Color(d.color);
+      for(let j=0;j<TR;j++){const k=ci*TR+j,x=c.hist[j],f=1-j/TR;
+        P[k*3]=Math.cos(x)*R;P[k*3+1]=.2+Math.sin(T*3+ci)*.02;P[k*3+2]=Math.sin(x)*R;
+        const w=j===0?.7:0;Cc[k*3]=lerp(col.r,1,w);Cc[k*3+1]=lerp(col.g,1,w);Cc[k*3+2]=lerp(col.b,1,w);
+        S[k]=(j===0?(c.big?7:4.2):(c.big?3.2:2.2)*f+.3);A[k]=fade*(j===0?1:.85*f*f);}
+    });
+    const hC=C.find(c=>c.on);
+    if(hC){tokenLight.position.set(Math.cos(hC.a)*R,.5,Math.sin(hC.a)*R);tokenLight.color.set(colAt(hC.a).color);}
+    flightEl.textContent=fl;
+    ['position','aColor','size','alpha'].forEach(n=>comets.geometry.attributes[n].needsUpdate=true);
+    dust.rotation.y+=dt*.01;
+    leds.forEach(l=>l.m.material.color.setHex(noise1(T*3+l.ph)>.35?l.base:0x0a2016));
+    fans.forEach(f=>f.rotation.x+=dt*14);
+    floaters.forEach((f,i)=>f.position.y=.85+Math.sin(T*1.2+i)*.06);
+    liveScreens.forEach(s=>{if(!s.auto)return;s.acc+=dt;if(s.acc>=s.every){s.acc=0;s.redraw();}});
+    renderer.render(scene,cam);
+    /* labels */
+    if(W>720)labels.forEach(o=>{o.d.group.getWorldPosition(v);v.y+=2.25;v.project(cam);
+      const sx=(v.x+1)/2*W,sy=(1-v.y)/2*H;if(!crect){const hr=host.getBoundingClientRect(),cr=center.getBoundingClientRect();crect={l:cr.left-hr.left-40,r:cr.right-hr.left+40,t:cr.top-hr.top-30,b:cr.bottom-hr.top+30};}
+      const behind=v.z>1||(sx>crect.l&&sx<crect.r&&sy>crect.t&&sy<crect.b);o.el.style.opacity=behind?0:clamp(1.15-(v.z-.96)*12,.25,1);
+      o.el.style.left=((v.x+1)/2*W)+'px';o.el.style.top=((1-v.y)/2*H)+'px';});
+    if(selDev){selDev.group.getWorldPosition(v);v.y+=3.3;v.project(cam);
+      card.style.left=((v.x+1)/2*W)+'px';card.style.top=((1-v.y)/2*H)+'px';card.style.opacity=v.z<1?1:0;}
+    hudT+=dt;if(hudT>.5){hudT=0;crect=null;if(!api.streaming){while(lapT.length&&lapT[0]<T-2.6)lapT.shift();tokNow=lapT.length/2.6*7.2;tokEl.textContent=tokNow.toFixed(1)+' tok/s';window.__ringTok=tokNow;heroScreens.forEach(r=>r.redraw());
+      labels.forEach(o=>o.ld.textContent='load '+Math.round(o.d.load*100)+'%');cardRefresh();}
+  }
+  const L=loop(host,frame);if(reduceMotion){frame(0,0);L.once();}
+  api.redraw=()=>reduceMotion&&L.once();
+  return api;
+}
+
+/* ───────── LAB: layer partition ───────── */
+function lab(){
+  const DEV=[
+    {id:'h100',name:'Server, H100 80 GB',bw:3350,mem:76,color:'#1be480',on:false},
+    {id:'pc',name:'Desktop, RTX 4090',bw:1008,mem:22,color:'#2fc983',on:true},
+    {id:'mac',name:'MacBook Pro, M3 Max',bw:400,mem:36,color:'#1a8f8f',on:true},
+    {id:'mini',name:'Mini PC, 32 GB RAM',bw:68,mem:26,color:'#9fbf3a',on:true},
+    {id:'laptop',name:'Laptop, integrated GPU',bw:90,mem:10,color:'#2b5f9e',on:true},
+    {id:'phone',name:'Android phone, 12 GB',bw:64,mem:6,color:'#6d9be0',on:true},
+    {id:'browser',name:'Browser tab, WebGPU',bw:40,mem:3,color:'#c99a2e',on:false},
+  ];
+  const MODELS={'8b':{name:'Llama 8B',gb:4.9,L:32,h:4096},'70b':{name:'Llama 70B',gb:42.5,L:80,h:8192},'405b':{name:'Llama 405B',gb:243,L:126,h:16384}};
+  const NETS={lan:{B:2.5,rtt:.25,name:'2.5 GbE'},wifi:{B:.6,rtt:3,name:'Wi-Fi 6'},wan:{B:.1,rtt:28,name:'the internet'}};
+  let model='70b',net='lan';
+  const list=$('#devList');
+  function addRow(d,first){const l=document.createElement('label');l.className='dev'+(d.id==='me'?' me':'');l.dataset.id=d.id;
+    l.innerHTML=`<input type="checkbox" ${d.on?'checked':''}><span><span class="nm">${d.name}</span><br><span class="sp">${d.bw.toLocaleString('en')} GB/s · ${d.mem} GB free</span></span><span class="sw" style="background:${d.color}"></span>`;
+    l.querySelector('input').addEventListener('change',e=>{d.on=e.target.checked;solve();});first?list.prepend(l):list.appendChild(l);}
+  DEV.forEach(d=>addRow(d));
+  const seg=(id,cb)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$(id).querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));cb(b);solve();});
+  seg('#modelSeg',b=>model=b.dataset.m);seg('#netSeg',b=>net=b.dataset.n);
+  const fmt=(x,d=1)=>x>=100?Math.round(x).toString():x.toFixed(d);
+
+  function waterfill(act,Lt,m){
+    const cap=act.map(d=>Math.floor(d.mem/m));
+    if(cap.reduce((s,c)=>s+c,0)<Lt)return null;
+    let lo=0,hi=Lt/Math.min(...act.map(d=>d.bw))+1;
+    const f=l=>act.reduce((s,d,i)=>s+Math.min(cap[i],l*d.bw),0);
+    for(let it=0;it<80;it++){const mid=(lo+hi)/2;f(mid)<Lt?lo=mid:hi=mid;}
+    const cont=act.map((d,i)=>Math.min(cap[i],hi*d.bw));
+    const n=cont.map(Math.floor);let rem=Lt-n.reduce((s,x)=>s+x,0);
+    const order=cont.map((x,i)=>[x-Math.floor(x),i]).sort((a,b)=>b[0]-a[0]);
+    for(const [,i] of order){if(rem<=0)break;if(n[i]<cap[i]){n[i]++;rem--;}}
+    for(let i=0;rem>0&&i<n.length;i++){while(rem>0&&n[i]<cap[i]){n[i]++;rem--;}}
+    return n;
+  }
+  function latencyPlan(act,Lt,m,comm){
+    /* minimise Σℓ·t + hops: fill fastest first */
+    const s=[...act].sort((a,b)=>b.bw-a.bw);let left=Lt,cost=0,used=[];
+    for(const d of s){if(left<=0)break;const take=Math.min(left,Math.floor(d.mem/m));if(take<=0)continue;left-=take;cost+=take*m/d.bw*1000+comm;used.push(d.name.split(',')[0]);}
+    if(left>0)return null;if(used.length===1)cost-=comm;return {tps:1000/cost,used};
+  }
+  const ringCv=$('#labRing');
+  function drawRing(rows,Lt,label){
+    const dpr=Math.min(devicePixelRatio||1,2),S=240;ringCv.width=S*dpr;ringCv.height=S*dpr;const g=ringCv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,S,S);
+    const cx=S/2,cy=S/2,r=92;g.lineCap='butt';
+    g.strokeStyle='rgba(215,232,221,.08)';g.lineWidth=20;g.beginPath();g.arc(cx,cy,r,0,Math.PI*2);g.stroke();
+    let a=-Math.PI/2;const gap=rows.length>1?.035:0;
+    rows.forEach(o=>{if(!o.n)return;const span=Math.PI*2*o.n/Lt;g.strokeStyle=o.d.color;g.lineWidth=20;g.beginPath();g.arc(cx,cy,r,a+gap/2,a+span-gap/2);g.stroke();
+      g.strokeStyle='rgba(7,17,13,.35)';g.lineWidth=1;if(Lt<=40)for(let i=1;i<o.n;i++){const x=a+span*i/o.n;g.beginPath();g.moveTo(cx+Math.cos(x)*(r-10),cy+Math.sin(x)*(r-10));g.lineTo(cx+Math.cos(x)*(r+10),cy+Math.sin(x)*(r+10));g.stroke();}
+      a+=span;});
+    g.fillStyle='#d7e8dd';g.textAlign='center';g.font='600 26px "Geist Mono",monospace';g.fillText(label[0],cx,cy+4);
+    g.fillStyle='#7d9384';g.font='12px Geist,system-ui,sans-serif';g.fillText(label[1],cx,cy+24);
+  }
+  function solve(){
+    const M=MODELS[model],N=NETS[net],m=M.gb/M.L,act=DEV.filter(d=>d.on);
+    const warn=$('#labWarn'),body=$('#allocBody');
+    const totalMem=act.reduce((s,d)=>s+d.mem,0);
+    const comm=(M.h*2*8)/(N.B*1e9)*1000+N.rtt;
+    const n=act.length?waterfill(act,M.L,m):null;
+    if(!n){
+      warn.classList.add('on');warn.textContent=act.length?tf('plan.need',{name:M.name,gb:M.gb,total:totalMem,more:Math.ceil(M.gb-totalMem+.5)}):t('plan.pick');
+      body.innerHTML='';['#kSingle','#kMulti','#kBottle'].forEach(id=>$(id).textContent='—');$('#kMem').innerHTML=`${fmt(M.gb)} <small>/ ${totalMem} GB</small>`;
+      $('#planSub').textContent=tf('plan.nofit',{name:M.name});drawRing([],1,['—','layers']);return;}
+    warn.classList.remove('on');
+    const rows=act.map((d,i)=>({d,n:n[i]}));const used=rows.filter(o=>o.n>0);const multi=used.length>1;
+    let l0=0;rows.forEach(o=>{o.t=o.n*m/o.d.bw*1000+(o.n&&multi?comm:0);o.l0=l0;l0+=o.n;});
+    const sum=rows.reduce((s,o)=>s+o.t,0),bott=rows.reduce((a,b)=>b.t>a.t?b:a);
+    const single=1000/sum,many=1000/bott.t;
+    $('#kSingle').innerHTML=`${fmt(single)} <small>tok/s</small>`;
+    $('#kMulti').innerHTML=`${fmt(many)} <small>tok/s total</small>`;
+    $('#kBottle').innerHTML=`${fmt(bott.t,2)} <small>ms</small>`;
+    $('#kMem').innerHTML=`${fmt(M.gb)} <small>/ ${totalMem} GB</small>`;
+    const lp=latencyPlan(act,M.L,m,comm);
+    let sub=tf('plan.base',{name:M.name,L:M.L,m:m.toFixed(2),net:N.name,n:used.length});
+    if(lp&&lp.tps>single*1.08)sub+=' '+tf('plan.fast',{used:lp.used.join(t('plan.and')),tps:fmt(lp.tps)});
+    $('#planSub').textContent=sub;
+    body.innerHTML=rows.map(o=>{const used=o.n*m;return `<tr><td><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${o.d.color};margin-right:8px"></span>${o.d.name.split(',')[0]}</td>
+      <td>${o.n?`${o.l0}–${o.l0+o.n-1}`:t('row.standby')}</td>
+      <td>${fmt(used)} / ${o.d.mem} GB</td>
+      <td>${o.n?fmt(o.t,2)+' ms':'—'}</td>
+      <td><div class="bar"><i style="width:${(o.t/sum*100).toFixed(1)}%;background:${o===bott?'#e2b13c':o.d.color}"></i></div></td></tr>`;}).join('');
+    drawRing(rows,M.L,[fmt(many),t('ring.many')]);
+  }
+  solve();
+  addEventListener('omnarc-lang',()=>solve());
+  return {add(d){const i=DEV.findIndex(x=>x.id===d.id);if(i>=0){DEV.splice(i,1);list.querySelector(`[data-id="${d.id}"]`)?.remove();}DEV.unshift(d);addRow(d,true);solve();}};
+}
+
+/* ───────── NODE: rack simulation ───────── */
+function heatColor(T){const st=[[30,[43,95,158]],[45,[26,143,143]],[60,[27,228,128]],[72,[201,154,46]],[85,[224,88,58]]];
+  if(T<=st[0][0])return st[0][1];for(let i=1;i<st.length;i++)if(T<=st[i][0]){const f=(T-st[i-1][0])/(st[i][0]-st[i-1][0]);return st[i-1][1].map((c,k)=>Math.round(lerp(c,st[i][1][k],f)));}return st[st.length-1][1];}
+function node(){
+  const NG=32,LAYERS=126;
+  const gpus=[...Array(NG)].map((_,i)=>({i,node:Math.floor(i/8),k:i%8,u:.3,T:38,P:150,kv:1+Math.random(),hist:[],l0:Math.round(i*LAYERS/NG),l1:Math.round((i+1)*LAYERS/NG)-1,sm:new Float32Array(132)}));
+  let sel=13,simT=0,histT=0;
+  function step(dt){
+    simT+=dt;
+    gpus.forEach(g=>{
+      const ph=simT*.35-g.i/NG;const wave=Math.pow(Math.max(0,Math.cos(ph*Math.PI*2)),3);
+      const target=clamp(.32+.6*wave+.12*(noise1(simT*.8+g.i*7)-.5),.05,1);
+      g.u=lerp(g.u,target,1-Math.exp(-dt*4));
+      g.P=90+610*Math.pow(g.u,1.25);
+      const Tt=28+.075*g.P;g.T+= (Tt-g.T)*(1-Math.exp(-dt/5));
+      g.kv=1.2+1.6*((simT*.02+g.i*.13)%1);
+      for(let s=0;s<132;s++)g.sm[s]=clamp(g.u+.35*(noise1(simT*1.7+s*.73+g.i*31)-.5),0,1);
+    });
+    histT+=dt;if(histT>=.5){histT=0;gpus.forEach(g=>{g.hist.push(g.P);if(g.hist.length>120)g.hist.shift();});}
+  }
+  for(let i=0;i<200;i++)step(.1);
+  /* telemetry panel */
+  const pick=$('#gpuPick');
+  for(let k=0;k<8;k++){const b=document.createElement('button');b.type='button';b.textContent=k;b.setAttribute('aria-label','GPU '+k);b.addEventListener('click',()=>select(Math.floor(sel/8)*8+k));pick.appendChild(b);}
+  function select(i){sel=i;pick.querySelectorAll('button').forEach((b,k)=>b.setAttribute('aria-pressed',k===sel%8));renderPanel();rack&&rack.select(i);}
+  const smCv=$('#smMap'),pwCv=$('#powerChart');
+  function sizeCv(cv){const dpr=Math.min(devicePixelRatio||1,2),w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==w*dpr){cv.width=w*dpr;cv.height=h*dpr;}const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);return [g,w,h];}
+  function renderPanel(){
+    const g=gpus[sel];
+    $('#gpuName').textContent=`node ${g.node+1}, GPU ${g.k} — layers ${g.l0}–${g.l1}`;
+    $('#gUtil').innerHTML=`${Math.round(g.u*100)}<small>%</small>`;
+    $('#gPow').innerHTML=`${Math.round(g.P)}<small> W</small>`;
+    $('#gTemp').innerHTML=`${Math.round(g.T)}<small> °C</small>`;
+    $('#gMem').innerHTML=`${(7.6+g.kv).toFixed(1)}<small> / 80 GB</small>`;
+    /* SM map */
+    {const [c,w,h]=sizeCv(smCv);c.clearRect(0,0,w,h);const cols=12,rows=11,gp=3,cw=(w-gp*(cols+1))/cols,ch=(h-gp*(rows+1))/rows;let avg=0;
+      for(let s=0;s<132;s++){const x=s%cols,y=Math.floor(s/cols),v=g.sm[s];avg+=v;const col=heatColor(30+v*55);c.fillStyle=`rgb(${col})`;c.globalAlpha=.25+v*.75;
+        c.beginPath();const X=gp+x*(cw+gp),Y=gp+y*(ch+gp);c.roundRect?c.roundRect(X,Y,cw,ch,3):c.rect(X,Y,cw,ch);c.fill();}
+      c.globalAlpha=1;$('#smAvg').textContent=`occupancy ${Math.round(avg/132*100)}%`;}
+    /* power chart */
+    {const [c,w,h]=sizeCv(pwCv);c.clearRect(0,0,w,h);c.strokeStyle='rgba(215,232,221,.07)';c.lineWidth=1;
+      for(let i=1;i<4;i++){c.beginPath();c.moveTo(0,h*i/4);c.lineTo(w,h*i/4);c.stroke();}
+      const hs=g.hist,n=120,y=p=>h-4-(p/700)*(h-10);
+      c.beginPath();hs.forEach((p,i)=>{const x=w-(hs.length-1-i)*(w/(n-1));i?c.lineTo(x,y(p)):c.moveTo(x,y(p));});
+      const gr=c.createLinearGradient(0,0,0,h);gr.addColorStop(0,'rgba(27,228,128,.35)');gr.addColorStop(1,'rgba(27,228,128,0)');
+      c.strokeStyle='#1be480';c.lineWidth=1.6;c.stroke();c.lineTo(w,h);c.lineTo(w-(hs.length-1)*(w/(n-1)),h);c.closePath();c.fillStyle=gr;c.fill();}
+    /* smi */
+    const nd=Math.floor(sel/8),lines=[`GPU  temp  power      memory        load  layers`];
+    for(let k=0;k<8;k++){const q=gpus[nd*8+k];lines.push(`${k===sel%8?'▸':' '}${k}   ${String(Math.round(q.T)).padStart(2)}°C  ${String(Math.round(q.P)).padStart(3)}/700 W  ${(7.6+q.kv).toFixed(1).padStart(4)}/80 GB   ${String(Math.round(q.u*100)).padStart(3)}%  ${q.l0}–${q.l1}`);}
+    lines.push(`ring hop to node ${(nd+1)%4+1}: ${(0.18+0.04*noise1(simT)).toFixed(2)} ms over NVLink + 400G`);
+    $('#smi').textContent=lines.join('\n');
+  }
+  let rack=null;
+  if(HAS3D)rack=rack3d(gpus,i=>select(i));else $('#stage').classList.add('no3d');
+  let pT=0;
+  const L=loop($('#node'),(dt)=>{step(dt);pT+=dt;if(pT>.25){pT=0;renderPanel();}rack&&rack.frame(dt);});
+  select(sel);
+  if(reduceMotion){renderPanel();rack&&rack.frame(0);}
+  addEventListener('resize',()=>renderPanel());
+}
+function rack3d(gpus,onPick){
+  const canvas=$('#rack3d'),stage=$('#stage');
+  const renderer=makeRenderer(canvas);const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x0c1a14,12,26);
+  const cam=new THREE.PerspectiveCamera(32,1,.1,80);
+  scene.add(new THREE.HemisphereLight(0xcfeedd,0x05100b,.5));
+  const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(5,8,7);scene.add(key);
+  const back=new THREE.PointLight(0xe0583a,1.4,8,2);back.position.set(0,2.2,-2.4);scene.add(back);
+  const world=new THREE.Group();scene.add(world);
+  scene.environment=studioEnv(renderer);
+  const metal=new THREE.MeshStandardMaterial({color:0x1c2823,metalness:.8,roughness:.32});
+  const dark=new THREE.MeshStandardMaterial({color:0x0b1310,metalness:.5,roughness:.45});
+  const box=(w,h,d,m)=>{const me=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);me.castShadow=true;return me;};
+  [[-1.5,1.25],[1.5,1.25],[-1.5,-1.25],[1.5,-1.25]].forEach(([x,z])=>{const p=box(.09,4.4,.09,metal);p.position.set(x,2.2,z);world.add(p);});
+  [0,4.4].forEach(y=>{const p=box(3.1,.08,2.6,metal);p.position.set(0,y,0);world.add(p);});
+  const hex=canvasTex(128,256,(g,w,h)=>{g.fillStyle='#050a08';g.fillRect(0,0,w,h);g.globalCompositeOperation='destination-out';const r=7;
+    for(let y=0;y<h+r;y+=r*1.6)for(let x=0;x<w+r;x+=r*1.85){const ox=(Math.round(y/(r*1.6))%2)*r*.92;g.beginPath();for(let k=0;k<6;k++){const a=Math.PI/3*k+Math.PI/6;g.lineTo(x+ox+Math.cos(a)*r*.82,y+Math.sin(a)*r*.82);}g.fill();}});
+  const sleds=[];const grilleMat=new THREE.MeshBasicMaterial({map:hex,transparent:true});
+  for(let n=0;n<4;n++){
+    const y=.62+(3-n)*.98;
+    world.add(box(2.85,.84,2.3,metal).translateY(y));
+    const bz=box(2.85,.84,.03,dark);bz.position.set(0,y,1.16);world.add(bz);
+    for(let k=0;k<8;k++){
+      const mat=new THREE.MeshBasicMaterial({color:0x1be480,toneMapped:false});
+      const s=box(.29,.66,.04,mat);s.position.set(-1.12+k*.32,y,1.19);s.userData.i=n*8+k;world.add(s);
+      const gr=new THREE.Mesh(new THREE.PlaneGeometry(.29,.66),grilleMat);gr.position.set(s.position.x,y,1.212);world.add(gr);
+      sleds.push(s);}
+    const tag=new THREE.Mesh(new THREE.PlaneGeometry(.06,.5),new THREE.MeshBasicMaterial({color:0x1be480}));tag.position.set(1.36,y,1.18);world.add(tag);
+  }
+  const floor=new THREE.GridHelper(14,28,0x1c3a2b,0x112419);floor.material.transparent=true;floor.material.opacity=.5;world.add(floor);
+  const shP=new THREE.Mesh(new THREE.PlaneGeometry(12,12),new THREE.ShadowMaterial({opacity:.4}));
+  shP.rotation.x=-Math.PI/2;shP.position.y=.005;shP.receiveShadow=true;world.add(shP);
+  let rackGrid=floor;
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  key.castShadow=true;key.shadow.mapSize.set(1024,1024);Object.assign(key.shadow.camera,{left:-5,right:5,top:6,bottom:-3,far:30});key.shadow.bias=-.0005;
+  /* selection frame */
+  const selBox=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(.33,.71,.08)),new THREE.LineBasicMaterial({color:0xffffff}));world.add(selBox);
+  /* airflow */
+  const NA=700,air=pointCloud(NA);world.add(air);
+  const AP=[...Array(NA)].map(()=>({n:Math.floor(Math.random()*4),x:(Math.random()-.5)*2.6,z:Math.random()*4.6-2.2,yy:(Math.random()-.5)*.6,sp:.9+Math.random()*.8}));
+  const st={yaw:-.5,pitch:0,mx:0,my:0,dragging:false,moved:0};
+  dragYaw(canvas,st,()=>reduceMotion&&api.frame(0));
+  const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();
+  canvas.addEventListener('click',e=>{if(st.moved>6)return;const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,cam);const h=ray.intersectObjects(sleds)[0];if(h)onPick(h.object.userData.i);});
+  canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,cam);canvas.style.cursor=ray.intersectObjects(sleds).length?'pointer':'grab';});
+  let W=1,H=1;function resize(){W=stage.clientWidth;H=stage.clientHeight;renderer.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();}
+  new ResizeObserver(resize).observe(stage);resize();
+  let sel=13,T=0;const col=new THREE.Color();
+  const api={select(i){sel=i;},frame(dt){
+    T+=dt;if(!st.dragging&&!reduceMotion)st.yaw=lerp(st.yaw,-.5+Math.sin(T*.15)*.35,.01);
+    world.rotation.y=lerp(world.rotation.y,st.yaw,.1);
+    const dist=W<560?17:14;cam.position.set(Math.sin(.0)*dist+st.mx*.4,3.4+st.pitch*6,dist);cam.lookAt(0,2.1,0);
+    sleds.forEach((s,i)=>{const c=heatColor(gpus[i].T);const k=.45+gpus[i].u*.55;s.material.color.setRGB(c[0]/255*k,c[1]/255*k,c[2]/255*k);});
+    selBox.position.copy(sleds[sel].position);selBox.position.z+=.01;
+    const P=air.geometry.attributes.position.array,C=air.geometry.attributes.aColor.array,S=air.geometry.attributes.size.array,A=air.geometry.attributes.alpha.array;
+    AP.forEach((p,i)=>{p.z-=dt*p.sp*1.6;if(p.z<-2.6){p.z=2.4;p.x=(Math.random()-.5)*2.6;}
+      const y=.62+(3-p.n)*.98+p.yy+(p.z<-1.2?(-1.2-p.z)*.6:0);
+      P[i*3]=p.x;P[i*3+1]=y;P[i*3+2]=p.z;
+      const avgT=(gpus[p.n*8].T+gpus[p.n*8+4].T+gpus[p.n*8+7].T)/3;const f=clamp((1.2-p.z)/2.6,0,1);
+      const c=heatColor(lerp(32,avgT+6,f));C[i*3]=c[0]/255;C[i*3+1]=c[1]/255;C[i*3+2]=c[2]/255;
+      S[i]=.9;A[i]=(p.z>1.15||p.z<-1.15)?.55:.08;});
+    ['position','aColor','size','alpha'].forEach(n=>air.geometry.attributes[n].needsUpdate=true);
+    renderer.render(scene,cam);}};
+  return api;
+}
+
+/* ───────── MATH plots ───────── */
+function plot(cv,o){
+  const dpr=Math.min(devicePixelRatio||1,2),w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+  const fg=css('--fg'),mu=css('--muted'),bd=css('--border'),pl=44,pr=14,pt=12,pb=30;
+  const X=x=>pl+(x-o.x0)/(o.x1-o.x0)*(w-pl-pr),Y=y=>pt+(1-(y-o.y0)/(o.y1-o.y0))*(h-pt-pb);
+  g.font='11px "Geist Mono",monospace';g.fillStyle=mu;g.strokeStyle=bd;g.lineWidth=1;
+  o.yt.forEach(y=>{g.beginPath();g.moveTo(pl,Y(y));g.lineTo(w-pr,Y(y));g.stroke();g.textAlign='right';g.fillText(o.yf(y),pl-6,Y(y)+4);});
+  o.xt.forEach(x=>{g.textAlign='center';g.fillText(o.xf?o.xf(x):x,X(x),h-pb+16);});
+  g.textAlign='right';g.fillText(o.xl,w-pr,h-2);
+  o.series.forEach(s=>{
+    g.strokeStyle=s.color;g.lineWidth=s.w||2;g.setLineDash(s.dash||[]);g.beginPath();s.pts.forEach(([x,y],i)=>i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y)));g.stroke();g.setLineDash([]);
+    if(s.dots){g.fillStyle=s.color;s.pts.forEach(([x,y])=>{g.beginPath();g.arc(X(x),Y(y),2.6,0,Math.PI*2);g.fill();});}
+  });
+  (o.marks||[]).forEach(m=>{g.fillStyle=css('--card');g.strokeStyle=m.color;g.lineWidth=2.5;g.beginPath();g.arc(X(m.x),Y(m.y),6,0,Math.PI*2);g.fill();g.stroke();
+    g.fillStyle=fg;g.font='600 12px Geist,system-ui,sans-serif';g.textAlign=X(m.x)>w*.7?'right':'left';g.fillText(m.label,X(m.x)+(X(m.x)>w*.7?-10:10),Y(m.y)-9);});
+  (o.legend||[]).forEach((l,i)=>{const lx=pl+8,ly=pt+12+i*16;g.strokeStyle=l.color;g.lineWidth=2;g.setLineDash(l.dash||[]);g.beginPath();g.moveTo(lx,ly-4);g.lineTo(lx+16,ly-4);g.stroke();g.setLineDash([]);g.fillStyle=mu;g.font='11.5px Geist,system-ui,sans-serif';g.textAlign='left';g.fillText(l.t,lx+22,ly);});
+}
+function math(){
+  const brand=()=>css('--brand'),gold=()=>css('--gold'),lapis=()=>css('--lapis');
+  const bind=(id,out,fmt,cb)=>{const i=$(id),o=$(out);const f=()=>{o.textContent=fmt(+i.value);cb();};i.addEventListener('input',f);return f;};
+  const pct=x=>(x*100).toFixed(x>.999?2:1)+'%';
+  /* speculative */
+  function spec(){const a=+$('#sA').value,c=+$('#sC').value;
+    const E=k=>(1-Math.pow(a,k+1))/(1-a),Sp=k=>E(k)/(1+k*c);
+    const ks=[...Array(12)].map((_,i)=>i+1);let best=1;ks.forEach(k=>{if(Sp(k)>Sp(best))best=k;});
+    const ymax=Math.ceil(Math.max(E(12),1/(1-a))+.3);
+    plot($('#plotSpec'),{x0:1,x1:12,y0:0,y1:ymax,xt:[1,3,6,9,12],yt:[...Array(ymax+1).keys()],yf:y=>y+'×',xl:'draft length k',
+      series:[{pts:ks.map(k=>[k,E(k)]),color:gold(),dash:[5,4]},{pts:ks.map(k=>[k,Sp(k)]),color:brand(),w:2.5,dots:true}],
+      marks:[{x:best,y:Sp(best),color:brand(),label:`k = ${best}`}],legend:[{t:'tokens per pass',color:gold(),dash:[5,4]},{t:'speed-up',color:brand()}]});
+    $('#rSpec').textContent=`Best draft length k = ${best}: ${E(best).toFixed(2)} tokens per pass, ${Sp(best).toFixed(2)}× faster than plain decoding.`;}
+  /* replicas */
+  function rep(){const p=+$('#sP').value,Wn=+$('#sW').value;const f=(r,w)=>Math.pow(1-Math.pow(1-p,r),w);const rs=[1,2,3,4,5];
+    plot($('#plotRep'),{x0:1,x1:5,y0:0,y1:1,xt:rs,yt:[0,.25,.5,.75,1],yf:y=>Math.round(y*100)+'%',xl:'replicas per window r',
+      series:[{pts:rs.map(r=>[r,f(r,Wn*2)]),color:lapis(),dash:[5,4]},{pts:rs.map(r=>[r,f(r,Wn)]),color:brand(),w:2.5,dots:true}],
+      legend:[{t:`W = ${Wn}`,color:brand()},{t:`W = ${Wn*2}`,color:lapis(),dash:[5,4]}]});
+    let need=rs.find(r=>f(r,Wn)>=.999);
+    $('#rRep').textContent=`No replicas: ring up ${pct(f(1,Wn))} of the time. Two copies: ${pct(f(2,Wn))}. `+(need?`Three nines need r = ${need}.`:'Three nines need more than 5 copies.');}
+  /* voting */
+  function vote(){const q=+$('#sQ').value,rho=+$('#sR').value;
+    const C=(n,k)=>{let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return r;};
+    const ind=n=>{let s=0;for(let j=Math.floor(n/2)+1;j<=n;j++)s+=C(n,j)*Math.pow(q,j)*Math.pow(1-q,n-j);return s;};
+    const cor=n=>rho*q+(1-rho)*ind(n);
+    const ns=[1,3,5,7,9,11,13,15];const y0=Math.floor(q*10)/10-.05;
+    plot($('#plotVote'),{x0:1,x1:15,y0:Math.max(.4,y0),y1:1,xt:[1,3,5,7,9,11,13,15],yt:[.5,.6,.7,.8,.9,1].filter(v=>v>=Math.max(.4,y0)),yf:y=>Math.round(y*100)+'%',xl:'devices voting n',
+      series:[{pts:ns.map(n=>[n,ind(n)]),color:gold(),dash:[5,4]},{pts:ns.map(n=>[n,cor(n)]),color:brand(),w:2.5,dots:true}],
+      legend:[{t:`errors correlated, ρ = ${rho}`,color:brand()},{t:'fully independent',color:gold(),dash:[5,4]}]});
+    $('#rVote').textContent=`5 devices: ${pct(cor(5))} right, against ${pct(q)} alone. Independent errors would give ${pct(ind(5))}; shared mistakes cap the gain.`;}
+  const fs=[
+    bind('#sA','#oA',v=>v.toFixed(2),spec),bind('#sC','#oC',v=>v.toFixed(2),spec),
+    bind('#sP','#oP',v=>v.toFixed(2),rep),bind('#sW','#oW',v=>v,rep),
+    bind('#sQ','#oQ',v=>v.toFixed(2),vote),bind('#sR','#oR',v=>v.toFixed(2),vote)];
+  const all=()=>fs.forEach(f=>f());all();
+  let rt;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(all,60);}).observe($('#math'));
+  addEventListener('omnarc-theme',()=>setTimeout(all,30));
+}
+
+/* ───────── i18n ───────── */
+const T={
+en:{"nav.story":"How it works","nav.lab":"Partition lab","nav.node":"Inside a node","nav.math":"The math","nav.road":"Roadmap","nav.faq":"FAQ","nav.start":"Get started",
+"hero.status":"pre-alpha, stage B1 in progress","hero.h1a":"Every device is an arc.","hero.h1b":"Together, one mind.","hero.ph":"Ask the ring anything…",
+"chip.ring":"How does a ring run one model?","chip.phone":"Can my old phone really help?","chip.privacy":"Does my prompt leave my house?",
+"hero.sim":"Answers here are simulated; the light shows each token’s trip around the ring.","sim":"simulated",
+"hud.speed":"ring speed","hud.arcs":"arcs","hud.layers":"layers","hud.flight":"in flight","copy":"Copy","copied":"Copied",
+"s1.h":"Seven devices, one model.","s1.p":"Each arc is one device’s share of the model’s 80 layers, sized by its measured memory bandwidth.",
+"s2.h":"Inside an arc, a window of layers.","s2.p":"The token’s hidden state climbs through every layer the device holds. Weights never move; only the state does.",
+"s3.h":"Then 16 KB hops to the next device.","s3.p":"For a 70B model, that is all that crosses the network per token, encrypted over QUIC.",
+"s4.h":"From one home to the world.","s4.p":"Idle devices behind any NAT can join one ring. That is the goal of stage B6, not a shipped feature.",
+"lab.h":"Build a ring, see where every layer lands.","lab.p":"Pick a model and your devices, or measure this browser. The planner solves the same balancing problem as the scheduler.",
+"node.h":"When the arc is a server rack.","node.p":"A ring can hold a whole rack as one arc. Each GPU takes its own window of layers, and heat follows load. Pick a GPU to read it.",
+"math.h":"Three formulas behind the ring.","math.p":"Each one decides a design choice in Omnarc. Move the sliders and watch the trade-off.",
+"cmp.h":"Four ways to spread a model.","cmp.p":"Today’s tools each cover one corner of the world’s idle compute.",
+"road.h":"Nine stages. Nine gates.","road.p":"A stage is done when its public gate passes, not when a blog post ships.","faq.h":"Questions",
+"cta.h":"Form your ring<br>tonight.","cta.p":"Start with two devices: clone, build, and run a ring wired by hand. Everything runs on your machines.","cta.b1":"Read the README","cta.b2":"Star on GitHub",
+"m.t":"This browser","m.d":"Measure real memory bandwidth here, then add this tab to the ring.","m.b":"Measure this browser","m.again":"Measure again","m.k1":"Backend","m.k2":"Copy bandwidth","m.k3":"Memory budget",
+"m.run":"Measuring… keep this tab in front.","m.ok":"Added to the ring as a measured device. The plan on the right now includes it.","m.cpu":"WebGPU is not available here, so this measured the CPU path instead.","m.fail":"Measurement failed. Close other heavy tabs and try again.","m.name":"This browser (measured)",
+"a.prefill":"prefill","a.done":"tokens in",
+"thr.dev":"Device","thr.layers":"Layers","thr.mem":"Memory","thr.stage":"Stage","thr.time":"Share of time",
+"lab.k1":"one request","lab.k2":"many requests","lab.k3":"slowest stage","lab.k4":"memory used",
+"row.standby":"standby","plan.and":" and ",
+"plan.base":"{name}: {L} layers of {m} GB over {net}. Devices holding layers: {n}.",
+"plan.fast":"For a single request, using only {used} would give {tps} tok/s; slow arcs add stage time.",
+"plan.need":"{name} needs {gb} GB; these devices have {total} GB free. Add {more} GB or pick a smaller model.",
+"plan.pick":"Pick at least one device.","plan.nofit":"{name} does not fit yet.",
+"ring.many":"tok/s, many requests",
+"node.drag":"Drag to turn. Click a GPU.","node.sm":"132 streaming multiprocessors","node.pw":"Power, last 60 s","node.lim":"limit 700 W",
+"use.k":"who is it for","use.h":"One mind for what you do.","use.p":"Goals of the roadmap — stages B4, B7 and B8.",
+"use.a.h":"Agents on your own model","use.a.p":"OpenClaw, OpenCode and other agents run on a frontier-class open model spread across your own computers — no per-token bill, no rate limit. One computer can only stream such a model from disk; a cluster keeps all of it in memory.",
+"use.b.h":"The family ring","use.b.p":"A family or a team shares one assistant that speaks their language; a weak phone joins by voice and computes nothing.",
+"use.c.h":"Accuracy mode","use.c.p":"Several devices answer the same question and check each other; the answer shows how many agreed — a single device’s mistake is caught before you read it.",
+"cmp.k":"the comparison","road.k":"the plan","faq.k":"questions","s5.h":"Proof, not opinion.","s5.p":"Four arcs answer in parallel; their hidden states vote, and every public-network answer carries a TOPLOC proof that your ring produced it. Disagreement is a feature: you see the split instead of a confident mistake."},
+uz:{"nav.story":"Qanday ishlaydi","nav.lab":"Bo‘lish laboratoriyasi","nav.node":"Node ichida","nav.math":"Matematika","nav.road":"Yo‘l xaritasi","nav.faq":"Savollar","nav.start":"Boshlash",
+"hero.status":"pre-alfa, B1 bosqichi davom etmoqda","hero.h1a":"Har bir qurilma — bitta yoy.","hero.h1b":"Birgalikda — bitta aql.","hero.ph":"Halqadan so‘rang…",
+"chip.ring":"Halqa bitta modelni qanday ishlatadi?","chip.phone":"Eski telefonim rostdan yordam beradimi?","chip.privacy":"So‘rovim uyimdan chiqib ketadimi?",
+"hero.sim":"Bu yerdagi javoblar simulyatsiya; nur har bir tokenning halqa bo‘ylab yo‘lini ko‘rsatadi.","sim":"simulyatsiya",
+"hud.speed":"halqa tezligi","hud.arcs":"yoylar","hud.layers":"qatlamlar","hud.flight":"yo‘lda","copy":"Nusxa","copied":"Nusxalandi",
+"s1.h":"Yetti qurilma, bitta model.","s1.p":"Har bir yoy — modelning 80 qatlamidan bitta qurilmaga tushgan ulush. Uning kattaligi o‘lchangan xotira o‘tkazuvchanligiga qarab belgilanadi.",
+"s2.h":"Yoy ichida — qatlamlar oynasi.","s2.p":"Tokenning yashirin holati qurilmadagi har bir qatlamdan o‘tib yuqoriga ko‘tariladi. Og‘irliklar joyidan qimirlamaydi, faqat holat harakatlanadi.",
+"s3.h":"Keyin 16 KB keyingi qurilmaga o‘tadi.","s3.p":"70B model uchun har bir tokenda tarmoq orqali faqat shuncha ma’lumot o‘tadi, QUIC orqali shifrlangan holda.",
+"s4.h":"Bitta uydan butun dunyoga.","s4.p":"Istalgan NAT ortidagi bo‘sh qurilmalar bitta halqaga qo‘shila oladi. Bu B6 bosqichining maqsadi, hali tayyor funksiya emas.",
+"lab.h":"Halqa tuzing va har bir qatlam qayerga tushishini ko‘ring.","lab.p":"Modelni va qurilmalaringizni tanlang yoki shu brauzerni o‘lchang. Planner rejalashtiruvchi yechadigan muvozanat masalasining aynan o‘zini yechadi.",
+"node.h":"Yoy server stoykasi bo‘lganda.","node.p":"Halqa butun stoykani bitta yoy sifatida qabul qila oladi. Har bir GPU o‘z qatlamlar oynasini oladi, harorat esa yuklamaga ergashadi. Ma’lumotni ko‘rish uchun GPU’ni tanlang.",
+"math.h":"Halqa ortidagi uchta formula.","math.p":"Har biri Omnarc’dagi bitta loyihaviy qarorni belgilaydi. Slayderlarni suring va murosani kuzating.",
+"cmp.h":"Modelni taqsimlashning to‘rt yo‘li.","cmp.p":"Bugungi vositalarning har biri dunyodagi bo‘sh hisoblash quvvatining faqat bir burchagini qamraydi.",
+"road.h":"To‘qqiz bosqich. To‘qqiz gate.","road.p":"Bosqich blog posti chiqqanda emas, ochiq gate’dan o‘tganda tugagan hisoblanadi.","faq.h":"Savollar",
+"cta.h":"Halqangizni<br>bugun tuzing.","cta.p":"Ikki qurilmadan boshlang: klonlang, yig‘ing va qo‘lda ulangan halqani ishga tushiring. Hammasi o‘z kompyuterlaringizda ishlaydi.","cta.b1":"README’ni o‘qish","cta.b2":"GitHub’da yulduzcha",
+"m.t":"Shu brauzer","m.d":"Bu yerda haqiqiy xotira o‘tkazuvchanligini o‘lchang va shu tabni halqaga qo‘shing.","m.b":"Brauzerni o‘lchash","m.again":"Qayta o‘lchash","m.k1":"Backend","m.k2":"Nusxalash tezligi","m.k3":"Xotira byudjeti",
+"m.run":"O‘lchanmoqda… bu tabni ochiq qoldiring.","m.ok":"O‘lchangan qurilma sifatida halqaga qo‘shildi. O‘ngdagi reja endi uni ham hisobga oladi.","m.cpu":"Bu yerda WebGPU yo‘q, shuning uchun CPU yo‘li o‘lchandi.","m.fail":"O‘lchab bo‘lmadi. Boshqa og‘ir tablarni yopib, qayta urinib ko‘ring.","m.name":"Shu brauzer (o‘lchangan)",
+"a.prefill":"prefill","a.done":"token,",
+"thr.dev":"Qurilma","thr.layers":"Qatlamlar","thr.mem":"Xotira","thr.stage":"Bosqich","thr.time":"Vaqt ulushi",
+"lab.k1":"bitta so‘rov","lab.k2":"ko‘p so‘rov","lab.k3":"eng sekin bosqich","lab.k4":"band xotira",
+"row.standby":"zaxirada","plan.and":" va ",
+"plan.base":"{name}: {L} qatlam, har biri {m} GB, {net} orqali. Qatlamlarni ushlab turgan qurilmalar: {n}.",
+"plan.fast":"Bitta so‘rov uchun faqat {used} dan foydalanish {tps} tok/s beradi; sekin yoylar bosqich vaqtini oshiradi.",
+"plan.need":"{name} uchun {gb} GB kerak; bu qurilmalarda {total} GB bo‘sh bor. Yana {more} GB qo‘shing yoki kichikroq model tanlang.",
+"plan.pick":"Kamida bitta qurilma tanlang.","plan.nofit":"{name} hali sig‘mayapti.",
+"ring.many":"tok/s, ko‘p so‘rov",
+"node.drag":"Aylantirish uchun sudrang. GPU’ni tanlang.","node.sm":"132 oqim multiprokssorlari","node.pw":"Quvvat, oxirgi 60 s","node.lim":"chegara 700 vatt",
+"use.k":"kim uchun","use.h":"Bir aql — siz qiladigan ish uchun.","use.p":"Yo‘l xaritasi maqsadlari — B4, B7 va B8 bosqichlari.",
+"use.a.h":"O‘z modellingizdagi agentlar","use.a.p":"OpenClaw, OpenCode va boshqa agentlar frontier-class ochiq model ustida ishlaydi — model sizning kompyuterlaringizga bo‘lingan: tokenga pul yo‘q, limit yo‘q. Bitta kompyuter bunday modelni diskdan faqat oqizadi; klaster esa hammasini xotirada ushlab turadi.",
+"use.b.h":"Oilaviy halqa","use.b.p":"Oilalar va jamoalar o‘z tilida gaplashadigan bitta yordamchini bo‘lishadi; kuchsiz telefon ovoz bilan qo‘shiladi va hech narsa hisoblamaydi.",
+"use.c.h":"Aniqlik rejimi","use.c.p":"Bir nechta qurilma bir savolga parallel javob beradi va bir-birini tekshiradi; javob nechta rozi bo‘lganini ko‘rsatadi — bitta qurilmaning xatosi siz o‘qishdan oldin ushlanadi.",
+"cmp.k":"taqqoslash","road.k":"reja","faq.k":"savollar","s5.h":"Fikr emas — isbot.","s5.p":"To‘rt yoy parallel javob beradi; yashirin holatlari ovoz beradi va ommaviy tarmoqdagi har bir javob TOPLOC isbotini olib yuradi — uni aynan sizning halqangiz yaratganini tasdiqlaydi. Kelishmovchilik xususiyat: ishonchli xato o‘rniga bo‘linishni ko‘rasiz."},
+ru:{"nav.story":"Как это работает","nav.lab":"Лаборатория разбиения","nav.node":"Внутри узла","nav.math":"Математика","nav.road":"Дорожная карта","nav.faq":"Вопросы","nav.start":"Начать",
+"hero.status":"пре-альфа, идёт этап B1","hero.h1a":"Каждое устройство — дуга.","hero.h1b":"Вместе — один разум.","hero.ph":"Спросите кольцо…",
+"chip.ring":"Как кольцо запускает одну модель?","chip.phone":"Мой старый телефон правда поможет?","chip.privacy":"Покидает ли мой запрос дом?",
+"hero.sim":"Ответы здесь смоделированы; свет показывает путь каждого токена по кольцу.","sim":"симуляция",
+"hud.speed":"скорость кольца","hud.arcs":"дуги","hud.layers":"слои","hud.flight":"в пути","copy":"Копировать","copied":"Скопировано",
+"s1.h":"Семь устройств, одна модель.","s1.p":"Каждая дуга — доля устройства в 80 слоях модели; её размер зависит от измеренной пропускной способности памяти.",
+"s2.h":"Внутри дуги — окно слоёв.","s2.p":"Скрытое состояние токена поднимается через каждый слой устройства. Веса не перемещаются — движется только состояние.",
+"s3.h":"Затем 16 КБ переходят на следующее устройство.","s3.p":"Для модели 70B это всё, что передаётся по сети на один токен, в зашифрованном виде по QUIC.",
+"s4.h":"От одного дома — ко всему миру.","s4.p":"Простаивающие устройства за любым NAT смогут войти в одно кольцо. Это цель этапа B6, а не готовая функция.",
+"lab.h":"Соберите кольцо и посмотрите, куда попадёт каждый слой.","lab.p":"Выберите модель и устройства или измерьте этот браузер. Планировщик решает ту же задачу балансировки, что и scheduler Omnarc.",
+"node.h":"Когда дуга — это серверная стойка.","node.p":"Кольцо может вместить целую стойку как одну дугу. Каждый GPU берёт своё окно слоёв, а нагрев следует за нагрузкой. Выберите GPU, чтобы увидеть его показатели.",
+"math.h":"Три формулы за кольцом.","math.p":"Каждая определяет одно проектное решение в Omnarc. Двигайте ползунки и смотрите на компромисс.",
+"cmp.h":"Четыре способа распределить модель.","cmp.p":"Сегодняшние инструменты покрывают лишь по одному уголку простаивающих мощностей мира.",
+"road.h":"Девять этапов. Девять гейтов.","road.p":"Этап завершён, когда пройден его публичный гейт, а не когда вышел пост в блоге.","faq.h":"Вопросы",
+"cta.h":"Соберите кольцо<br>сегодня.","cta.p":"Начните с двух устройств: клонируйте, соберите и запустите кольцо, связанное вручную. Всё работает на ваших машинах.","cta.b1":"Читать README","cta.b2":"Звезда на GitHub",
+"m.t":"Этот браузер","m.d":"Измерьте реальную пропускную способность памяти и добавьте эту вкладку в кольцо.","m.b":"Измерить браузер","m.again":"Измерить снова","m.k1":"Бэкенд","m.k2":"Скорость копирования","m.k3":"Бюджет памяти",
+"m.run":"Измеряем… не уходите с этой вкладки.","m.ok":"Добавлено в кольцо как измеренное устройство. План справа теперь его учитывает.","m.cpu":"WebGPU здесь недоступен, поэтому измерен путь через CPU.","m.fail":"Измерение не удалось. Закройте тяжёлые вкладки и попробуйте снова.","m.name":"Этот браузер (измерен)",
+"a.prefill":"префилл","a.done":"токенов за",
+"thr.dev":"Устройство","thr.layers":"Слои","thr.mem":"Память","thr.stage":"Этап","thr.time":"Доля времени",
+"lab.k1":"один запрос","lab.k2":"много запросов","lab.k3":"самый медленный этап","lab.k4":"занятая память",
+"row.standby":"в резерве","plan.and":" и ",
+"plan.base":"{name}: {L} слоёв по {m} ГБ через {net}. Слои держат устройств: {n}.",
+"plan.fast":"Для одного запроса только {used} дали бы {tps} ток/с; медленные дуги добавляют время этапа.",
+"plan.need":"{name} требует {gb} ГБ; на этих устройствах свободно {total} ГБ. Добавьте ещё {more} ГБ или выберите модель поменьше.",
+"plan.pick":"Выберите хотя бы одно устройство.","plan.nofit":"{name} пока не помещается.",
+"ring.many":"ток/с, много запросов",
+"node.drag":"Потяните, чтобы повернуть. Кликните по GPU.","node.sm":"132 потоковых мультипроцессора","node.pw":"Мощность, последние 60 с","node.lim":"лимит 700 Вт",
+"use.k":"для кого","use.h":"Один разум для ваших задач.","use.p":"Цели дорожной карты — этапы B4, B7 и B8.",
+"use.a.h":"Агенты на своей модели","use.a.p":"OpenClaw, OpenCode и другие агенты работают на opensource-модели переднего уровня, распределённой по вашим машинам — без платы за токены и лимитов. Один компьютер может лишь стримить такую модель с диска; кластер держит её целиком в памяти.",
+"use.b.h":"Семейное кольцо","use.b.p":"Семья или команда делят одного ассистента, говорящего на их языке; слабый телефон подключается голосом и ничего не считает.",
+"use.c.h":"Режим точности","use.c.p":"Несколько устройств отвечают на один вопрос параллельно и проверяют друг друга; в ответе видно, сколько их сошлось — ошибка одного устройства ловится раньше, чем вы её прочтёте.",
+"cmp.k":"сравнение","road.k":"план","faq.k":"вопросы","s5.h":"Доказательство, а не мнение.","s5.p":"Четыре дуги отвечают параллельно; их скрытые состояния голосуют, и каждый ответ в публичной сети несёт доказательство TOPLOC, что его создало ваше кольцо. Расхождение — это функция: вы видите раскол вместо уверенной ошибки."}
+};
+const ANS={
+en:{ring:"A model is a stack of layers. Omnarc measures each device and gives it a window of layers in proportion to its memory bandwidth: the server here holds 24, the phone holds 4. When you ask something, the server embeds your words and runs its window, then sends a 16 KB hidden state to the next device. Each one adds its layers and passes it on. When the state comes back around, the server turns it into the next token, and the trip starts again.",
+phone:"Yes, within limits. A phone with 12 GB of RAM can spare about 6 GB, which holds a few layers of a 70B model. Its memory bandwidth is low, so it gets a small arc, and the planner may leave it on standby when speed matters more than memory. Weak phones can also join by voice only: they send your question and play the answer while the ring computes.",
+privacy:"On your own network, nothing leaves it: every hop between your devices is encrypted QUIC on your LAN. On the public network, raw text stays on your device; other devices only see hidden states, and every answer carries a TOPLOC proof that your ring produced it. Omnarc sends no telemetry.",
+trace:n=>`Your prompt is about ${n} tokens. The server holds layers 0–23 and the output head, so it embedded the prompt and ran the first window. The hidden state then made six hops, through the pc, nas, laptop, tablet, phone and browser, each adding its layers. Every word streaming here made that trip once.\n\nThis answer is simulated. Build Omnarc and run omnarc-node ring to get real answers from your own devices.`},
+uz:{ring:"Model — bu qatlamlar to‘plami. Omnarc har bir qurilmani o‘lchaydi va xotira o‘tkazuvchanligiga mos ravishda unga qatlamlar oynasini beradi: bu yerda server 24 ta, telefon esa 4 ta qatlamni ushlab turadi. Siz savol berganingizda server so‘zlaringizni embedding qiladi, o‘z oynasini hisoblaydi va 16 KB yashirin holatni keyingi qurilmaga yuboradi. Har bir qurilma o‘z qatlamlarini qo‘shib, uni uzatadi. Holat aylanib qaytganda server undan keyingi tokenni chiqaradi va yo‘l yana boshlanadi.",
+phone:"Ha, ma’lum chegarada. 12 GB operativ xotirali telefon taxminan 6 GB ajrata oladi, bu 70B modelning bir necha qatlamiga yetadi. Uning xotira o‘tkazuvchanligi past, shuning uchun unga kichik yoy tegadi. Tezlik xotiradan muhimroq bo‘lganda planner uni kutish rejimida qoldirishi mumkin. Kuchsiz telefonlar faqat ovoz orqali ham qo‘shila oladi: ular savolingizni yuboradi va halqa hisoblayotganda javobni o‘qib beradi.",
+privacy:"O‘z tarmog‘ingizda hech narsa tashqariga chiqmaydi: qurilmalaringiz orasidagi har bir o‘tish lokal tarmoqda shifrlangan QUIC orqali bo‘ladi. Ommaviy tarmoqda esa xom matn qurilmangizda qoladi; boshqa qurilmalar faqat yashirin holatlarni ko‘radi va har bir javobda uni sizning halqangiz yaratganini tasdiqlovchi TOPLOC isboti bo‘ladi. Omnarc hech qanday telemetriya yubormaydi.",
+trace:n=>`So‘rovingiz taxminan ${n} tokendan iborat. Server 0–23 qatlamlarni va chiqish boshini ushlab turadi, shuning uchun so‘rovni u embedding qildi va birinchi oynani hisobladi. Keyin yashirin holat olti marta o‘tdi: pc, nas, noutbuk, planshet, telefon va brauzer orqali, har biri o‘z qatlamlarini qo‘shdi. Bu yerda chiqayotgan har bir so‘z shu yo‘lni bir marta bosib o‘tdi.\n\nBu javob simulyatsiya. Omnarc’ni yig‘ing va o‘z qurilmalaringizdan haqiqiy javob olish uchun omnarc-node ring’ni ishga tushiring.`},
+ru:{ring:"Модель — это стопка слоёв. Omnarc измеряет каждое устройство и выдаёт ему окно слоёв пропорционально пропускной способности памяти: здесь сервер держит 24 слоя, телефон — 4. Когда вы задаёте вопрос, сервер превращает слова в эмбеддинги, прогоняет своё окно и отправляет 16 КБ скрытого состояния следующему устройству. Каждое добавляет свои слои и передаёт дальше. Когда состояние возвращается, сервер выдаёт следующий токен, и путь начинается снова.",
+phone:"Да, в пределах возможностей. Телефон с 12 ГБ оперативной памяти может выделить около 6 ГБ — этого хватает на несколько слоёв модели 70B. Пропускная способность памяти у него низкая, поэтому он получает маленькую дугу, а когда скорость важнее памяти, планировщик может оставить его в резерве. Слабые телефоны могут подключиться только голосом: они отправляют вопрос и озвучивают ответ, пока считает кольцо.",
+privacy:"Внутри вашей сети ничего её не покидает: каждый переход между устройствами идёт по зашифрованному QUIC в локальной сети. В публичной сети исходный текст остаётся на вашем устройстве; другие видят только скрытые состояния, а каждый ответ содержит доказательство TOPLOC, что его создало ваше кольцо. Omnarc не отправляет телеметрию.",
+trace:n=>`Ваш запрос — примерно ${n} токенов. Сервер держит слои 0–23 и выходную голову, поэтому он превратил запрос в эмбеддинги и прогнал первое окно. Затем скрытое состояние сделало шесть переходов — через pc, nas, ноутбук, планшет, телефон и браузер, — и каждое устройство добавило свои слои. Каждое слово, которое здесь появляется, прошло этот путь один раз.\n\nЭтот ответ смоделирован. Соберите Omnarc и запустите omnarc-node ring, чтобы получать настоящие ответы от своих устройств.`}
+};
+let LANG='en';
+const t=k=>(T[LANG]&&T[LANG][k])||T.en[k]||k;
+const tf=(k,o)=>t(k).replace(/\{(\w+)\}/g,(m,x)=>o[x]==null?m:o[x]);
+function applyLang(l){
+  LANG=T[l]?l:'en';root.lang=LANG;
+  document.querySelectorAll('[data-i]').forEach(el=>el.innerHTML=t(el.dataset.i));
+  document.querySelectorAll('[data-ip]').forEach(el=>el.placeholder=t(el.dataset.ip));
+  document.querySelectorAll('#langSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===LANG));
+  const mb=$('#measureBtn');if(mb&&mb.dataset.done)mb.textContent=t('m.again');
+  try{localStorage.setItem('omnarc-lang',LANG);}catch(e){}
+  dispatchEvent(new Event('omnarc-lang'));
+}
+$('#langSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b)applyLang(b.dataset.l);});
+{let l='en';try{l=localStorage.getItem('omnarc-lang')||'';}catch(e){}if(!l){const n=(navigator.language||'en').slice(0,2);l=n==='uz'?'uz':n==='ru'?'ru':'en';}applyLang(l);}
+/* copy button reads translated labels */
+$('#copyBtn').addEventListener('click',e=>{setTimeout(()=>e.target.textContent=t('copied'),0);setTimeout(()=>e.target.textContent=t('copy'),1600);});
+
+/* ───────── chat: ask the ring ───────── */
+function chat(H){
+  const form=$('#askForm'),inp=$('#askIn'),send=$('#askSend'),box=$('#answer'),meta=$('#aMeta'),q=$('#aQ'),txt=$('#aTxt'),chips=$('#chips');
+  let busy=false;
+  const grow=()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,150)+'px';send.disabled=busy||!inp.value.trim();};
+  inp.addEventListener('input',grow);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit?form.requestSubmit():form.dispatchEvent(new Event('submit'));}});
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  async function run(question,answer){
+    if(busy)return;busy=true;send.disabled=true;chips.querySelectorAll('button').forEach(b=>b.disabled=true);
+    box.classList.add('on');q.textContent=question;txt.textContent='';txt.classList.add('typing');
+    const nIn=Math.max(1,Math.round(question.length/4));
+    meta.textContent=`Llama 8B · 7 arcs · ${t('a.prefill')} ${nIn}`;
+    H.streaming=true;H.spawn({big:true});
+    await sleep(reduceMotion?0:900);
+    const toks=answer.match(/\s+|[^\s]+/g)||[];let k=0;const t0=performance.now();
+    const tokEl=$('#hudTok');
+    for(const tk of toks){
+      if(/^\s+$/.test(tk)){txt.appendChild(document.createTextNode(tk));continue;}
+      const s=document.createElement('span');s.className='tk';s.textContent=tk;txt.appendChild(s);k++;
+      if(k%2===1)H.spawn();
+      box.scrollTop=box.scrollHeight;
+      if(k%6===0){const el=(performance.now()-t0)/1000;tokEl.textContent=(k*1.3/el).toFixed(1)+' tok/s';}
+      if(!reduceMotion)await sleep(36+Math.random()*38);
+    }
+    const secs=((performance.now()-t0)/1000).toFixed(1);
+    txt.classList.remove('typing');meta.textContent=`Llama 8B · ${Math.round(k*1.3)} ${t('a.done')} ${secs} s`;
+    H.streaming=false;busy=false;grow();chips.querySelectorAll('button').forEach(b=>b.disabled=false);
+  }
+  form.addEventListener('submit',e=>{e.preventDefault();const v=inp.value.trim();if(!v||busy)return;inp.value='';grow();
+    run(v,ANS[LANG].trace(Math.max(1,Math.round(v.length/4))));});
+  chips.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;run(b.textContent,ANS[LANG][b.dataset.k]);});
+  grow();
+}
+
+/* ───────── story: the scroll film ───────── */
+function story(){
+  const sec=$('#story'),canvas=$('#story3d'),caps=[...sec.querySelectorAll('.cap')],dots=[...sec.querySelectorAll('.story-prog i')];
+  const sLed=[],sFan=[],sFloat=[];let scrT=0;
+  const RANGES=[[0,.2],[.22,.44],[.46,.7],[.72,.87],[.89,1.01]];
+  dots.forEach((d,i)=>{d.style.cursor='pointer';d.addEventListener('click',()=>scrollTo({top:sec.offsetTop+sec.offsetHeight*RANGES[i][0]-8,behavior:reduceMotion?'auto':'smooth'}));});
+  const prog=()=>clamp((scrollY-sec.offsetTop)/(sec.offsetHeight-innerHeight),0,1);
+  let stage=-1;
+  const setStage=p=>{const s=RANGES.findIndex(([a,b])=>p>=a&&p<b);const st=s<0?(p<.25?0:3):s;if(st===stage)return;stage=st;caps.forEach((c,i)=>c.classList.toggle('on',i===st));dots.forEach((d,i)=>d.classList.toggle('on',i===st));};
+  if(!HAS3D){sec.classList.add('no3d');addEventListener('scroll',()=>setStage(prog()),{passive:true});setStage(0);return;}
+  const renderer=makeRenderer(canvas);
+  const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x07110d,26,90);
+  scene.environment=studioEnv(renderer);
+  const cam=new THREE.PerspectiveCamera(40,1,.1,300);
+  scene.add(new THREE.HemisphereLight(0xcfeedd,0x04100a,.6));
+  const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(6,12,8);scene.add(key);
+  const COLS=[0x1be480,0x2fc983,0x9fbf3a,0x1a8f8f,0x2b5f9e,0x5b8fd0,0xc99a2e],SH=[24,20,15,10,5,4,3];
+  /* 1. ring */
+  let storyGrid=null;
+  const ring=new THREE.Group();scene.add(ring);const R=6;
+  {let a=0;const gap=.06,span=Math.PI*2-gap*7;
+   class Arc extends THREE.Curve{constructor(a0,a1){super();this.a0=a0;this.a1=a1;}getPoint(t,o=new THREE.Vector3()){const x=this.a0+(this.a1-this.a0)*t;return o.set(Math.cos(x)*R,0,Math.sin(x)*R);}}
+   const IDS=['server','pc','nas','laptop','tablet','phone','browser'];
+   SH.forEach((n,i)=>{
+     const a1=a+span*n/81;
+     ring.add(new THREE.Mesh(new THREE.TubeGeometry(new Arc(a,a1),n*3,.09,8,false),new THREE.MeshBasicMaterial({color:COLS[i],toneMapped:false})));
+     const mid=(a+a1)/2,x0=Math.cos(mid)*(R+1.6),z0=Math.sin(mid)*(R+1.6);
+     const mk=makeDevice(IDS[i],COLS[i],{leds:sLed,fans:sFan,floaters:sFloat});
+     mk.position.set(x0,-.4,z0);mk.scale.setScalar(.62);
+     mk.rotation.y=Math.PI/2-mid;
+     ring.add(mk);
+     const halo=new THREE.Mesh(new THREE.TorusGeometry(.66,.014,6,48),new THREE.MeshBasicMaterial({color:COLS[i],toneMapped:false,transparent:true,opacity:.7}));
+     halo.rotation.x=Math.PI/2;halo.position.set(x0,-.39,z0);ring.add(halo);
+     a=a1+gap;});
+   const g=new THREE.PolarGridHelper(13,24,8,96,0x1c3a2b,0x112419);g.position.y=-.42;g.material.transparent=true;g.material.opacity=.5;ring.add(g);storyGrid=g;}
+  const rc=pointCloud(4*24);ring.add(rc);const rcA=[0,1.6,3.2,4.7];
+  /* 2. layer stack */
+  const stack=new THREE.Group();stack.position.set(0,0,-44);scene.add(stack);
+  const NL=10,plates=[];
+  const wtex=i=>canvasTex(256,256,(g,w,h)=>{g.fillStyle='rgba(7,17,13,0)';g.clearRect(0,0,w,h);for(let y=0;y<16;y++)for(let x=0;x<16;x++){const v=noise1(x*.7+y*1.3+i*9)*noise1(y*.5+x*.2+i*3);g.fillStyle=`rgba(27,228,128,${(.08+v*.75).toFixed(3)})`;g.fillRect(x*16+1,y*16+1,14,14);}g.strokeStyle='rgba(27,228,128,.8)';g.lineWidth=3;g.strokeRect(1.5,1.5,w-3,h-3);});
+  for(let i=0;i<NL;i++){
+    const m=new THREE.MeshBasicMaterial({map:wtex(i),transparent:true,opacity:.35,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,toneMapped:false});
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(7,7),m);p.rotation.x=-Math.PI/2;p.position.y=i*.8;stack.add(p);plates.push(p);
+    const lab=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(256,64,(g)=>{g.fillStyle='#7d9384';g.font='500 34px monospace';g.fillText('layer '+(24+i*2),8,44);}),transparent:true,depthWrite:false}));
+    lab.scale.set(1.7,.42,1);lab.position.set(4.6,i*.8,0);stack.add(lab);}
+  const tokCore=new THREE.Mesh(new THREE.SphereGeometry(.22,20,16),new THREE.MeshBasicMaterial({color:0xeafff2,toneMapped:false}));stack.add(tokCore);
+  const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:radialTex('rgba(27,228,128,.9)','rgba(27,228,128,0)'),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));halo.scale.set(3,3,1);stack.add(halo);
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,NL*.8+2,8,1,true),new THREE.MeshBasicMaterial({color:0x1be480,transparent:true,opacity:.25,toneMapped:false}));beam.position.y=NL*.4-.4;stack.add(beam);
+  /* 3. packet + 4. globe */
+  const globe=new THREE.Group();globe.position.set(0,0,-108);scene.add(globe);const GR=10;
+  const land=v=>Math.sin(v.x*2.1+1.3)*Math.sin(v.y*2.6+.4)*Math.sin(v.z*1.9+2.1)+.45*Math.sin(v.x*4.3+v.y*2.2)*Math.sin(v.z*3.7)>.06;
+  const NG=5200,gp=pointCloud(NG);globe.add(gp);const nodes=[];
+  {const P=gp.geometry.attributes.position.array,C=gp.geometry.attributes.aColor.array,S=gp.geometry.attributes.size.array,A=gp.geometry.attributes.alpha.array;
+   const v=new THREE.Vector3();for(let i=0;i<NG;i++){const y=1-2*(i+.5)/NG,r=Math.sqrt(1-y*y),th=i*2.399963;v.set(Math.cos(th)*r,y,Math.sin(th)*r);
+     const L=land(v);P[i*3]=v.x*GR;P[i*3+1]=v.y*GR;P[i*3+2]=v.z*GR;
+     C[i*3]=L?.2:.1;C[i*3+1]=L?.7:.3;C[i*3+2]=L?.45:.3;S[i]=L?.55:.3;A[i]=L?.6:.18;
+     if(L&&i%61===0)nodes.push(v.clone().multiplyScalar(GR));}}
+  const atm=new THREE.Sprite(new THREE.SpriteMaterial({map:radialTex('rgba(27,228,128,.22)','rgba(27,228,128,0)'),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));atm.scale.set(GR*3.1,GR*3.1,1);globe.add(atm);
+  const arcs=[];
+  for(let i=0;i<Math.min(30,nodes.length-1);i++){const a=nodes[i],b=nodes[(i*7+5)%nodes.length];if(a.distanceTo(b)<3)continue;
+    const mid=a.clone().add(b).multiplyScalar(.5);mid.setLength(GR+a.distanceTo(b)*.35);
+    const curve=new THREE.QuadraticBezierCurve3(a,mid,b);const pts=curve.getPoints(60);
+    const geo=new THREE.BufferGeometry().setFromPoints(pts);const ln=new THREE.Line(geo,new THREE.LineBasicMaterial({color:i%4?0x1be480:0xe2b13c,transparent:true,opacity:.6}));
+    globe.add(ln);arcs.push({curve,geo,off:Math.random()});}
+  const nd=pointCloud(nodes.length);globe.add(nd);
+  {const P=nd.geometry.attributes.position.array,C=nd.geometry.attributes.aColor.array,S=nd.geometry.attributes.size.array,A=nd.geometry.attributes.alpha.array;nodes.forEach((v,i)=>{P[i*3]=v.x;P[i*3+1]=v.y;P[i*3+2]=v.z;C[i*3]=.6;C[i*3+1]=1;C[i*3+2]=.75;S[i]=1.6;A[i]=.95;});}
+  const ac=pointCloud(arcs.length);globe.add(ac);
+  const pk=new THREE.Sprite(new THREE.SpriteMaterial({map:radialTex('rgba(226,177,60,1)','rgba(226,177,60,0)'),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));pk.scale.set(1.6,1.6,1);scene.add(pk);
+  const pkPath=new THREE.CatmullRomCurve3([new THREE.Vector3(0,NL*.8,-44),new THREE.Vector3(3,10,-62),new THREE.Vector3(-2,13,-84),nodes[0]?nodes[0].clone().add(globe.position):new THREE.Vector3(0,10,-108)]);
+  const trailGeo=new THREE.BufferGeometry().setFromPoints(pkPath.getPoints(120));
+  scene.add(new THREE.Line(trailGeo,new THREE.LineDashedMaterial({color:0xe2b13c,dashSize:.6,gapSize:.4,transparent:true,opacity:.7})).computeLineDistances());
+  const pkTag=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(512,128,g=>{g.fillStyle='rgba(7,17,13,.75)';g.fillRect(0,20,512,88);g.strokeStyle='#e2b13c';g.lineWidth=3;g.strokeRect(2,22,508,84);g.fillStyle='#f3d58a';g.font='600 46px monospace';g.fillText('16 KB · QUIC · ✓',22,82);}),transparent:true,depthWrite:false}));
+  pkTag.scale.set(4.4,1.1,1);scene.add(pkTag);
+  const pkTrail=pointCloud(40);scene.add(pkTrail);const pkHist=[];
+  /* stars */
+  const NS=1400,stars=pointCloud(NS);scene.add(stars);
+  {const P=stars.geometry.attributes.position.array,C=stars.geometry.attributes.aColor.array,S=stars.geometry.attributes.size.array,A=stars.geometry.attributes.alpha.array;
+   for(let i=0;i<NS;i++){P[i*3]=(Math.random()-.5)*120;P[i*3+1]=Math.random()*50-12;P[i*3+2]=20-Math.random()*170;C[i*3]=.5;C[i*3+1]=.85;C[i*3+2]=.65;S[i]=.3+Math.random()*.7;A[i]=.15+Math.random()*.35;}}
+  /* stage 5 — the vote: four arcs answer, one proof */
+  const voteSpr=new THREE.Sprite(new THREE.SpriteMaterial({map:radialTex('rgba(226,177,60,.95)','rgba(226,177,60,0)'),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));
+  voteSpr.scale.set(3.2,3.2,1);voteSpr.position.copy(nodes[0]);globe.add(voteSpr);
+  const voteTag=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(512,128,g=>{g.fillStyle='rgba(7,17,13,.8)';g.fillRect(0,22,512,84);g.strokeStyle='#1be480';g.lineWidth=3;g.strokeRect(2,24,508,80);g.fillStyle='#b9f4d6';g.font='600 44px monospace';g.fillText('TOPLOC ✓ 4/4',22,82);}),transparent:true,depthWrite:false}));
+  voteTag.scale.set(3.7,.92,1);scene.add(voteTag);voteTag.visible=false;
+
+  /* camera keys */
+  const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+  const KEYS=[
+    {p:0,pos:V(0,10,21),look:V(0,0,0)},{p:.16,pos:V(-6,6,13),look:V(0,0,-2)},
+    {p:.27,pos:V(2,5,-30),look:V(0,3,-44)},{p:.4,pos:V(9,6,-38),look:V(0,3.5,-44)},{p:.5,pos:V(4,11,-49),look:V(0,5,-48)},
+    {p:.62,pos:V(-16,16,-50),look:V(0,9,-74)},{p:.74,pos:V(0,9,-80),look:V(0,0,-108)},
+    {p:.88,pos:V(-10,6,-84),look:V(0,0,-108)},{p:1,pos:V(0,22,-70),look:V(0,0,-108)}];
+  const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+  const cp=new THREE.Vector3(),cl=new THREE.Vector3(),mp={x:0,y:0};
+  canvas.parentElement.addEventListener('pointermove',e=>{mp.x=e.clientX/innerWidth*2-1;mp.y=e.clientY/innerHeight*2-1;});
+  function camAt(p){let i=0;while(i<KEYS.length-2&&p>KEYS[i+1].p)i++;const a=KEYS[i],b=KEYS[i+1],f=ease(clamp((p-a.p)/(b.p-a.p),0,1));cp.lerpVectors(a.pos,b.pos,f);cl.lerpVectors(a.look,b.look,f);}
+  let W=1,H=1;function resize(){W=canvas.clientWidth;H=canvas.clientHeight;renderer.setSize(W,H,false);cam.aspect=W/H;cam.fov=W<700?52:40;cam.updateProjectionMatrix();}
+  new ResizeObserver(resize).observe(canvas);resize();
+  let T=0,sp=0;
+  function frame(dt){
+    T+=dt;const target=prog();sp=reduceMotion?target:lerp(sp,target,1-Math.exp(-dt*7));if(dt===0)sp=target;
+    setStage(target);camAt(sp);
+    cam.position.set(cp.x+mp.x*.8,cp.y-mp.y*.5,cp.z);cam.lookAt(cl);
+    /* ring comets */
+    {const P=rc.geometry.attributes.position.array,C=rc.geometry.attributes.aColor.array,S=rc.geometry.attributes.size.array,A=rc.geometry.attributes.alpha.array;
+     rcA.forEach((a0,c)=>{const a=a0+T*.8;for(let j=0;j<24;j++){const k=c*24+j,x=a-j*.03,f=1-j/24;P[k*3]=Math.cos(x)*R;P[k*3+1]=.22;P[k*3+2]=Math.sin(x)*R;C[k*3]=.5+.5*(j===0);C[k*3+1]=1;C[k*3+2]=.7+.3*(j===0);S[k]=j?2.6*f+.3:5;A[k]=j?f*f*.85:1;}});
+     ['position','aColor','size','alpha'].forEach(n=>rc.geometry.attributes[n].needsUpdate=true);}
+    ring.rotation.y=T*.05;
+    /* token climbs the stack in .26–.52, loops locally otherwise */
+    const lp=clamp((sp-.26)/.24,0,1),ty=-.6+lp*(NL*.8+.4)+(sp<.26?0:0);
+    tokCore.position.y=halo.position.y=ty;tokCore.visible=halo.visible=sp<.56;
+    plates.forEach((p,i)=>{const d=ty-i*.8;p.material.opacity=.22+.7*Math.exp(-d*d*2.2);});
+    stack.rotation.y=Math.sin(T*.2)*.15+sp*.8;
+    /* packet */
+    const pp=clamp((sp-.5)/.24,0,1);pk.visible=pkTag.visible=pp>0&&pp<1;pkPath.getPointAt(pp,pk.position);pk.scale.setScalar(1.3+Math.sin(T*8)*.15);
+    pkTag.position.copy(pk.position);pkTag.position.y+=1.5;trailGeo.setDrawRange(0,Math.floor(pp*120));
+    {const P=pkTrail.geometry.attributes.position.array,C=pkTrail.geometry.attributes.aColor.array,S=pkTrail.geometry.attributes.size.array,A=pkTrail.geometry.attributes.alpha.array,v=new THREE.Vector3();
+     for(let i=0;i<40;i++){pkPath.getPointAt(clamp(pp-i*.004,0,1),v);P[i*3]=v.x;P[i*3+1]=v.y;P[i*3+2]=v.z;C[i*3]=1;C[i*3+1]=.75;C[i*3+2]=.3;S[i]=(1-i/40)*3+.3;A[i]=pk.visible?(1-i/40)*.8:0;}
+     ['position','aColor','size','alpha'].forEach(n=>pkTrail.geometry.attributes[n].needsUpdate=true);}
+    /* globe */
+    globe.rotation.y=T*.04+sp*1.2;
+    const rv=clamp((sp-.74)/.2,0,1);
+    arcs.forEach((a,i)=>a.geo.setDrawRange(0,Math.floor(61*clamp(rv*1.6-i/arcs.length*.6,0,1))));
+    {const P=ac.geometry.attributes.position.array,C=ac.geometry.attributes.aColor.array,S=ac.geometry.attributes.size.array,A=ac.geometry.attributes.alpha.array;const v=new THREE.Vector3();
+     arcs.forEach((a,i)=>{a.curve.getPoint((T*.25+a.off)%1,v);P[i*3]=v.x;P[i*3+1]=v.y;P[i*3+2]=v.z;C[i*3]=1;C[i*3+1]=.9;C[i*3+2]=.55;S[i]=2.4;A[i]=rv>.5?(sp>.88?.95:.65):0;});
+     ['position','aColor','size','alpha'].forEach(n=>ac.geometry.attributes[n].needsUpdate=true);}
+    /* stage 5 — TOPLOC vote pulse + badge */
+    const vp=clamp((sp-.89)/.12,0,1);
+    voteSpr.material.opacity=vp*.85;voteSpr.visible=vp>0;
+    voteSpr.scale.setScalar(2.4+.8*Math.abs(Math.sin(T*4))+.5*vp);
+    voteTag.visible=vp>.5;if(voteTag.visible){const vv=new THREE.Vector3();globe.localToWorld(vv.copy(nodes[0]));voteTag.position.copy(vv);voteTag.position.y+=1.9;voteTag.material.opacity=clamp((vp-.5)*4,0,1);}
+    sFloat.forEach((f,i)=>f.position.y=.85+Math.sin(T*1.2+i)*.06);
+    scrT+=dt;if(scrT>1){scrT=0;browserScr&&browserScr.redraw();}
+    renderer.render(scene,cam);
+  }
+  const L=loop(sec,frame);
+  addEventListener('scroll',()=>{if(reduceMotion)frame(0);},{passive:true});
+  frame(0);
+}
+
+/* ───────── measure this browser ───────── */
+function measure(LAB){
+  const btn=$('#measureBtn'),out=$('#mOut'),st=$('#mStatus');
+  async function gpu(){
+    if(!navigator.gpu)return null;
+    const ad=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});if(!ad)return null;
+    const dev=await ad.requestDevice();
+    const size=Math.min(128*1024*1024,Math.floor(ad.limits.maxBufferSize/2/4)*4,Math.floor(ad.limits.maxBufferSize/4)*4);
+    const U=GPUBufferUsage,a=dev.createBuffer({size,usage:U.COPY_SRC|U.COPY_DST}),b=dev.createBuffer({size,usage:U.COPY_SRC|U.COPY_DST});
+    const pass=n=>{const e=dev.createCommandEncoder();for(let i=0;i<n;i++)i%2?e.copyBufferToBuffer(b,0,a,0,size):e.copyBufferToBuffer(a,0,b,0,size);dev.queue.submit([e.finish()]);return dev.queue.onSubmittedWorkDone();};
+    await pass(4);let best=0;
+    for(let r=0;r<3;r++){const n=24,t0=performance.now();await pass(n);const s=(performance.now()-t0)/1000;best=Math.max(best,size*2*n/s/1e9);}
+    let info=ad.info||{};if(!ad.info&&ad.requestAdapterInfo){try{info=await ad.requestAdapterInfo();}catch(e){}}
+    const name=[info.vendor,info.architecture].filter(Boolean).join(' ')||'WebGPU';
+    const maxGB=ad.limits.maxBufferSize/2**30;a.destroy();b.destroy();dev.destroy&&dev.destroy();
+    return {kind:'WebGPU · '+name,bw:best,maxGB};
+  }
+  function cpu(){
+    const n=8*1024*1024,A=new Float64Array(n),B=new Float64Array(n);for(let i=0;i<n;i+=4096)A[i]=i;
+    B.set(A);let best=0;for(let r=0;r<5;r++){const t0=performance.now();B.set(A);A.set(B);const s=(performance.now()-t0)/1000;best=Math.max(best,n*8*4/s/1e9);}
+    return {kind:'CPU (JavaScript)',bw:best,maxGB:0};
+  }
+  btn.addEventListener('click',async()=>{
+    btn.disabled=true;st.textContent=t('m.run');
+    try{
+      await new Promise(r=>setTimeout(r,60));
+      let r=null;try{r=await gpu();}catch(e){r=null;}
+      const isCpu=!r;if(!r)r=cpu();
+      const ram=navigator.deviceMemory||4;
+      const budget=Math.max(.5,Math.min(ram*.35,r.maxGB?Math.max(r.maxGB,1):ram*.35));
+      out.hidden=false;$('#mBack').textContent=r.kind;$('#mBw').textContent=r.bw.toFixed(1)+' GB/s';$('#mMem').textContent='≈ '+budget.toFixed(1)+' GB';
+      LAB.add({id:'me',name:t('m.name'),bw:Math.max(1,Math.round(r.bw)),mem:Math.round(budget*10)/10,color:'#e8f5ec',on:true});
+      st.textContent=(isCpu?t('m.cpu')+' ':'')+t('m.ok');
+      btn.dataset.done='1';btn.textContent=t('m.again');
+    }catch(e){console.error(e);st.textContent=t('m.fail');}
+    btn.disabled=false;
+  });
+}
+
+/* ───────── reveal-on-scroll ───────── */
+(()=>{
+  const els=[...document.querySelectorAll('.rv')];
+  if(!('IntersectionObserver' in window)||reduceMotion){els.forEach(e=>e.classList.add('in'));return;}
+  const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);pending.delete(en.target);}});},{threshold:.1,rootMargin:'0px 0px -44px 0px'});
+  const pending=new Set(els);
+  const show=e=>{if(pending.has(e)){e.classList.add('in');pending.delete(e);io.unobserve(e);}};
+  const scan=()=>{const vh=innerHeight;pending.forEach(e=>{const r=e.getBoundingClientRect();if(r.top<vh-40&&r.bottom>-120)show(e);});};
+  els.forEach(e=>io.observe(e));
+  addEventListener('scroll',scan,{passive:true});
+  addEventListener('resize',scan,{passive:true});
+  scan();
+  const watch=setInterval(()=>{if(!pending.size)clearInterval(watch);else scan();},900);
+})();
+
+/* ───────── edge-lighting + mini-HUD wiring ───────── */
+(()=>{
+  document.querySelectorAll('.panel,.mcard,.dev').forEach(e=>e.classList.add('glowable'));
+  document.addEventListener('pointermove',e=>{
+    const t=e.target&&e.target.closest&&e.target.closest('.glowable');if(!t)return;
+    const r=t.getBoundingClientRect();
+    t.style.setProperty('--mx',(e.clientX-r.left)+'px');t.style.setProperty('--my',(e.clientY-r.top)+'px');
+  },{passive:true});
+  const hud=document.getElementById('miniHud');if(!hud)return;
+  const b=hud.querySelector('b');let shown=false;
+  addEventListener('scroll',()=>{
+    const on=scrollY>innerHeight*.9&&!shown? true : scrollY<=innerHeight*.9? false : hud.classList.contains('on');
+    hud.classList.toggle('on',scrollY>innerHeight*.9);shown=scrollY>innerHeight*.9;
+  },{passive:true});
+  setInterval(()=>{const t=window.__ringTok;if(t&&hud.classList.contains('on'))b.textContent=t.toFixed(1)+' tok/s';},700);
+})();
+
+/* ───────── boot ───────── */
+let HERO={spawn(){}};
+try{HERO=hero()||HERO;}catch(e){console.error(e);$('#top').classList.add('no3d');}
+const LAB=lab();
+try{node();}catch(e){console.error(e);}
+math();
+try{story();}catch(e){console.error(e);$('#story').classList.add('no3d');}
+chat(HERO);measure(LAB);
+fetch('https://api.github.com/repos/HumoyunDavronov2001/omnarc').then(r=>r.ok?r.json():null).then(d=>{
+  const n=d&&d.stargazers_count;
+  if(typeof n==='number'&&n>0){const el=$('#ghStars');if(el){el.hidden=false;el.textContent=n>=1000?(n/1000).toFixed(1)+'k':n;}}
+}).catch(()=>{});
+})();
+</script>
+</body>
+</html>
