@@ -318,7 +318,18 @@ async fn fetch(shared: &Shared, plan: &v1::PlacementPlan, hash: Hash, windows: &
         let connection = shared.endpoint.connect(source, omnarc_store::BLOBS_ALPN).await?;
         let name = plan.model.as_ref().map(|m| m.name.as_str()).filter(|n| !n.is_empty());
         eprintln!("omnarc: fetching layers {window} from {}", source.fmt_short());
-        model = Some(shared.models.fetch(&connection, name, hash, window, |_| {}).await?);
+        let total = match &model {
+            Some(have) => shared.models.missing(have, window).await?,
+            None => 0,
+        };
+        let shown = name.unwrap_or("the model").to_owned();
+        let progress = |received: u64| {
+            *shared.fetching.lock().expect("fetching") =
+                Some(v1::ModelFetch { model: shown.clone(), received_bytes: received, total_bytes: total });
+        };
+        let fetched = shared.models.fetch(&connection, name, hash, window, progress).await;
+        *shared.fetching.lock().expect("fetching") = None;
+        model = Some(fetched?);
     }
     model.ok_or_else(|| "the model is not on this device".into())
 }

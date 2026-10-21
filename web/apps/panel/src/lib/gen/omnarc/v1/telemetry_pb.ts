@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file omnarc/v1/telemetry.proto.
  */
 export const file_omnarc_v1_telemetry: GenFile = /*@__PURE__*/
-  fileDesc("ChlvbW5hcmMvdjEvdGVsZW1ldHJ5LnByb3RvEglvbW5hcmMudjEiTAoKUG93ZXJTdGF0ZRISCgpvbl9iYXR0ZXJ5GAEgASgIEhAKCGNoYXJnaW5nGAIgASgIEhgKEGJhdHRlcnlfZnJhY3Rpb24YAyABKAIieAoKTGlua1NhbXBsZRIfCgRwZWVyGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBIhCgRraW5kGAIgASgOMhMub21uYXJjLnYxLkxpbmtLaW5kEg4KBnJ0dF9tcxgDIAEoAhIWCg5iYW5kd2lkdGhfbWJwcxgEIAEoAiJ2CglTdGFnZUxvYWQSFAoMcGxhbl92ZXJzaW9uGAEgASgEEhMKC2xheWVyX2JlZ2luGAIgASgNEhEKCWxheWVyX2VuZBgDIAEoDRIVCg1idXN5X2ZyYWN0aW9uGAQgASgCEhQKDG1zX3Blcl90b2tlbhgFIAEoAiK6AgoJVGVsZW1ldHJ5Eh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB3VuaXhfbXMYAiABKAMSEAoIY3B1X2xvYWQYAyABKAISGQoRbWVtb3J5X3VzZWRfYnl0ZXMYBCABKAQSHAoUbWVtb3J5X29mZmVyZWRfYnl0ZXMYBSABKAQSKAoHdGhlcm1hbBgGIAEoDjIXLm9tbmFyYy52MS5UaGVybWFsU3RhdGUSJAoFcG93ZXIYByABKAsyFS5vbW5hcmMudjEuUG93ZXJTdGF0ZRIkCgVsaW5rcxgIIAMoCzIVLm9tbmFyYy52MS5MaW5rU2FtcGxlEiQKBnN0YWdlcxgJIAMoCzIULm9tbmFyYy52MS5TdGFnZUxvYWQSFAoMdG9rZW5zX3RvZGF5GAogASgEKpcBCgxUaGVybWFsU3RhdGUSHQoZVEhFUk1BTF9TVEFURV9VTlNQRUNJRklFRBAAEhkKFVRIRVJNQUxfU1RBVEVfTk9NSU5BTBABEhYKElRIRVJNQUxfU1RBVEVfRkFJUhACEhkKFVRIRVJNQUxfU1RBVEVfU0VSSU9VUxADEhoKFlRIRVJNQUxfU1RBVEVfQ1JJVElDQUwQBCqqAQoITGlua0tpbmQSGQoVTElOS19LSU5EX1VOU1BFQ0lGSUVEEAASEgoOTElOS19LSU5EX1dJRkkQARIWChJMSU5LX0tJTkRfRVRIRVJORVQQAhIRCg1MSU5LX0tJTkRfVVNCEAMSGQoVTElOS19LSU5EX1RIVU5ERVJCT0xUEAQSEwoPTElOS19LSU5EX1JFTEFZEAUSFAoQTElOS19LSU5EX1dFQlJUQxAGYgZwcm90bzM", [file_omnarc_v1_device]);
+  fileDesc("ChlvbW5hcmMvdjEvdGVsZW1ldHJ5LnByb3RvEglvbW5hcmMudjEiTAoKUG93ZXJTdGF0ZRISCgpvbl9iYXR0ZXJ5GAEgASgIEhAKCGNoYXJnaW5nGAIgASgIEhgKEGJhdHRlcnlfZnJhY3Rpb24YAyABKAIieAoKTGlua1NhbXBsZRIfCgRwZWVyGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBIhCgRraW5kGAIgASgOMhMub21uYXJjLnYxLkxpbmtLaW5kEg4KBnJ0dF9tcxgDIAEoAhIWCg5iYW5kd2lkdGhfbWJwcxgEIAEoAiJ2CglTdGFnZUxvYWQSFAoMcGxhbl92ZXJzaW9uGAEgASgEEhMKC2xheWVyX2JlZ2luGAIgASgNEhEKCWxheWVyX2VuZBgDIAEoDRIVCg1idXN5X2ZyYWN0aW9uGAQgASgCEhQKDG1zX3Blcl90b2tlbhgFIAEoAiLjAgoJVGVsZW1ldHJ5Eh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB3VuaXhfbXMYAiABKAMSEAoIY3B1X2xvYWQYAyABKAISGQoRbWVtb3J5X3VzZWRfYnl0ZXMYBCABKAQSHAoUbWVtb3J5X29mZmVyZWRfYnl0ZXMYBSABKAQSKAoHdGhlcm1hbBgGIAEoDjIXLm9tbmFyYy52MS5UaGVybWFsU3RhdGUSJAoFcG93ZXIYByABKAsyFS5vbW5hcmMudjEuUG93ZXJTdGF0ZRIkCgVsaW5rcxgIIAMoCzIVLm9tbmFyYy52MS5MaW5rU2FtcGxlEiQKBnN0YWdlcxgJIAMoCzIULm9tbmFyYy52MS5TdGFnZUxvYWQSFAoMdG9rZW5zX3RvZGF5GAogASgEEicKCGZldGNoaW5nGAsgASgLMhUub21uYXJjLnYxLk1vZGVsRmV0Y2giSAoKTW9kZWxGZXRjaBINCgVtb2RlbBgBIAEoCRIWCg5yZWNlaXZlZF9ieXRlcxgCIAEoBBITCgt0b3RhbF9ieXRlcxgDIAEoBCqXAQoMVGhlcm1hbFN0YXRlEh0KGVRIRVJNQUxfU1RBVEVfVU5TUEVDSUZJRUQQABIZChVUSEVSTUFMX1NUQVRFX05PTUlOQUwQARIWChJUSEVSTUFMX1NUQVRFX0ZBSVIQAhIZChVUSEVSTUFMX1NUQVRFX1NFUklPVVMQAxIaChZUSEVSTUFMX1NUQVRFX0NSSVRJQ0FMEAQqqgEKCExpbmtLaW5kEhkKFUxJTktfS0lORF9VTlNQRUNJRklFRBAAEhIKDkxJTktfS0lORF9XSUZJEAESFgoSTElOS19LSU5EX0VUSEVSTkVUEAISEQoNTElOS19LSU5EX1VTQhADEhkKFUxJTktfS0lORF9USFVOREVSQk9MVBAEEhMKD0xJTktfS0lORF9SRUxBWRAFEhQKEExJTktfS0lORF9XRUJSVEMQBmIGcHJvdG8z", [file_omnarc_v1_device]);
 
 /**
  * @generated from message omnarc.v1.PowerState
@@ -181,6 +181,13 @@ export type Telemetry = Message<"omnarc.v1.Telemetry"> & {
    * @generated from field: uint64 tokens_today = 10;
    */
   tokensToday: bigint;
+
+  /**
+   * The layers this device is fetching for the plan, while it fetches them (PA-10).
+   *
+   * @generated from field: omnarc.v1.ModelFetch fetching = 11;
+   */
+  fetching?: ModelFetch | undefined;
 };
 
 /**
@@ -189,6 +196,35 @@ export type Telemetry = Message<"omnarc.v1.Telemetry"> & {
  */
 export const TelemetrySchema: GenMessage<Telemetry> = /*@__PURE__*/
   messageDesc(file_omnarc_v1_telemetry, 3);
+
+/**
+ * @generated from message omnarc.v1.ModelFetch
+ */
+export type ModelFetch = Message<"omnarc.v1.ModelFetch"> & {
+  /**
+   * @generated from field: string model = 1;
+   */
+  model: string;
+
+  /**
+   * @generated from field: uint64 received_bytes = 2;
+   */
+  receivedBytes: bigint;
+
+  /**
+   * What the device still missed when the fetch began; 0 while the model's header has not arrived yet.
+   *
+   * @generated from field: uint64 total_bytes = 3;
+   */
+  totalBytes: bigint;
+};
+
+/**
+ * Describes the message omnarc.v1.ModelFetch.
+ * Use `create(ModelFetchSchema)` to create a new message.
+ */
+export const ModelFetchSchema: GenMessage<ModelFetch> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_telemetry, 4);
 
 /**
  * Thermal state as reported by the operating system.

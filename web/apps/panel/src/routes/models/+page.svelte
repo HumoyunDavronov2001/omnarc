@@ -152,9 +152,17 @@
         <ol class="m-0 grid list-none gap-1.5 p-0" aria-label="Devices of the plan, in ring order">
           {#each Object.keys(view.devices) as id (id)}
             {@const part = planPart(running, id)}
+            {@const fetching = view.telemetry[id]?.fetching}
             {#if part}
               <li class="flex items-center gap-3 rounded-lg border border-line bg-surface-2 px-3 py-2 text-13">
                 <span class="min-w-0 flex-1 truncate text-text-1">{deviceName(view, id)}</span>
+                {#if fetching}
+                  <span class="font-mono text-12 text-text-2" role="status">
+                    fetching {fetching.totalBytes > 0n
+                      ? `${Math.min(100, Math.round((Number(fetching.receivedBytes) / Number(fetching.totalBytes)) * 100))}%`
+                      : formatSize(fetching.receivedBytes)}
+                  </span>
+                {/if}
                 <span class="font-mono text-12 text-text-2">layers {part.begin}–{part.end - 1}</span>
                 <Chip label={part.role === 'head' ? 'answers' : part.role === 'replica' ? 'stands by' : 'computes'} tone={part.role === 'replica' ? undefined : 'good'} />
               </li>

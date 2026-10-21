@@ -130,6 +130,8 @@ struct Shared {
     stages: Mutex<Vec<v1::StageLoad>>,
     // a faster plan for the running model, on the device that started it
     suggestion: Mutex<Option<v1::PlanSuggestion>>,
+    // the layers being fetched for the plan, for the telemetry
+    fetching: Mutex<Option<v1::ModelFetch>>,
 }
 
 // What the service keeps doing while it runs.
@@ -297,6 +299,7 @@ impl Service {
             tensors: Mutex::default(),
             stages: Mutex::default(),
             suggestion: Mutex::default(),
+            fetching: Mutex::default(),
         });
         joins.0.set(Arc::clone(&shared)).expect("set once");
         tensors.0.set(Arc::clone(&shared)).expect("set once");
@@ -1115,6 +1118,7 @@ async fn speak(shared: Arc<Shared>, mut device: v1::DeviceInfo, every: Duration)
             ),
             stages: stage_loads(&shared),
             tokens_today: today.tokens(),
+            fetching: shared.fetching.lock().expect("fetching").clone(),
         };
         // this device's own telemetry reaches the panel the same way as the others'
         shared.telemetry.lock().expect("telemetry").insert(shared.key.public(), telemetry.clone());

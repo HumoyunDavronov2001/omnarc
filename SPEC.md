@@ -16,7 +16,7 @@ design concept (its section number), or "—".
 |---|---|---|---|---|---|---|
 | Engine | 0 | 30 | 9 | 7 | 14 | 42 % |
 | Node agent and API | 0 | 42 | 13 | 17 | 12 | 51 % |
-| Panel | 24 | 7 | 4 | 13 | 14 | 34 % |
+| Panel | 24 | 7 | 5 | 12 | 14 | 35 % |
 | Desktop app | 4 | 5 | 0 | 0 | 9 | 0 % |
 | Android app | 7 | 8 | 0 | 2 | 13 | 7 % |
 | iOS app | 8 | 6 | 0 | 2 | 12 | 7 % |
@@ -27,7 +27,7 @@ design concept (its section number), or "—".
 | Islands | 0 | 3 | 0 | 0 | 3 | 0 % |
 | Benchmarks, sites and releases | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Design system and quality across all apps | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **All** | **50** | **143** | **34** | **47** | **112** | **30 %** |
+| **All** | **50** | **143** | **35** | **46** | **112** | **30 %** |
 
 "Ready" counts a partly done item as half. By stage — what each stage has to deliver:
 
@@ -36,7 +36,7 @@ design concept (its section number), or "—".
 | B0 | 10 | 9 | 1 | 0 |
 | B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
-| B3 | 16 | 6 | 9 | 1 |
+| B3 | 16 | 7 | 8 | 1 |
 | B4 | 18 | 0 | 9 | 9 |
 | B5 | 53 | 0 | 5 | 48 |
 | B6 | 23 | 0 | 0 | 23 |
@@ -184,7 +184,7 @@ nine sections in a rail: Ring, Devices, Models, Chat, Observe, Training, Network
 | PA-07 | People (the family ring) | screen | K1, Q6 | B6 | — | ○ |
 | PA-08 | Models: catalog | screen | — | B8 | — | ○ |
 | PA-09 | Will it fit? and the placement plan | screen | — | B3 | 04 | ◐ |
-| PA-10 | Running models and downloads | screen | T5 | B3 | — | ◐ |
+| PA-10 | Running models and downloads | screen | T5 | B3 | — | ✓ |
 | PA-11 | Use from apps and agents | screen | A4 | B8 | — | ○ |
 | PA-12 | Chat | screen | D8 | B4 | — | ◐ |
 | PA-13 | Observe: token path | screen | — | B4 | 05 | ◐ |

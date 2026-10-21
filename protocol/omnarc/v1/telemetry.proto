@@ -64,4 +64,13 @@ message Telemetry {
   repeated StageLoad stages = 9;
   // Tokens this device's windows computed since local midnight, for every request it served (its contribution).
   uint64 tokens_today = 10;
+  // The layers this device is fetching for the plan, while it fetches them (PA-10).
+  ModelFetch fetching = 11;
+}
+
+message ModelFetch {
+  string model = 1;
+  uint64 received_bytes = 2;
+  // What the device still missed when the fetch began; 0 while the model's header has not arrived yet.
+  uint64 total_bytes = 3;
 }
