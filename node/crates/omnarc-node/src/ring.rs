@@ -707,7 +707,9 @@ impl Head {
         let (replica, mut mirrors, _) = connect_replica(endpoint, config, node).await;
         let (tx, mut inbox) = mpsc::channel(256);
         let mut prevs = vec![accept_prev(&self.net, config, node, tx.clone()).await?];
-        let mut last: Option<(u32, FrameHeader, Vec<u8>)> = None;
+        // every step sent whose logits have not come back: the prompt goes out in chunks without waiting, so a
+        // device that leaves may take several with it, and each is resent to its standby in order
+        let mut inflight: std::collections::VecDeque<(u32, FrameHeader, Vec<u8>)> = std::collections::VecDeque::new();
 
         let shard_id = node.shards[first].id;
         let tokens = with_engine(&node.engine, move |engine| engine.tokenize(shard_id, &prompt, true)).await?;
@@ -726,7 +728,7 @@ impl Head {
             mirror(&mut mirrors, first_start, &node.token_frame(request, 0, position, count)?, &bytes).await;
             let output = node.run_tokens(first, request, position, chunk.to_vec()).await?;
             let frame = node.frame(request, 0, position, count, false)?;
-            last = Some((first_end, frame, output.clone()));
+            inflight.push_back((first_end, frame, output.clone()));
             forward(endpoint, config, node, &mut next, &mut links, first_end, &frame, &output).await?;
         }
 
@@ -740,10 +742,16 @@ impl Head {
             let message = tokio::select! {
                 message = inbox.recv() => message,
                 () = closed(next.as_ref()) => {
-                    // the device after this one has gone: its window goes to the replica, the step it was working on
-                    // is resent there, and the frames that come back now come from the replica (NO-43)
-                    let (key, frame, payload) = last.clone().ok_or("the next node left before anything was sent")?;
-                    forward(endpoint, config, node, &mut next, &mut links, key, &frame, &payload).await?;
+                    // the device after this one has gone: its window goes to the replica, the steps it was working on
+                    // are resent there, and the frames that come back now come from the replica (NO-43)
+                    if inflight.is_empty() {
+                        return Err("the next node left before anything was sent".into());
+                    }
+                    for (key, frame, payload) in &inflight {
+                        let mut replay = *frame;
+                        replay.flags = frame.flags.union(Flags::REPLAY);
+                        forward(endpoint, config, node, &mut next, &mut links, *key, &replay, payload).await?;
+                    }
                     prevs.push(accept_prev(&self.net, config, node, tx.clone()).await?);
                     continue;
                 }
@@ -763,6 +771,10 @@ impl Head {
                 }
                 forward(endpoint, config, node, &mut next, &mut links, info.layers.end, &frame, &output).await?;
                 continue;
+            }
+            // these logits answer the step that started at this position, and every step before it
+            while inflight.front().is_some_and(|(_, f, _)| f.position_start <= header.position_start) {
+                inflight.pop_front();
             }
             // logits: only the end of the prompt and every decoded token pick a next token
             let position = header.position_start + count;
@@ -816,7 +828,7 @@ impl Head {
             if speculative {
                 frame.flags = frame.flags.union(Flags::DRAFT);
             }
-            last = Some((first_end, frame, output.clone()));
+            inflight.push_back((first_end, frame, output.clone()));
             forward(endpoint, config, node, &mut next, &mut links, first_end, &frame, &output).await?;
         }
 

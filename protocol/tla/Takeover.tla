@@ -17,16 +17,23 @@
 (* wire. The model shows why the second is needed: without it a copy can   *)
 (* still be in flight, or be lost with P, while the head moves on, and R   *)
 (* takes over with a hole in its cache.                                    *)
+(*                                                                         *)
+(* A prompt goes out in chunks without waiting (Pipeline > 1); then the     *)
+(* head must resend every step not yet answered (ReplayAll), or a chunk P  *)
+(* took with it never reaches R.                                           *)
 (***************************************************************************)
 EXTENDS Naturals, Sequences
 
 CONSTANTS
-    N,      \* positions the head generates
-    Ack     \* P answers only once R holds the copy
+    N,          \* positions the head generates
+    Ack,        \* P answers only once R holds the copy
+    Pipeline,   \* steps the head sends before an answer comes back: 1 while decoding, more for a prompt's chunks
+    ReplayAll   \* the head resends every unanswered step to R, not just the last one
 
 Frame(p, mirrored, replay) == [pos |-> p, mirror |-> mirrored, replay |-> replay]
 Prefix(k) == [i \in 1..k |-> i]
 Range(s) == {s[i] : i \in DOMAIN s}
+Min(S) == CHOOSE x \in S : \A y \in S : x <= y
 
 VARIABLES
     sent,       \* positions the head has sent: 1..sent
@@ -52,9 +59,9 @@ Init ==
     /\ upP = TRUE /\ target = "P" /\ liveR = FALSE
     /\ waiting = {} /\ wrong = FALSE
 
-\* the head sends the next position once the last one was answered
+\* the head sends the next position while fewer than Pipeline steps wait for an answer
 HeadSend ==
-    /\ sent < N /\ answered = sent
+    /\ sent < N /\ sent - answered < Pipeline
     /\ sent' = sent + 1
     /\ IF target = "P"
          THEN /\ wireP' = Append(wireP, Frame(sent + 1, FALSE, FALSE)) /\ UNCHANGED wireR
@@ -90,10 +97,11 @@ RunP ==
     /\ inP' = Tail(inP)
     /\ UNCHANGED <<sent, kvR, inR, wireP, wireR, upP, target, liveR>>
 
-\* with Ack: R took the copy off the wire, so P answers
+\* with Ack: R took the copy off the wire, so P answers; answers go back in order, on one stream
 AckAnswer ==
     /\ upP
-    /\ \E p \in waiting :
+    /\ waiting /= {}
+    /\ LET p == Min(waiting) IN
         /\ p \in Range(kvR) \cup {inR[i].pos : i \in DOMAIN inR}
         /\ answered' = p
         /\ waiting' = waiting \ {p}
@@ -130,7 +138,10 @@ Takeover ==
     /\ ~upP /\ target = "P"
     /\ target' = "R"
     /\ IF sent > answered
-         THEN wireR' = Append(wireR, Frame(sent, FALSE, TRUE))
+         THEN wireR' = wireR \o
+                IF ReplayAll
+                  THEN [i \in 1..(sent - answered) |-> Frame(answered + i, FALSE, TRUE)]
+                  ELSE <<Frame(sent, FALSE, TRUE)>>
          ELSE UNCHANGED wireR
     /\ UNCHANGED <<sent, answered, kvP, kvR, inP, inR, wireP, wireM, upP, liveR, waiting, wrong>>
 

@@ -4,8 +4,9 @@ Two models of the scheduler's protocol, checked with TLC (`tla2tools.jar` 1.8.0)
 
 | Model | What it checks | Result |
 |---|---|---|
-| `Takeover.tla` + `Takeover.cfg` | A window's standby takes over while an answer is being generated (EN-17, NO-43): no answer is ever computed from a cache with a hole or a repeat, the standby's cache stays a gapless prefix, and the answer always finishes, whether the device crashes or not. | No error (N = 5: 576 states) |
-| `Takeover.tla` + `TakeoverWithoutAck.cfg` | The same without the standby confirming its copies. | `NoWrongAnswer` is violated in 9 steps |
+| `Takeover.tla` + `Takeover.cfg` | A window's standby takes over while an answer is being generated (EN-17, NO-43), with a prompt's chunks sent two at a time: no answer is ever computed from a cache with a hole or a repeat, the standby's cache stays a gapless prefix, and the answer always finishes, whether the device crashes or not. | No error (1,636 states) |
+| `Takeover.tla` + `TakeoverWithoutAck.cfg` | The same without the standby confirming its copies. | `NoWrongAnswer` is violated |
+| `Takeover.tla` + `TakeoverReplayingLast.cfg` | The same with the head resending only its last step. | `NoWrongAnswer` is violated |
 | `Replan.tla` + `Replan.cfg` | A new plan reaches every device: phones take a plan over gossip only if it is newer, never run one the computers did not agree on, never go back, and all catch up once the plan stops changing. | No error (2 phones, 3 plans: 4,736 states) |
 
 ## What the model found
@@ -16,10 +17,15 @@ standby takes over with a hole in its cache. Now the device forwards its output 
 the copy is in its queue (`ring.rs`, `confirmed`); a standby that does not confirm within two seconds is dropped,
 so a slow standby costs redundancy, never the answer.
 
+The second finding came from CI: a prompt goes out in chunks without waiting for answers, so a device that
+leaves can take several chunks with it, and resending only the last left a hole that showed as a different answer.
+The head now keeps every step whose logits have not come back and resends them all, in order, marked REPLAY.
+
 ## Running them
 
 ```bash
 java -cp tla2tools.jar tlc2.TLC -config Takeover.cfg -workers 2 Takeover.tla
-java -cp tla2tools.jar tlc2.TLC -config TakeoverWithoutAck.cfg -workers 2 Takeover.tla   # shows the violation
+java -cp tla2tools.jar tlc2.TLC -config TakeoverWithoutAck.cfg -workers 2 Takeover.tla     # shows a violation
+java -cp tla2tools.jar tlc2.TLC -config TakeoverReplayingLast.cfg -workers 2 Takeover.tla  # shows another
 java -cp tla2tools.jar tlc2.TLC -config Replan.cfg -workers 2 Replan.tla
 ```
