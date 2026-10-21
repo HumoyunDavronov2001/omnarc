@@ -134,7 +134,7 @@ pub struct Config {
     pub chunk: u32,
     /// The KV cache's element type (EN-16); the same on every node of a ring.
     pub kv: KvType,
-    /// Element type of the hidden state between nodes: F16 (default), Bf16 or F32.
+    /// Element type of the hidden state between nodes: F16 (default), Bf16, F32 or F8E4M3 (EN-19).
     pub wire: DType,
     /// This node only mirrors: it runs the frames a live node sends it to keep its KV cache in step, and
     /// connects to no next node. Taking over as the live node is stage B3's next piece (NO-43).
@@ -197,7 +197,15 @@ impl Node {
     async fn run(&self, shard: usize, header: &FrameHeader, payload: Vec<u8>) -> Result<Vec<u8>, BoxError> {
         let info = self.shards[shard].clone();
         let (request, position, count) = (header.request_id, header.position_start, u32::from(header.token_count));
-        let (dtype, wire) = (header.dtype, self.wire);
+        let wire = self.engine_wire();
+        let hidden = self.hidden_dim as usize;
+        // 8-bit hidden states are opened to f32 for the engine, which speaks no f8 (EN-19)
+        let (dtype, payload) = if header.dtype == DType::F8E4M3 {
+            let values = omnarc_protocol::f8::unpack(&payload, hidden).ok_or("an f8 frame of the wrong length")?;
+            (DType::F32, values.iter().flat_map(|v| v.to_le_bytes()).collect())
+        } else {
+            (header.dtype, payload)
+        };
         let replay = header.flags.contains(Flags::REPLAY);
         let draft = header.flags.contains(Flags::DRAFT);
         let started = Instant::now();
@@ -216,6 +224,7 @@ impl Node {
         })
         .await?;
         tally(count, started);
+        let output = if self.shards[shard].gives_logits() { output } else { self.to_wire(output) };
         // the next round's window is read from disk while the rest of the ring computes
         if self.shards.len() > 1 {
             let next = self.shards[(shard + 1) % self.shards.len()].id;
@@ -232,7 +241,7 @@ impl Node {
         tokens: Vec<i32>,
     ) -> Result<Vec<u8>, BoxError> {
         let info = self.shards[shard].clone();
-        let wire = self.wire;
+        let wire = self.engine_wire();
         let (started, count) = (Instant::now(), u32::try_from(tokens.len()).unwrap_or(u32::MAX));
         let output = with_engine(&self.engine, move |engine| {
             let step = Step { request, position, input: Input::Tokens(&tokens), all_logits: false, output: wire };
@@ -240,7 +249,21 @@ impl Node {
         })
         .await?;
         tally(count, started);
-        Ok(output)
+        Ok(if self.shards[shard].gives_logits() { output } else { self.to_wire(output) })
+    }
+
+    /// What the engine hands out: the wire's own type, or f32 to be packed into 8 bits.
+    fn engine_wire(&self) -> DType {
+        if self.wire == DType::F8E4M3 { DType::F32 } else { self.wire }
+    }
+
+    /// The engine's hidden state as the wire carries it.
+    fn to_wire(&self, output: Vec<u8>) -> Vec<u8> {
+        if self.wire != DType::F8E4M3 {
+            return output;
+        }
+        let values: Vec<f32> = output.as_chunks::<4>().0.iter().map(|b| f32::from_le_bytes(*b)).collect();
+        omnarc_protocol::f8::pack(&values, self.hidden_dim as usize)
     }
 
     async fn truncate(&self, shard: usize, request: u64, position: u32) {

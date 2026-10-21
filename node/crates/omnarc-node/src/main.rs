@@ -266,7 +266,7 @@ struct RingArgs {
     /// Head: tokens guessed ahead and checked by the ring in one round (greedy sampling only); 0: none.
     #[arg(long, default_value_t = 4)]
     draft: u32,
-    /// Element type of the hidden state between nodes: f16, bf16 or f32; the same on every node.
+    /// Element type of the hidden state between nodes: f16, bf16, f32 or f8; the same on every node.
     #[arg(long, default_value = "f16", value_parser = parse_wire)]
     wire: DType,
     /// The key file (default: the user's data directory, omnarc/node.key).
@@ -301,7 +301,9 @@ fn parse_wire(name: &str) -> Result<DType, String> {
         "f16" => Ok(DType::F16),
         "bf16" => Ok(DType::Bf16),
         "f32" => Ok(DType::F32),
-        other => Err(format!("unknown wire format {other}; use f16, bf16 or f32")),
+        // 8 bits and a scale per token: half of f16's bytes on every link (EN-19)
+        "f8" => Ok(DType::F8E4M3),
+        other => Err(format!("unknown wire format {other}; use f16, bf16, f32 or f8")),
     }
 }
 

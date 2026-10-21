@@ -43,8 +43,8 @@ fn generate_whole(engine_path: &Path, model: &Path, layers: u32) -> Vec<i32> {
     generated
 }
 
-#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-async fn a_ring_generates_what_one_device_generates() {
+/// A ring of two nodes on this machine whose links carry `wire`: its answer, and what one device answers.
+async fn ring_of_two(wire: DType, name: &str) -> (ring::Report, Vec<i32>) {
     let engine = env_path("OMNARC_ENGINE");
     let model = env_path("OMNARC_TEST_MODEL");
     let layers = {
@@ -54,7 +54,7 @@ async fn a_ring_generates_what_one_device_generates() {
         info.layer_count
     };
 
-    let dir = std::env::temp_dir().join(format!("omnarc-ring-test-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("omnarc-ring-{name}-{}", std::process::id()));
     let (head_key, worker_key) = (dir.join("head.key"), dir.join("worker.key"));
     let head_id = ring::node_id(&head_key).unwrap();
     let worker_id = ring::node_id(&worker_key).unwrap();
@@ -74,7 +74,7 @@ async fn a_ring_generates_what_one_device_generates() {
         replica: None,
         max_tokens: 512,
         chunk: 8, // a prompt of several chunks
-        wire: DType::F32,
+        wire,
         threads: 0,
         draft: 4,
         kv: omnarc_engine_host::KvType::F16,
@@ -107,10 +107,27 @@ async fn a_ring_generates_what_one_device_generates() {
     worker_task.abort();
 
     let expected = tokio::task::spawn_blocking(move || generate_whole(&engine, &model, layers)).await.unwrap();
+    let _ = std::fs::remove_dir_all(dir);
+    (report, expected)
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_ring_generates_what_one_device_generates() {
+    let (report, expected) = ring_of_two(DType::F32, "f32").await;
     assert_eq!(report.generated, expected, "ring: {:?}", report.text);
     assert!(report.prompt_tokens > 8);
     assert!(report.tpot.is_some());
-    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// EN-19: 8-bit hidden states with a scale per token carry half of f16's bytes. They are not exact, so the answer
+/// may part from the exact one -- but it starts the same and finishes.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_ring_speaking_eight_bits_answers_nearly_the_same() {
+    let (report, expected) = ring_of_two(DType::F8E4M3, "f8").await;
+    assert_eq!(report.generated.len(), GENERATE as usize, "the answer finished: {:?}", report.text);
+    let same = report.generated.iter().zip(&expected).take_while(|(a, b)| a == b).count();
+    assert!(same >= 4, "the first {same} tokens agree: {:?}", report.text);
+    eprintln!("an f8 ring agrees with the exact answer for its first {same} of {GENERATE} tokens");
 }
 
 /// EN-17: the live node sends its replica a copy of every frame it receives, the replica runs it to keep its KV
