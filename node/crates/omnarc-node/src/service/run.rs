@@ -251,6 +251,7 @@ async fn apply(shared: &Arc<Shared>, plan: &v1::PlacementPlan) -> Result<(), Box
         backend: Backend::Unspecified,
         max_tokens: if plan.context == 0 { DEFAULT_CONTEXT } else { plan.context },
         chunk: 256,
+        kv: omnarc_engine_host::KvType::from_name(&plan.kv_cache).unwrap_or_default(),
         wire: DType::F16,
         mirror_only: role.mirror_only,
         replica: role.replica.as_ref().map(peer).transpose()?,
@@ -631,7 +632,7 @@ impl ProtocolHandler for AskHandler {
 /// What the placement needs to know of `model` with a KV cache of `context` tokens.
 #[cfg(feature = "coordinator")]
 #[must_use]
-pub fn shape(model: &Model, context: u32) -> omnarc_scheduler::Model {
+pub fn shape(model: &Model, context: u32, kv: omnarc_engine_host::KvType) -> omnarc_scheduler::Model {
     use omnarc_store::layers::Part;
     let layout = &model.layout;
     let mut per_layer = vec![0u64; layout.layers as usize];
@@ -652,12 +653,15 @@ pub fn shape(model: &Model, context: u32) -> omnarc_scheduler::Model {
     let embedding = get("embedding_length").unwrap_or(0);
     let key_len = get("attention.key_length").unwrap_or(embedding / heads);
     let value_len = get("attention.value_length").unwrap_or(key_len);
+    // keys and values for every position of the context, in the cache's element type
+    let values = u64::from(context) * kv_heads * (key_len + value_len);
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_precision_loss)]
+    let kv_bytes = (values as f64 * kv.bytes_per_value()).ceil() as u64;
     omnarc_scheduler::Model {
         layers: layout.layers,
         // the largest layer: a window is planned for its worst case
         layer_bytes: per_layer.iter().copied().max().unwrap_or(0),
-        // f16 keys and values for every position of the context
-        kv_bytes_per_layer: u64::from(context) * kv_heads * (key_len + value_len) * 2,
+        kv_bytes_per_layer: kv_bytes,
         head_bytes: head,
         tail_bytes: 0,
     }
@@ -706,6 +710,7 @@ fn to_plan(
     model: &Model,
     context: u32,
     mode: i32,
+    kv: omnarc_engine_host::KvType,
     source: EndpointId,
     placement: &omnarc_scheduler::Placement<EndpointId>,
 ) -> v1::PlacementPlan {
@@ -744,6 +749,7 @@ fn to_plan(
         backups: Vec::new(),
         #[allow(clippy::cast_possible_truncation)]
         estimated_ms_per_token: (placement.seconds_per_token * 1e3) as f32,
+        kv_cache: kv.name().to_owned(),
     }
 }
 
@@ -762,17 +768,19 @@ pub(super) async fn run_model(
         return Err(format!("this device holds only part of {}: start it where all of it is", model.name).into());
     }
     let context = if request.context == 0 { DEFAULT_CONTEXT } else { request.context };
-    let shape = shape(&model, context);
+    let kv = omnarc_engine_host::KvType::from_name(&request.kv_cache)
+        .ok_or_else(|| format!("unknown KV cache type {}: f16, q8_0 or q4_0", request.kv_cache))?;
+    let shape = shape(&model, context, kv);
     let devices = offers(shared, &shape);
     let placement = omnarc_scheduler::place(&shape, &devices)?;
     let version = shared.plan.borrow().as_ref().map_or(0, |p| p.version) + 1;
     let me = shared.key.public();
-    let mut plan = to_plan(version, &model, context, request.mode, me, &placement);
+    let mut plan = to_plan(version, &model, context, request.mode, kv, me, &placement);
     plan.backups = omnarc_scheduler::backups(&shape, &devices, &placement)
         .into_iter()
         .map(|(gone, backup)| v1::BackupPlan {
             gone: Some(node_id(gone)),
-            plan: Some(to_plan(0, &model, context, request.mode, me, &backup)),
+            plan: Some(to_plan(0, &model, context, request.mode, kv, me, &backup)),
         })
         .collect();
     if !request.dry_run {
@@ -850,11 +858,12 @@ async fn better_plan(shared: &Shared) -> Option<v1::PlanSuggestion> {
     }
     let hash = Hash::from_bytes(<[u8; 32]>::try_from(plan.model.as_ref()?.blake3.as_slice()).ok()?).to_hex();
     let model = shared.models.model(&hash).await.ok()?;
-    let shape = shape(&model, plan.context);
+    let kv = omnarc_engine_host::KvType::from_name(&plan.kv_cache).unwrap_or_default();
+    let shape = shape(&model, plan.context, kv);
     let placement = omnarc_scheduler::place(&shape, &offers(shared, &shape)).ok()?;
     #[allow(clippy::cast_possible_truncation)]
     let ms = (placement.seconds_per_token * 1e3) as f32;
-    let candidate = to_plan(0, &model, plan.context, plan.mode, shared.key.public(), &placement);
+    let candidate = to_plan(0, &model, plan.context, plan.mode, kv, shared.key.public(), &placement);
     let same = |a: &[v1::Stage], b: &[v1::Stage]| {
         a.len() == b.len()
             && a.iter()

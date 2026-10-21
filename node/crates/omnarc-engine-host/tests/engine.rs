@@ -9,7 +9,7 @@
 
 use std::path::PathBuf;
 
-use omnarc_engine_host::{Backend, DType, Engine, Error, Input, SamplerParams, Status, Step};
+use omnarc_engine_host::{Backend, DType, Engine, Error, Input, KvType, SamplerParams, Status, Step};
 
 fn paths() -> (PathBuf, PathBuf) {
     let get = |name: &str| {
@@ -180,5 +180,36 @@ fn a_replica_continues_an_answer_from_the_kv_cache() {
     for shard in [&live, &replica, &bare] {
         engine.close(shard.id).unwrap();
     }
+    engine.quit().unwrap();
+}
+
+#[test]
+fn a_shard_holds_its_cache_in_eight_bits_too() {
+    let (engine_path, model) = paths();
+    let mut engine = Engine::spawn(&engine_path, 16 << 20).unwrap();
+    // the first two layers only: enough to run the cache, little enough for a large model on a small machine
+    let shard = match engine.open_with_kv(&model, 0..2, Backend::Cpu, 256, KvType::Q8_0) {
+        Ok(shard) => shard,
+        Err(e) => {
+            // a model whose attention heads are not a multiple of the 32-value blocks cannot quantize its cache
+            assert!(e.to_string().contains("does not divide"), "{e}");
+            engine.quit().unwrap();
+            return;
+        }
+    };
+    let tokens = engine.tokenize(shard.id, "Once upon a time", true).unwrap();
+    let step = Step { request: 1, position: 0, input: Input::Tokens(&tokens), all_logits: false, output: DType::F32 };
+    let out = engine.run(&shard, &step).unwrap();
+    let hidden = shard.model.hidden_dim as usize;
+    assert_eq!(out.data.len(), tokens.len() * hidden * 4, "a hidden state for every token");
+    // and the next token reads the 8-bit cache
+    let next = Step {
+        request: 1,
+        position: u32::try_from(tokens.len()).unwrap(),
+        input: Input::Tokens(&[tokens[0]]),
+        all_logits: false,
+        output: DType::F32,
+    };
+    assert_eq!(engine.run(&shard, &next).unwrap().data.len(), hidden * 4);
     engine.quit().unwrap();
 }

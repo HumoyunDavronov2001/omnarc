@@ -15,7 +15,7 @@ static int failures = 0;
 
 int main(void) {
     CHECK(om_abi_version() == OMNARC_ABI_VERSION);
-    CHECK(OMNARC_ABI_VERSION == 4u);
+    CHECK(OMNARC_ABI_VERSION == 5u);
     CHECK(strcmp(om_version_string(), "0.1.0") == 0);
     CHECK(strcmp(om_status_string(OM_OK), "ok") == 0);
     CHECK(strcmp(om_status_string(OM_ERR_NOT_IMPLEMENTED), "not implemented") == 0);
@@ -37,7 +37,7 @@ int main(void) {
     CHECK(om_shard_open(NULL, NULL) == OM_ERR_INVALID_ARGUMENT);
     CHECK(strlen(om_last_error()) > 0);
 
-    om_shard_params params = {"no-such-model.gguf", 10, 10, OM_BACKEND_AUTO, 4096};
+    om_shard_params params = {"no-such-model.gguf", 10, 10, OM_BACKEND_AUTO, 4096, OM_KV_F16};
     CHECK(om_shard_open(&params, &shard) == OM_ERR_INVALID_ARGUMENT); /* empty layer range */
     params.layer_end = 24;
     params.max_tokens = 0;
@@ -46,6 +46,9 @@ int main(void) {
     params.backend = (om_backend)42;
     CHECK(om_shard_open(&params, &shard) == OM_ERR_INVALID_ARGUMENT); /* unknown backend */
     params.backend = OM_BACKEND_AUTO;
+    params.kv_type = (om_kv_type)7;
+    CHECK(om_shard_open(&params, &shard) == OM_ERR_INVALID_ARGUMENT); /* unknown KV cache type */
+    params.kv_type = OM_KV_Q8_0;
     CHECK(om_shard_open(&params, &shard) == OM_ERR_IO); /* valid arguments, no such file */
     CHECK(strstr(om_last_error(), "no-such-model.gguf") != NULL);
 

@@ -132,6 +132,7 @@ public:
     }
 
     bool ok() const { return ok_; }
+    bool more() const { return pos_ < data_.size(); }
 
 private:
     const std::vector<uint8_t> &data_;
@@ -232,6 +233,8 @@ struct engine {
                 params.layer_end = in.get<uint32_t>();
                 params.backend = static_cast<om_backend>(in.get<uint32_t>());
                 params.max_tokens = in.get<uint32_t>();
+                // ABI 5: the KV cache type follows; an older host sends none and gets f16
+                if (in.more()) params.kv_type = static_cast<om_kv_type>(in.get<uint32_t>());
                 if (!in.ok()) break;
                 om_shard *s = nullptr;
                 const om_status status = om_shard_open(&params, &s);

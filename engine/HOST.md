@@ -35,7 +35,7 @@ status carries one string, the error message, as its payload.
 |---:|---|---|---|
 | 1 | `HELLO` | — | `u32` ABI version, string engine version, `u64` region size |
 | 2 | `MODEL_INFO` | string path | model info |
-| 3 | `OPEN` | string path, `u32` layer begin, `u32` layer end, `u32` backend, `u32` max tokens | `u32` shard, shard info |
+| 3 | `OPEN` | string path, `u32` layer begin, `u32` layer end, `u32` backend, `u32` max tokens, from ABI 5 `u32` KV cache type (0 f16, 1 q8_0, 2 q4_0) | `u32` shard, shard info |
 | 4 | `CLOSE` | `u32` shard | — |
 | 5 | `RUN` | `u32` shard, `u64` request, `u32` position, `u32` count, `u8` input, `u8` all logits, `u8` output, `u8` 0 | `u32` rows, `u32` values per row |
 | 6 | `DROP` | `u32` shard, `u64` request | — |

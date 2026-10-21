@@ -114,7 +114,7 @@ async fn a_cluster_places_a_model_by_what_each_device_offers_and_answers_from_an
 
     // budgets that hold the model only together: the desktop half of the layers with the head's extras, the laptop
     // the other half, the phone less than one layer
-    let shape = omnarc_node::service::shape(&model, CONTEXT);
+    let shape = omnarc_node::service::shape(&model, CONTEXT, omnarc_engine_host::KvType::F16);
     let half = shape.layers / 2;
     let reserve = omnarc_node::service::ENGINE_RESERVE;
     let room = u64::midpoint(shape.layer_bytes, shape.kv_bytes_per_layer);
@@ -235,7 +235,7 @@ async fn when_a_device_of_the_ring_leaves_its_standby_takes_its_place() {
 
     // the desktop holds the head and half the layers; the laptop and the server each the other half: one of them
     // runs it and the other stands by
-    let shape = omnarc_node::service::shape(&model, CONTEXT);
+    let shape = omnarc_node::service::shape(&model, CONTEXT, omnarc_engine_host::KvType::F16);
     let half = shape.layers / 2;
     let reserve = omnarc_node::service::ENGINE_RESERVE;
     let room = u64::midpoint(shape.layer_bytes, shape.kv_bytes_per_layer);

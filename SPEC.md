@@ -14,7 +14,7 @@ design concept (its section number), or "—".
 <!-- count:begin — written by .github/scripts/spec_count.py from the tables below; do not edit by hand -->
 | Part | Screens | Functions | ✓ done | ◐ partly | ○ not started | Ready |
 |---|---|---|---|---|---|---|
-| Engine | 0 | 30 | 9 | 5 | 16 | 38 % |
+| Engine | 0 | 30 | 9 | 6 | 15 | 40 % |
 | Node agent and API | 0 | 42 | 13 | 17 | 12 | 51 % |
 | Panel | 24 | 7 | 4 | 13 | 14 | 34 % |
 | Desktop app | 4 | 5 | 0 | 0 | 9 | 0 % |
@@ -27,7 +27,7 @@ design concept (its section number), or "—".
 | Islands | 0 | 3 | 0 | 0 | 3 | 0 % |
 | Benchmarks, sites and releases | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Design system and quality across all apps | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **All** | **50** | **143** | **34** | **45** | **114** | **29 %** |
+| **All** | **50** | **143** | **34** | **46** | **113** | **30 %** |
 
 "Ready" counts a partly done item as half. By stage — what each stage has to deliver:
 
@@ -37,7 +37,7 @@ design concept (its section number), or "—".
 | B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
 | B3 | 16 | 6 | 9 | 1 |
-| B4 | 18 | 0 | 7 | 11 |
+| B4 | 18 | 0 | 8 | 10 |
 | B5 | 53 | 0 | 5 | 48 |
 | B6 | 23 | 0 | 0 | 23 |
 | B7 | 9 | 0 | 0 | 9 |
@@ -83,7 +83,7 @@ design concept (its section number), or "—".
 | EN-13 | Draft sources: MTP heads, EAGLE-3, a small model, n-grams; large draft trees for slow devices | function | D3 | B4 | — | ◐ |
 | EN-14 | Hot and cold neurons (PowerInfer) | function | D4 | B4 | — | ○ |
 | EN-15 | MoE experts placed by co-activation, predicted and fetched ahead; hot experts copied (EPLB) | function | D4 | B4 | — | ○ |
-| EN-16 | Paged KV cache, radix prefix cache, q8/q4 KV | function | P§4 | B4 | — | ○ |
+| EN-16 | Paged KV cache, radix prefix cache, q8/q4 KV | function | P§4 | B4 | — | ◐ |
 | EN-17 | A replica is kept in step with the device that is answering, so it continues without recomputing: it is sent the same inputs and runs them, and a cache can also be handed over directly | function | R3, Y7 | B3 | — | ✓ |
 | EN-18 | Ring attention: long context across the memory of many devices | function | Y9 | B4 | — | ○ |
 | EN-19 | f8e4m3 activations with a per-token scale | function | T3 | B4 | — | ○ |

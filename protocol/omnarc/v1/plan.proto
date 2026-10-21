@@ -58,6 +58,8 @@ message PlacementPlan {
   repeated BackupPlan backups = 8;
   // What the placement expected one token to take, in milliseconds, when it chose this plan.
   float estimated_ms_per_token = 9;
+  // The KV cache's element type on every stage: "f16" (or empty), "q8_0", "q4_0" (EN-16).
+  string kv_cache = 10;
 }
 
 message BackupPlan {

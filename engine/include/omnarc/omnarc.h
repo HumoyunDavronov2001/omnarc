@@ -23,7 +23,7 @@ extern "C" {
 
 /* 1: stage B0 interface. 2: shards on llama.cpp — model info, om_shard_run, KV management, prefetching,
  * tokenizer and sampler. 3: om_devices. */
-#define OMNARC_ABI_VERSION 4u
+#define OMNARC_ABI_VERSION 5u
 
 typedef enum om_status {
     OM_OK = 0,
@@ -54,12 +54,21 @@ typedef enum om_backend {
 /* A loaded, contiguous range of model layers on one device. Opaque. */
 typedef struct om_shard om_shard;
 
+/* The element type of a shard's KV cache (SPEC EN-16): 8- and 4-bit caches hold two and almost four times as
+ * many tokens in the same memory. */
+typedef enum om_kv_type {
+    OM_KV_F16 = 0,
+    OM_KV_Q8_0 = 1,
+    OM_KV_Q4_0 = 2,
+} om_kv_type;
+
 typedef struct om_shard_params {
     const char *model_path; /* GGUF file */
     uint32_t layer_begin;   /* first layer, inclusive */
     uint32_t layer_end;     /* last layer, exclusive; layer_count + 1 includes the output head */
     om_backend backend;     /* OM_BACKEND_AUTO picks the fastest available backend */
     uint32_t max_tokens;    /* KV cache capacity in tokens, shared by all requests of the shard */
+    om_kv_type kv_type;     /* KV cache element type; OM_KV_F16 when zero */
 } om_shard_params;
 
 /* The ABI version this library implements (OMNARC_ABI_VERSION at build time). */

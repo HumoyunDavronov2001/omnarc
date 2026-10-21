@@ -315,6 +315,9 @@ om_status om_shard_open(const om_shard_params *params, om_shard **out) {
     }
     if (params->layer_end <= params->layer_begin) return fail(OM_ERR_INVALID_ARGUMENT, "the layer window is empty");
     if (params->max_tokens == 0) return fail(OM_ERR_INVALID_ARGUMENT, "max_tokens must be positive");
+    if (static_cast<int>(params->kv_type) < 0 || static_cast<int>(params->kv_type) > OM_KV_Q4_0) {
+        return fail(OM_ERR_INVALID_ARGUMENT, "unknown KV cache type");
+    }
     const int backend = static_cast<int>(params->backend);  // enums may be unsigned: compare as int
     if (backend < OM_BACKEND_AUTO || backend > OM_BACKEND_WEBGPU) {
         return fail(OM_ERR_INVALID_ARGUMENT, "unknown backend");
@@ -390,6 +393,13 @@ om_status om_shard_open(const om_shard_params *params, om_shard **out) {
     cparams.layer_begin = static_cast<int32_t>(params->layer_begin);
     cparams.layer_end = static_cast<int32_t>(params->layer_end);
     cparams.no_perf = true;
+    if (params->kv_type != OM_KV_F16) {
+        // a quantized V cache is read through Flash Attention only
+        const ggml_type type = params->kv_type == OM_KV_Q8_0 ? GGML_TYPE_Q8_0 : GGML_TYPE_Q4_0;
+        cparams.type_k = type;
+        cparams.type_v = type;
+        cparams.flash_attn_type = LLAMA_FLASH_ATTN_TYPE_ENABLED;
+    }
 
     shard->ctx = llama_init_from_model(shard->model, cparams);
     if (shard->ctx == nullptr) {

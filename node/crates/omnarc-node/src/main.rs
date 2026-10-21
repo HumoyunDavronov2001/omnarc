@@ -257,6 +257,9 @@ struct RingArgs {
     /// Prompt tokens per prefill step.
     #[arg(long, default_value_t = 256)]
     chunk: u32,
+    /// The KV cache's element type: f16, q8 or q4 (`q8_0`, `q4_0`); the same on every node.
+    #[arg(long, default_value = "f16", value_parser = parse_kv)]
+    kv: omnarc_engine_host::KvType,
     /// Threads for this node's layers; 0: all physical cores.
     #[arg(long, default_value_t = 0)]
     threads: u32,
@@ -272,6 +275,11 @@ struct RingArgs {
     /// The omnarc-engine executable (default: next to omnarc-node).
     #[arg(long)]
     engine: Option<PathBuf>,
+}
+
+fn parse_kv(name: &str) -> Result<omnarc_engine_host::KvType, String> {
+    omnarc_engine_host::KvType::from_name(name)
+        .ok_or_else(|| format!("unknown KV cache type {name}: f16, q8_0 or q4_0"))
 }
 
 fn parse_backend(name: &str) -> Result<Backend, String> {
@@ -310,6 +318,7 @@ fn ring(args: RingArgs, data: &Path) -> Result<(), ring::BoxError> {
         backend: args.backend,
         max_tokens: args.max_tokens,
         chunk: args.chunk.max(1),
+        kv: args.kv,
         wire: args.wire,
         mirror_only: args.mirror_only,
         replica: args.replica,

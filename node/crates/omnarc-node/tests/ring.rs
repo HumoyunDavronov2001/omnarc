@@ -77,6 +77,7 @@ async fn a_ring_generates_what_one_device_generates() {
         wire: DType::F32,
         threads: 0,
         draft: 4,
+        kv: omnarc_engine_host::KvType::F16,
         prompt,
         generate: GENERATE,
     };
@@ -152,6 +153,7 @@ async fn a_replica_mirrors_the_frames_without_changing_the_answer() {
         wire: DType::F32,
         threads: 0,
         draft: 4,
+        kv: omnarc_engine_host::KvType::F16,
         prompt,
         generate: GENERATE,
     };
@@ -254,6 +256,7 @@ async fn a_replica_takes_over_when_the_device_holding_a_window_leaves() {
             wire: DType::F32,
             threads: 0,
             draft: 4,
+            kv: omnarc_engine_host::KvType::F16,
             prompt,
             generate: GENERATE,
         }

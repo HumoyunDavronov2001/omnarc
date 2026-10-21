@@ -179,6 +179,50 @@ impl Output<'_> {
     }
 }
 
+/// The element type of a shard's KV cache (EN-16).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[repr(u32)]
+pub enum KvType {
+    #[default]
+    F16 = 0,
+    /// 8 bits and a scale per 32 values: about half of f16.
+    Q8_0 = 1,
+    /// 4 bits and a scale per 32 values: about a quarter.
+    Q4_0 = 2,
+}
+
+impl KvType {
+    /// Bytes one cached value takes.
+    #[must_use]
+    pub fn bytes_per_value(self) -> f64 {
+        match self {
+            Self::F16 => 2.0,
+            Self::Q8_0 => 34.0 / 32.0,
+            Self::Q4_0 => 18.0 / 32.0,
+        }
+    }
+
+    /// The name used in plans and requests: empty or `f16`, `q8_0`, `q4_0`.
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "" | "f16" => Some(Self::F16),
+            "q8_0" | "q8" => Some(Self::Q8_0),
+            "q4_0" | "q4" => Some(Self::Q4_0),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::F16 => "f16",
+            Self::Q8_0 => "q8_0",
+            Self::Q4_0 => "q4_0",
+        }
+    }
+}
+
 /// Sampling settings; a temperature of 0 is greedy.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SamplerParams {
@@ -338,12 +382,33 @@ impl Engine {
     /// # Errors
     /// The window is invalid, the architecture cannot be split, the backend is missing or memory runs out.
     pub fn open(&mut self, path: &Path, layers: Range<u32>, backend: Backend, max_tokens: u32) -> Result<ShardInfo> {
+        self.open_with_kv(path, layers, backend, max_tokens, KvType::F16)
+    }
+
+    /// [`open`](Self::open) with the KV cache's element type (EN-16); an engine older than ABI 5 keeps f16 and
+    /// refuses any other.
+    ///
+    /// # Errors
+    /// As [`open`](Self::open), and a quantized cache on an engine that cannot hold one.
+    pub fn open_with_kv(
+        &mut self,
+        path: &Path,
+        layers: Range<u32>,
+        backend: Backend,
+        max_tokens: u32,
+        kv: KvType,
+    ) -> Result<ShardInfo> {
         let mut payload = Vec::new();
         put_str(&mut payload, &path.to_string_lossy());
         payload.extend_from_slice(&layers.start.to_le_bytes());
         payload.extend_from_slice(&layers.end.to_le_bytes());
         payload.extend_from_slice(&u32::try_from(backend as i32).unwrap_or(0).to_le_bytes());
         payload.extend_from_slice(&max_tokens.to_le_bytes());
+        if self.abi_version >= 5 {
+            payload.extend_from_slice(&(kv as u32).to_le_bytes());
+        } else if kv != KvType::F16 {
+            return Err(Error::Protocol(format!("engine ABI {} holds only an f16 KV cache", self.abi_version)));
+        }
         let mut r = self.request(op::OPEN, &payload)?;
         let id = ShardId(r.u32()?);
         let model = r.model_info()?;

@@ -178,6 +178,8 @@ message RunModelRequest {
   uint32 context = 3;
   // Only answer "Will it fit?": the plan the model would get, without starting it.
   bool dry_run = 4;
+  // The KV cache's element type: "f16" (or empty), "q8_0" or "q4_0"; smaller caches fit longer contexts (EN-16).
+  string kv_cache = 5;
 }
 
 message RunModelResponse {

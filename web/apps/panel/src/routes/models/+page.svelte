@@ -14,6 +14,8 @@
   // the answer to "Will it fit?" for one model, before it starts
   let preview = $state<{ model: string; answer: RunModelResponse } | null>(null);
   let context = $state(4096);
+  // the KV cache's element type (EN-16): 8 and 4 bits fit about two and three and a half times the context
+  let kvCache = $state('f16');
 
   async function load() {
     try {
@@ -35,7 +37,7 @@
     busy = model.blake3;
     failed = '';
     try {
-      const answer = await api.runModel({ model: model.blake3, context, dryRun });
+      const answer = await api.runModel({ model: model.blake3, context, dryRun, kvCache });
       preview = dryRun ? { model: model.blake3, answer } : null;
     } catch (e) {
       failed = message(e);
@@ -139,7 +141,9 @@
         <div class="flex flex-wrap items-center gap-3">
           <Status kind="good" label={running.model?.name || 'A model'} />
           <span class="text-13 text-text-2">
-            {running.model?.layerCount} layers · context {running.context} · plan {running.version}
+            {running.model?.layerCount} layers · context {running.context}{running.kvCache && running.kvCache !== 'f16'
+              ? ` · ${running.kvCache === 'q8_0' ? '8' : '4'}-bit cache`
+              : ''} · plan {running.version}
           </span>
           <div class="ml-auto">
             <Button label="Stop" icon="power" disabled={busy === 'stop'} onclick={stop} />
@@ -183,6 +187,14 @@
             {/each}
           </select>
           <span>longer contexts need more memory on every device</span>
+        </label>
+        <label class="flex flex-wrap items-center gap-3 text-13 text-text-2">
+          KV cache
+          <select class="h-9 rounded-lg border border-line-2 bg-surface-2 px-2 text-13 text-text-1" bind:value={kvCache}>
+            <option value="f16">16-bit, exact</option>
+            <option value="q8_0">8-bit, about half the memory</option>
+            <option value="q4_0">4-bit, about a quarter</option>
+          </select>
         </label>
         <ul class="m-0 grid list-none gap-3 p-0">
           {#each models as model (model.blake3)}

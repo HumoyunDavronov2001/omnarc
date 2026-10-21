@@ -20,7 +20,7 @@ use std::str::FromStr;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use omnarc_engine_host::{Backend, DType, Engine, Input, SamplerParams, ShardInfo, Step};
+use omnarc_engine_host::{Backend, DType, Engine, Input, KvType, SamplerParams, ShardInfo, Step};
 use omnarc_network::{Connection, Endpoint, EndpointId, Peer, SendStream};
 use omnarc_protocol::frame::{Flags, FrameHeader};
 use tokio::sync::{mpsc, watch};
@@ -132,6 +132,8 @@ pub struct Config {
     pub max_tokens: u32,
     /// Tokens per prefill step.
     pub chunk: u32,
+    /// The KV cache's element type (EN-16); the same on every node of a ring.
+    pub kv: KvType,
     /// Element type of the hidden state between nodes: F16 (default), Bf16 or F32.
     pub wire: DType,
     /// This node only mirrors: it runs the frames a live node sends it to keep its KV cache in step, and
@@ -297,7 +299,8 @@ fn open_node(config: &Config) -> Result<Node, BoxError> {
         if window.0.end > info.layer_count + 1 {
             return Err(format!("window {window} ends after the output head (layer {})", info.layer_count).into());
         }
-        let shard = engine.open(&config.model, window.0.clone(), config.backend, config.max_tokens)?;
+        let shard =
+            engine.open_with_kv(&config.model, window.0.clone(), config.backend, config.max_tokens, config.kv)?;
         if config.threads > 0 {
             engine.set_threads(shard.id, config.threads)?;
         }
