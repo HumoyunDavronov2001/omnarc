@@ -35,7 +35,7 @@ status carries one string, the error message, as its payload.
 |---:|---|---|---|
 | 1 | `HELLO` | — | `u32` ABI version, string engine version, `u64` region size |
 | 2 | `MODEL_INFO` | string path | model info |
-| 3 | `OPEN` | string path, `u32` layer begin, `u32` layer end, `u32` backend, `u32` max tokens, from ABI 5 `u32` KV cache type (0 f16, 1 q8_0, 2 q4_0) | `u32` shard, shard info |
+| 3 | `OPEN` | string path, `u32` layer begin, `u32` layer end, `u32` backend, `u32` max tokens, from ABI 5 `u32` KV cache type (0 f16, 1 q8_0, 2 q4_0), from ABI 7 `u32` GPU (1 + its index in `DEVICES`, 0 every GPU) and `u32` layers on it (the window's last ones; 0 all) | `u32` shard, shard info |
 | 4 | `CLOSE` | `u32` shard | — |
 | 5 | `RUN` | `u32` shard, `u64` request, `u32` position, `u32` count, `u8` input, `u8` all logits, `u8` output, `u8` 0 | `u32` rows, `u32` values per row |
 | 6 | `DROP` | `u32` shard, `u64` request | — |
@@ -48,11 +48,12 @@ status carries one string, the error message, as its payload.
 | 13 | `SAMPLE` | `u32` sampler, `u32` vocabulary size | `i32` token |
 | 14 | `SAMPLER_CLOSE` | `u32` sampler | — |
 | 15 | `QUIT` | — | — |
-| 16 | `DEVICES` | — | `u32` count, then per GPU: `u32` backend, `u64` memory in bytes, string name (ABI 3) |
+| 16 | `DEVICES` | — | `u32` count, then per GPU: `u32` backend, `u64` memory in bytes, string name (ABI 3), from ABI 7 `u32` 1 when it shares the processor's memory and `u64` its free memory |
 | 17 | `KV_SIZE` | `u32` shard, `u64` request | `u64` bytes the cache takes now (ABI 4) |
 | 18 | `KV_READ` | `u32` shard, `u64` request | `u64` bytes written, the cache itself in the output half (ABI 4) |
 | 19 | `KV_WRITE` | `u32` shard, `u64` request, `u64` bytes; the cache in the input half | — (ABI 4) |
 | 20 | `CHAT_PROMPT` | `u32` shard, `u32` count, then count × (string role, string text) | string: the conversation in the model's chat template, ending where the answer begins (ABI 6) |
+| 21 | `BENCH` | `u32` GPU index, `u32` milliseconds | `f64` bandwidth in bytes/s (one vector against a 64 MiB f16 matrix), `f64` FLOPS (256 vectors) (ABI 7) |
 
 - **Model info:** string architecture, `u32` layer count, `u32` hidden size, `u32` vocabulary size, `u32` context
   length, `u64` file size, `u8` splittable.

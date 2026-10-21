@@ -22,8 +22,9 @@ extern "C" {
 #endif
 
 /* 1: stage B0 interface. 2: shards on llama.cpp — model info, om_shard_run, KV management, prefetching,
- * tokenizer and sampler. 3: om_devices. */
-#define OMNARC_ABI_VERSION 6u
+ * tokenizer and sampler. 3: om_devices. 7: one chosen GPU and part of a window on it (gpu, gpu_layers), the GPU's
+ * kind and free memory in om_device, om_device_bench. */
+#define OMNARC_ABI_VERSION 7u
 
 typedef enum om_status {
     OM_OK = 0,
@@ -69,6 +70,12 @@ typedef struct om_shard_params {
     om_backend backend;     /* OM_BACKEND_AUTO picks the fastest available backend */
     uint32_t max_tokens;    /* KV cache capacity in tokens, shared by all requests of the shard */
     om_kv_type kv_type;     /* KV cache element type; OM_KV_F16 when zero */
+    /* ABI 7: 1 + the index in om_devices() of the one GPU the window runs on; 0: every GPU of the backend */
+    uint32_t gpu;
+    /* ABI 7: how many of the window's repeating layers run on that GPU, the last ones of the window, so the layers
+     * that stay on the processor come first; the output head goes on the GPU too when the window holds it.
+     * 0: all of them. Ignored for OM_BACKEND_CPU. */
+    uint32_t gpu_layers;
 } om_shard_params;
 
 /* The ABI version this library implements (OMNARC_ABI_VERSION at build time). */
@@ -85,11 +92,18 @@ typedef struct om_device {
     om_backend backend;    /* CUDA, Vulkan, Metal, ... */
     uint64_t memory_bytes; /* its memory as its backend reports it; 0 if unknown */
     char name[128];        /* e.g. "NVIDIA GeForce GTX 1050", NUL-terminated */
+    uint32_t integrated;   /* ABI 7: 1 when the GPU shares the processor's memory */
+    uint64_t free_bytes;   /* ABI 7: its memory free right now; 0 if unknown */
 } om_device;
 
 /* Lists the GPUs this build of the engine can run layers on: writes up to capacity of them to out and returns how
  * many there are. None means the engine computes on the processor. */
 size_t om_devices(om_device *out, size_t capacity);
+
+/* ABI 7. Measures GPU `index` of om_devices() for about `millis` milliseconds (SPEC NO-40): *bandwidth_bytes_per_s
+ * by multiplying a 64 MiB f16 matrix with one vector, which reads the weights as one token's pass does, and *flops
+ * by multiplying it with 256 vectors, as a prefill does. */
+om_status om_device_bench(uint32_t index, uint32_t millis, double *bandwidth_bytes_per_s, double *flops);
 
 /* Loads layers [layer_begin, layer_end) of a model. Only the weights of those layers are read; the shard that
  * starts at layer 0 also loads the token embeddings. [layer_count, layer_count + 1) is the output head alone: it

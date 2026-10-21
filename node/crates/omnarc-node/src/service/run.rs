@@ -33,6 +33,42 @@ pub(super) const SPREAD_EVERY: Duration = Duration::from_secs(5);
 /// What each stage keeps aside for the engine's compute buffers, besides its windows.
 pub const ENGINE_RESERVE: u64 = 192 << 20;
 
+/// GPU memory kept free of layers: the compute buffers and the driver's own.
+pub const GPU_RESERVE: u64 = 384 << 20;
+
+/// A device's fastest measured GPU: 1 + its index among the accelerators other than the processor, as a plan names
+/// it, and the GPU itself.
+pub fn fastest_gpu(info: &v1::DeviceInfo) -> Option<(u32, &v1::Accelerator)> {
+    info.accelerators
+        .iter()
+        .filter(|a| a.backend != v1::Backend::Cpu as i32)
+        .enumerate()
+        .filter(|(_, a)| a.measured_bandwidth_gbps > 0.0 && a.memory_bytes > GPU_RESERVE)
+        .max_by(|(_, a), (_, b)| a.measured_bandwidth_gbps.total_cmp(&b.measured_bandwidth_gbps))
+        .map(|(i, a)| (u32::try_from(i + 1).unwrap_or(0), a))
+}
+
+/// Names the GPU of every stage and replica that has layers on one, the backups' too.
+pub fn assign_gpus(devices: &std::collections::HashMap<EndpointId, v1::DeviceInfo>, plan: &mut v1::PlacementPlan) {
+    let slot = |node: Option<&v1::NodeId>| {
+        node.and_then(|n| endpoint_id(&n.ed25519_public_key))
+            .and_then(|id| devices.get(&id))
+            .and_then(fastest_gpu)
+            .map_or(0, |(slot, _)| slot)
+    };
+    for s in &mut plan.stages {
+        s.gpu = if s.gpu_layers > 0 { slot(s.node.as_ref()) } else { 0 };
+    }
+    for r in &mut plan.replicas {
+        r.gpu = if r.gpu_layers > 0 { slot(r.node.as_ref()) } else { 0 };
+    }
+    for b in &mut plan.backups {
+        if let Some(p) = b.plan.as_mut() {
+            assign_gpus(devices, p);
+        }
+    }
+}
+
 /// The context the KV caches are sized for when the request names none.
 pub const DEFAULT_CONTEXT: u32 = 4096;
 
@@ -66,6 +102,10 @@ impl std::fmt::Debug for Running {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Role {
     pub windows: Vec<Range<u32>>,
+    /// 1 + the index of the GPU its windows use among the device's accelerators other than the processor; 0: none.
+    pub gpu: u32,
+    /// How many of its window's layers run there, the last ones (NO-51).
+    pub gpu_layers: u32,
     /// It answers prompts: it holds layer 0 and the output.
     pub head: bool,
     /// It stands by for another device's windows and only keeps its cache in step (EN-17).
@@ -115,6 +155,8 @@ pub fn role(plan: &v1::PlacementPlan, me: &[u8]) -> Option<Role> {
         if n == 1 {
             return Some(Role {
                 windows: windows(0),
+                gpu: stages[0].gpu,
+                gpu_layers: stages[0].gpu_layers,
                 head: true,
                 mirror_only: false,
                 next: None,
@@ -127,6 +169,8 @@ pub fn role(plan: &v1::PlacementPlan, me: &[u8]) -> Option<Role> {
         prev.extend(replica_of(before(i)));
         return Some(Role {
             windows: windows(i),
+            gpu: stages[i].gpu,
+            gpu_layers: stages[i].gpu_layers,
             head: i == 0,
             mirror_only: false,
             next: Some(node(after(i))),
@@ -141,6 +185,8 @@ pub fn role(plan: &v1::PlacementPlan, me: &[u8]) -> Option<Role> {
         // a whole copy of a model that fits on one device answers prompts of its own (R6)
         return Some(Role {
             windows: windows(0),
+            gpu: replica.gpu,
+            gpu_layers: replica.gpu_layers,
             head: true,
             mirror_only: false,
             next: None,
@@ -155,6 +201,8 @@ pub fn role(plan: &v1::PlacementPlan, me: &[u8]) -> Option<Role> {
     prev.dedup();
     Some(Role {
         windows: windows(i),
+        gpu: replica.gpu,
+        gpu_layers: replica.gpu_layers,
         head: false,
         mirror_only: true,
         next: Some(node(after(i))),
@@ -246,7 +294,10 @@ async fn apply(shared: &Arc<Shared>, plan: &v1::PlacementPlan) -> Result<(), Box
         prev: role.prev.iter().filter_map(|p| endpoint_id(p)).collect(),
         key: PathBuf::new(),
         engine: ring::default_engine_path(),
-        backend: Backend::Unspecified,
+        // the plan decides the GPU: without one the engine must not spread the layers over every GPU it finds
+        backend: if role.gpu == 0 { Backend::Cpu } else { Backend::Unspecified },
+        gpu: role.gpu,
+        gpu_layers: role.gpu_layers,
         max_tokens: if plan.context == 0 { DEFAULT_CONTEXT } else { plan.context },
         chunk: 256,
         kv: omnarc_engine_host::KvType::from_name(&plan.kv_cache).unwrap_or_default(),
@@ -695,10 +746,23 @@ fn offers(shared: &Shared, shape: &omnarc_scheduler::Model) -> Vec<omnarc_schedu
         .into_iter()
         .filter_map(|id| {
             let t = telemetry.get(&id).filter(|t| now - t.unix_ms <= GONE_AFTER_MS)?;
-            let gbps = devices.get(&id)?.accelerators.iter().map(|a| a.measured_bandwidth_gbps).fold(0.0, f32::max);
+            let info = devices.get(&id)?;
+            // the processor's speed alone: a GPU's is its own, below
+            let gbps = info
+                .accelerators
+                .iter()
+                .filter(|a| a.backend == v1::Backend::Cpu as i32)
+                .map(|a| a.measured_bandwidth_gbps)
+                .fold(0.0, f32::max);
             if gbps <= 0.0 {
                 return None;
             }
+            #[allow(clippy::cast_precision_loss)]
+            let gpu = fastest_gpu(info).map(|(_, a)| omnarc_scheduler::Gpu {
+                offered_bytes: a.memory_bytes.saturating_sub(GPU_RESERVE),
+                seconds_per_layer: shape.layer_bytes as f64 / (f64::from(a.measured_bandwidth_gbps) * 1e9),
+                shares_memory: a.shares_memory,
+            });
             #[allow(clippy::cast_precision_loss)]
             let seconds_per_layer = shape.layer_bytes as f64 / (f64::from(gbps) * 1e9);
             let link_seconds = if id == shared.key.public() {
@@ -711,6 +775,7 @@ fn offers(shared: &Shared, shape: &omnarc_scheduler::Model) -> Vec<omnarc_schedu
                 offered_bytes: t.memory_offered_bytes.saturating_sub(ENGINE_RESERVE),
                 seconds_per_layer,
                 link_seconds,
+                gpu,
             })
         })
         .collect();
@@ -750,13 +815,20 @@ fn to_plan(
                 node: Some(node_id(s.node)),
                 layer_begin: s.layers.start,
                 layer_end: s.layers.end,
+                gpu_layers: s.gpu_layers,
                 ..Default::default()
             })
             .collect(),
         replicas: placement
             .replicas
             .iter()
-            .map(|r| v1::Replica { node: Some(node_id(r.node)), layer_begin: r.layers.start, layer_end: r.layers.end })
+            .map(|r| v1::Replica {
+                node: Some(node_id(r.node)),
+                layer_begin: r.layers.start,
+                layer_end: r.layers.end,
+                gpu_layers: r.gpu_layers,
+                ..Default::default()
+            })
             .collect(),
         source: Some(node_id(source)),
         context,
@@ -798,6 +870,7 @@ pub(super) async fn run_model(
             plan: Some(to_plan(0, &model, context, request.mode, kv, me, &backup)),
         })
         .collect();
+    assign_gpus(&shared.devices.lock().expect("devices"), &mut plan);
     if !request.dry_run {
         consensus.propose(Command::SetPlan(plan.encode_to_vec())).await?;
     }
@@ -890,12 +963,16 @@ async fn better_plan(shared: &Shared) -> Option<v1::PlanSuggestion> {
     let placement = omnarc_scheduler::place_for(&shape, &offers(shared, &shape), objective(plan.mode).ok()?).ok()?;
     #[allow(clippy::cast_possible_truncation)]
     let ms = (placement.seconds_per_token * 1e3) as f32;
-    let candidate = to_plan(0, &model, plan.context, plan.mode, kv, shared.key.public(), &placement);
+    let mut candidate = to_plan(0, &model, plan.context, plan.mode, kv, shared.key.public(), &placement);
+    assign_gpus(&shared.devices.lock().expect("devices"), &mut candidate);
     let same = |a: &[v1::Stage], b: &[v1::Stage]| {
         a.len() == b.len()
-            && a.iter()
-                .zip(b)
-                .all(|(x, y)| x.node == y.node && x.layer_begin == y.layer_begin && x.layer_end == y.layer_end)
+            && a.iter().zip(b).all(|(x, y)| {
+                x.node == y.node
+                    && x.layer_begin == y.layer_begin
+                    && x.layer_end == y.layer_end
+                    && x.gpu_layers == y.gpu_layers
+            })
     };
     (ms < plan.estimated_ms_per_token * SUGGEST_GAIN && !same(&candidate.stages, &plan.stages)).then_some({
         v1::PlanSuggestion {
@@ -997,7 +1074,7 @@ mod tests {
                 .collect(),
             replicas: replicas
                 .iter()
-                .map(|&(n, b, e)| v1::Replica { node: Some(id(n)), layer_begin: b, layer_end: e })
+                .map(|&(n, b, e)| v1::Replica { node: Some(id(n)), layer_begin: b, layer_end: e, ..Default::default() })
                 .collect(),
             ..Default::default()
         }

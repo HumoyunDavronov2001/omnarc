@@ -133,6 +133,10 @@ pub struct Config {
     pub key: PathBuf,
     pub engine: PathBuf,
     pub backend: Backend,
+    /// 1 + the index of the GPU among this device's accelerators other than the processor; 0: none (NO-51).
+    pub gpu: u32,
+    /// The window's layers on that GPU, the last ones; the output head goes along on the head.
+    pub gpu_layers: u32,
     pub max_tokens: u32,
     /// Tokens per prefill step.
     pub chunk: u32,
@@ -321,13 +325,35 @@ fn open_node(config: &Config) -> Result<Node, BoxError> {
     let half = (config.chunk as usize * hidden * 4).max(rows * info.vocab_size as usize * 4) + (1 << 16);
     let mut engine = Engine::spawn(&config.engine, 2 * half)?;
 
+    // the plan names the GPU as the device's own list does, without the processor; the engine counts it in
+    let gpu_index = if config.gpu > 0 && config.gpu_layers > 0 {
+        let devices = engine.devices()?;
+        let index = devices
+            .iter()
+            .enumerate()
+            .filter(|(_, d)| d.backend != Backend::Cpu)
+            .nth(config.gpu as usize - 1)
+            .map(|(i, _)| i)
+            .ok_or("the plan's GPU is not among this device's")?;
+        Some(u32::try_from(index)?)
+    } else {
+        None
+    };
+
     let mut shards = Vec::new();
     for window in &config.windows {
         if window.0.end > info.layer_count + 1 {
             return Err(format!("window {window} ends after the output head (layer {})", info.layer_count).into());
         }
+        // the window's last gpu_layers layers on the GPU; all of them (0) when that is the whole window, and the
+        // output window goes along whole
+        let repeating = window.0.end.min(info.layer_count).saturating_sub(window.0.start);
+        let gpu = gpu_index.map(|index| omnarc_engine_host::Gpu {
+            index,
+            layers: if repeating == 0 || config.gpu_layers >= repeating { 0 } else { config.gpu_layers },
+        });
         let shard =
-            engine.open_with_kv(&config.model, window.0.clone(), config.backend, config.max_tokens, config.kv)?;
+            engine.open_on(&config.model, window.0.clone(), config.backend, config.max_tokens, config.kv, gpu)?;
         if config.threads > 0 {
             engine.set_threads(shard.id, config.threads)?;
         }

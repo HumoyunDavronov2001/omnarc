@@ -2,6 +2,7 @@
 #include "omnarc/omnarc.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -12,6 +13,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "ggml-alloc.h"
 #include "ggml-backend.h"
 #include "gguf.h"
 #include "llama.h"
@@ -98,6 +100,17 @@ om_backend device_backend(ggml_backend_dev_t dev) {
 bool is_gpu(ggml_backend_dev_t dev) {
     const auto type = ggml_backend_dev_type(dev);
     return type == GGML_BACKEND_DEVICE_TYPE_GPU || type == GGML_BACKEND_DEVICE_TYPE_IGPU;
+}
+
+// The GPU `index` of om_devices(), or nullptr.
+ggml_backend_dev_t gpu_at(uint32_t index) {
+    uint32_t seen = 0;
+    for (size_t i = 0; i < ggml_backend_dev_count(); ++i) {
+        ggml_backend_dev_t dev = ggml_backend_dev_get(i);
+        if (!is_gpu(dev)) continue;
+        if (seen++ == index) return dev;
+    }
+    return nullptr;
 }
 
 struct gguf_deleter {
@@ -276,11 +289,69 @@ size_t om_devices(om_device *out, size_t capacity) {
             size_t total_mem = 0;
             ggml_backend_dev_memory(dev, &free_mem, &total_mem);
             device.memory_bytes = total_mem;
+            device.free_bytes = free_mem;
+            device.integrated = ggml_backend_dev_type(dev) == GGML_BACKEND_DEVICE_TYPE_IGPU ? 1 : 0;
             std::snprintf(device.name, sizeof device.name, "%s", ggml_backend_dev_description(dev));
         }
         ++count;
     }
     return count;
+}
+
+om_status om_device_bench(uint32_t index, uint32_t millis, double *bandwidth_bytes_per_s, double *flops) {
+    if (bandwidth_bytes_per_s == nullptr || flops == nullptr) {
+        return fail(OM_ERR_INVALID_ARGUMENT, "bandwidth_bytes_per_s and flops are required");
+    }
+    *bandwidth_bytes_per_s = 0;
+    *flops = 0;
+    init_once();
+    ggml_backend_dev_t dev = gpu_at(index);
+    if (dev == nullptr) return fail(OM_ERR_INVALID_ARGUMENT, "there is no GPU " + std::to_string(index));
+    g_last_error.clear();
+
+    // a 4096 x 8192 f16 matrix: 64 MiB, more than any GPU's cache, so every pass reads it from memory
+    constexpr int64_t kRows = 4096;
+    constexpr int64_t kCols = 8192;
+    constexpr int64_t kBatch = 256;
+    ggml_backend_t backend = ggml_backend_dev_init(dev, nullptr);
+    if (backend == nullptr) return fail(OM_ERR_BACKEND, "the GPU could not be started");
+    ggml_init_params ip = {ggml_tensor_overhead() * 8 + ggml_graph_overhead() * 2, nullptr, /*no_alloc =*/true};
+    ggml_context *ctx = ggml_init(ip);
+    ggml_tensor *matrix = ggml_new_tensor_2d(ctx, GGML_TYPE_F16, kRows, kCols);
+    ggml_tensor *vector = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, kRows, 1);
+    ggml_tensor *batch = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, kRows, kBatch);
+    ggml_cgraph *one = ggml_new_graph(ctx);
+    ggml_build_forward_expand(one, ggml_mul_mat(ctx, matrix, vector));
+    ggml_cgraph *many = ggml_new_graph(ctx);
+    ggml_build_forward_expand(many, ggml_mul_mat(ctx, matrix, batch));
+    ggml_backend_buffer_t buffer = ggml_backend_alloc_ctx_tensors(ctx, backend);
+    om_status status = OM_OK;
+    if (buffer == nullptr) {
+        status = fail(OM_ERR_OUT_OF_MEMORY, "the GPU has no room for the 64 MiB test matrix");
+    } else {
+        ggml_backend_buffer_clear(buffer, 0);
+        // how often `graph` runs in `budget`, after one run that warms it up
+        auto runs_per_second = [&](ggml_cgraph *graph, std::chrono::milliseconds budget) -> double {
+            if (ggml_backend_graph_compute(backend, graph) != GGML_STATUS_SUCCESS) return 0;
+            const auto start = std::chrono::steady_clock::now();
+            int runs = 0;
+            std::chrono::duration<double> spent{};
+            do {
+                if (ggml_backend_graph_compute(backend, graph) != GGML_STATUS_SUCCESS) return 0;
+                ++runs;
+                spent = std::chrono::steady_clock::now() - start;
+            } while (spent < budget);
+            return runs / spent.count();
+        };
+        const auto half = std::chrono::milliseconds(std::max<uint32_t>(millis, 2) / 2);
+        *bandwidth_bytes_per_s = runs_per_second(one, half) * static_cast<double>(ggml_nbytes(matrix));
+        *flops = runs_per_second(many, half) * 2.0 * kRows * kCols * kBatch;
+        if (*bandwidth_bytes_per_s == 0 || *flops == 0) status = fail(OM_ERR_BACKEND, "the GPU failed the test");
+        ggml_backend_buffer_free(buffer);
+    }
+    ggml_free(ctx);
+    ggml_backend_free(backend);
+    return status;
 }
 
 const char *om_status_string(om_status status) {
@@ -342,9 +413,16 @@ om_status om_shard_open(const om_shard_params *params, om_shard **out) {
 
     init_once();
 
-    // devices: the GPUs of the requested backend, every GPU for AUTO, none for CPU
+    // devices: the one GPU asked for, or the GPUs of the requested backend, every GPU for AUTO, none for CPU
     std::vector<ggml_backend_dev_t> devices;
-    for (size_t i = 0; i < ggml_backend_dev_count(); ++i) {
+    if (params->gpu > 0 && params->backend != OM_BACKEND_CPU) {
+        ggml_backend_dev_t dev = gpu_at(params->gpu - 1);
+        if (dev == nullptr) {
+            return fail(OM_ERR_UNSUPPORTED, "there is no GPU " + std::to_string(params->gpu - 1) + " in this build");
+        }
+        devices.push_back(dev);
+    }
+    for (size_t i = 0; params->gpu == 0 && i < ggml_backend_dev_count(); ++i) {
         ggml_backend_dev_t dev = ggml_backend_dev_get(i);
         if (is_gpu(dev) && (params->backend == OM_BACKEND_AUTO || device_backend(dev) == params->backend)) {
             devices.push_back(dev);
@@ -361,6 +439,12 @@ om_status om_shard_open(const om_shard_params *params, om_shard **out) {
     llama_model_params mparams = llama_model_default_params();
     mparams.devices = devices.data();
     mparams.n_gpu_layers = shard->weights_on_host ? 0 : -1;  // all of the window's layers on the GPUs
+    const uint32_t last = std::min(params->layer_end, n_layer);  // the window's repeating layers end here
+    const uint32_t repeating = last - std::min(last, params->layer_begin);
+    if (!shard->weights_on_host && params->gpu_layers > 0 && params->gpu_layers < repeating) {
+        // llama.cpp puts the last n_gpu_layers of the model on the GPU, the output head counting as one
+        mparams.n_gpu_layers = static_cast<int32_t>(n_layer + 1 - (last - params->gpu_layers));
+    }
     mparams.layer_begin = static_cast<int32_t>(params->layer_begin);
     mparams.layer_end = static_cast<int32_t>(params->layer_end);
     if (shard->weights_on_host) {

@@ -12,7 +12,7 @@ fn llama_8b() -> Model {
 }
 
 fn device(id: u32, offered_mb: u64, seconds_per_layer: f64) -> Device<u32> {
-    Device { id, offered_bytes: offered_mb * MB, seconds_per_layer, link_seconds: 0.002 }
+    Device { id, offered_bytes: offered_mb * MB, seconds_per_layer, link_seconds: 0.002, gpu: None }
 }
 
 fn assert_valid(model: &Model, devices: &[Device<u32>], plan: &Placement<u32>) {
@@ -22,8 +22,7 @@ fn assert_valid(model: &Model, devices: &[Device<u32>], plan: &Placement<u32>) {
         assert!(stage.layers.end > stage.layers.start, "no empty window");
         next = stage.layers.end;
         let d = devices.iter().find(|d| d.id == stage.node).expect("a stage is a device");
-        let used = model.window_bytes(stage.layers.end - stage.layers.start, i == 0);
-        assert!(used <= d.offered_bytes, "device {} offers {} and was given {used}", d.id, d.offered_bytes);
+        assert_holds(model, d, stage.layers.end - stage.layers.start, stage.gpu_layers, i == 0);
     }
     assert_eq!(next, model.layers, "every layer is placed once");
     for r in &plan.replicas {
@@ -32,13 +31,108 @@ fn assert_valid(model: &Model, devices: &[Device<u32>], plan: &Placement<u32>) {
     }
 }
 
+// Q1 with the GPU: its layers (and on the head the output) within what it offers, the rest within the memory.
+fn assert_holds(model: &Model, d: &Device<u32>, layers: u32, gpu_layers: u32, head: bool) {
+    let per_layer = model.layer_bytes + model.kv_bytes_per_layer;
+    let ends = if head { model.head_bytes + model.tail_bytes } else { 0 };
+    let Some(gpu) = d.gpu else {
+        assert_eq!(gpu_layers, 0, "device {} has no GPU", d.id);
+        let used = model.window_bytes(layers, head);
+        assert!(used <= d.offered_bytes, "device {} offers {} and was given {used}", d.id, d.offered_bytes);
+        return;
+    };
+    assert!(gpu_layers <= layers);
+    let tail = if head && gpu_layers > 0 { model.tail_bytes } else { 0 };
+    let on_gpu = u64::from(gpu_layers) * per_layer + tail;
+    assert!(on_gpu <= gpu.offered_bytes, "GPU of {} offers {} and was given {on_gpu}", d.id, gpu.offered_bytes);
+    let in_memory = if gpu.shares_memory {
+        u64::from(layers) * per_layer + ends
+    } else {
+        u64::from(layers - gpu_layers) * per_layer + ends - tail
+    };
+    assert!(in_memory <= d.offered_bytes, "device {} offers {} and was given {in_memory}", d.id, d.offered_bytes);
+}
+
+fn with_gpu(mut d: Device<u32>, offered_mb: u64, seconds_per_layer: f64, shares_memory: bool) -> Device<u32> {
+    d.gpu = Some(Gpu { offered_bytes: offered_mb * MB, seconds_per_layer, shares_memory });
+    d
+}
+
+#[test]
+fn a_gpu_lets_one_device_hold_what_its_memory_alone_cannot() {
+    // 5.7 GB of model: 3 GB of memory and a 4 GB GPU hold it, and the GPU makes it the quicker device (R6)
+    let model = llama_8b();
+    let devices = [with_gpu(device(1, 3_000, 0.002), 4_000, 0.0002, false), device(2, 8_000, 0.002)];
+    let plan = place(&model, &devices).unwrap();
+    assert_valid(&model, &devices, &plan);
+    // (4000 - 280 for the output) / 161 per layer
+    assert_eq!(plan.stages, vec![Stage { node: 1, layers: 0..32, gpu_layers: 23 }]);
+    assert_eq!(plan.replicas, vec![Replica { node: 2, layers: 0..32, gpu_layers: 0 }]);
+    assert!(plan.seconds_per_token < 32.0 * 0.002, "the GPU's layers are quicker");
+}
+
+#[test]
+fn a_split_puts_on_each_gpu_only_what_it_offers() {
+    // neither device holds the model alone, so it is split; the GPU takes layers within its 1 GB
+    let model = llama_8b();
+    let devices = [with_gpu(device(1, 2_000, 0.002), 1_000, 0.0002, false), device(2, 3_000, 0.002)];
+    let plan = place(&model, &devices).unwrap();
+    assert_valid(&model, &devices, &plan);
+    let on_gpu: u32 = plan.stages.iter().filter(|s| s.node == 1).map(|s| s.gpu_layers).sum();
+    assert!(on_gpu > 0, "a GPU quicker than the processor is used");
+}
+
+#[test]
+fn a_gpu_slower_than_the_processor_takes_nothing_memory_does_not_force() {
+    let model = llama_8b();
+    let devices = [with_gpu(device(1, 8_000, 0.002), 4_000, 0.004, false)];
+    let plan = place(&model, &devices).unwrap();
+    assert_eq!(plan.stages[0].gpu_layers, 0);
+}
+
+#[test]
+fn an_integrated_gpu_adds_speed_but_no_room() {
+    let model = llama_8b();
+    // its 4 GB are the device's own 3 GB: the model does not fit
+    let small = [with_gpu(device(1, 3_000, 0.002), 4_000, 0.0002, true)];
+    assert!(matches!(place(&model, &small), Err(Error::DoesNotFit { .. })));
+    // with the room it is used for speed
+    let large = [with_gpu(device(1, 8_000, 0.002), 4_000, 0.0002, true)];
+    let plan = place(&model, &large).unwrap();
+    assert_valid(&model, &large, &plan);
+    assert!(plan.stages[0].gpu_layers > 0);
+}
+
+#[test]
+fn sixty_four_devices_with_gpus_are_placed_within_a_second() {
+    let model = Model { layers: 80, ..llama_8b() };
+    let devices: Vec<_> = (0..64)
+        .map(|i| {
+            let d = device(i, 700 + u64::from(i % 7) * 100, 0.002 + f64::from(i % 5) * 0.0005);
+            if i % 3 == 0 { with_gpu(d, 2_000, 0.0003, i % 6 == 0) } else { d }
+        })
+        .collect();
+    let started = std::time::Instant::now();
+    let plan = place(&model, &devices).unwrap();
+    assert!(started.elapsed() < std::time::Duration::from_secs(1), "took {:?}", started.elapsed());
+    assert_valid(&model, &devices, &plan);
+}
+
 #[test]
 fn a_model_that_fits_on_one_device_is_not_split() {
     let model = llama_8b();
     let devices = [device(1, 8_000, 0.004), device(2, 16_000, 0.002), device(3, 2_000, 0.001)];
     let plan = place(&model, &devices).unwrap();
-    assert_eq!(plan.stages, vec![Stage { node: 2, layers: 0..32 }], "the fastest device that holds all of it");
-    assert_eq!(plan.replicas, vec![Replica { node: 1, layers: 0..32 }], "another that holds it all is a copy");
+    assert_eq!(
+        plan.stages,
+        vec![Stage { node: 2, layers: 0..32, gpu_layers: 0 }],
+        "the fastest device that holds all of it"
+    );
+    assert_eq!(
+        plan.replicas,
+        vec![Replica { node: 1, layers: 0..32, gpu_layers: 0 }],
+        "another that holds it all is a copy"
+    );
     assert_eq!(plan.left_out, vec![(3, LeftOut::NotNeeded)], "a faster device too small for it is not used");
 }
 
@@ -78,7 +172,10 @@ fn the_head_is_wherever_its_extras_fit() {
     let devices = [device(1, 700, 0.001), device(2, 5_100, 0.002)];
     let plan = place(&model, &devices).unwrap();
     assert_valid(&model, &devices, &plan);
-    assert_eq!(plan.stages, vec![Stage { node: 2, layers: 0..28 }, Stage { node: 1, layers: 28..32 }]);
+    assert_eq!(
+        plan.stages,
+        vec![Stage { node: 2, layers: 0..28, gpu_layers: 0 }, Stage { node: 1, layers: 28..32, gpu_layers: 0 }]
+    );
 }
 
 #[test]

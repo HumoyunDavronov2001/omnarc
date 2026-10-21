@@ -51,6 +51,7 @@ enum opcode : uint16_t {
     OP_KV_READ = 18,
     OP_KV_WRITE = 19,
     OP_CHAT_PROMPT = 20,
+    OP_BENCH = 21,
 };
 
 enum element : uint8_t { EL_TOKENS = 0, EL_F32 = 1, EL_F16 = 2, EL_BF16 = 3 };
@@ -215,8 +216,24 @@ struct engine {
                     out.put(static_cast<uint32_t>(device.backend));
                     out.put(device.memory_bytes);
                     out.str(device.name);
+                    // ABI 7
+                    out.put(device.integrated);
+                    out.put(device.free_bytes);
                 }
                 return OM_OK;
+            }
+            case OP_BENCH: {
+                const auto index = in.get<uint32_t>();
+                const auto millis = in.get<uint32_t>();
+                if (!in.ok()) break;
+                double bandwidth = 0;
+                double flops = 0;
+                const om_status status = om_device_bench(index, millis, &bandwidth, &flops);
+                if (status == OM_OK) {
+                    out.put(bandwidth);
+                    out.put(flops);
+                }
+                return status;
             }
             case OP_MODEL_INFO: {
                 const std::string path = in.str();
@@ -236,6 +253,11 @@ struct engine {
                 params.max_tokens = in.get<uint32_t>();
                 // ABI 5: the KV cache type follows; an older host sends none and gets f16
                 if (in.more()) params.kv_type = static_cast<om_kv_type>(in.get<uint32_t>());
+                // ABI 7: the GPU and how many layers run on it
+                if (in.more()) {
+                    params.gpu = in.get<uint32_t>();
+                    params.gpu_layers = in.get<uint32_t>();
+                }
                 if (!in.ok()) break;
                 om_shard *s = nullptr;
                 const om_status status = om_shard_open(&params, &s);

@@ -103,6 +103,29 @@ pub struct Device {
     pub name: String,
     /// Its memory as its backend reports it; 0 if unknown.
     pub memory_bytes: u64,
+    /// Its memory free when it was listed; 0 if unknown or the engine is older than ABI 7.
+    pub free_bytes: u64,
+    /// It shares the processor's memory (an integrated GPU); false from an engine older than ABI 7.
+    pub integrated: bool,
+}
+
+/// The one GPU a shard runs on, and how much of the shard (ABI 7).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Gpu {
+    /// Its index among [`Engine::devices`].
+    pub index: u32,
+    /// The window's repeating layers on it, the last ones of the window; the output head goes along when the window
+    /// holds it. 0: all of them.
+    pub layers: u32,
+}
+
+/// What [`Engine::bench`] measured on a GPU.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Bench {
+    /// Bytes of weights it reads per second, as one token's pass does.
+    pub bandwidth_bytes_per_s: f64,
+    /// Its matrix throughput, as a prefill uses it.
+    pub flops: f64,
 }
 
 /// An open shard: a window of layers loaded in the engine.
@@ -260,6 +283,7 @@ mod op {
     pub const KV_READ: u16 = 18;
     pub const KV_WRITE: u16 = 19;
     pub const CHAT_PROMPT: u16 = 20;
+    pub const BENCH: u16 = 21;
 }
 
 const EL_TOKENS: u8 = 0;
@@ -362,9 +386,25 @@ impl Engine {
                 let backend = Backend::try_from(i32::try_from(r.u32()?).unwrap_or(0)).unwrap_or(Backend::Unspecified);
                 let memory_bytes = r.u64()?;
                 let name = r.string()?;
-                Ok(Device { backend, name, memory_bytes })
+                let (integrated, free_bytes) =
+                    if self.abi_version >= 7 { (r.u32()? != 0, r.u64()?) } else { (false, 0) };
+                Ok(Device { backend, name, memory_bytes, free_bytes, integrated })
             })
             .collect()
+    }
+
+    /// Measures GPU `index` of [`devices`](Self::devices) for about `time` (NO-40).
+    ///
+    /// # Errors
+    /// There is no such GPU, it fails the test, or the engine is older than ABI 7.
+    pub fn bench(&mut self, index: u32, time: std::time::Duration) -> Result<Bench> {
+        if self.abi_version < 7 {
+            return Err(Error::Protocol(format!("engine ABI {} cannot measure a GPU", self.abi_version)));
+        }
+        let mut payload = index.to_le_bytes().to_vec();
+        payload.extend_from_slice(&u32::try_from(time.as_millis()).unwrap_or(u32::MAX).to_le_bytes());
+        let mut r = self.request(op::BENCH, &payload)?;
+        Ok(Bench { bandwidth_bytes_per_s: f64::from_bits(r.u64()?), flops: f64::from_bits(r.u64()?) })
     }
 
     /// Reads a model's metadata without loading its weights.
@@ -399,6 +439,23 @@ impl Engine {
         max_tokens: u32,
         kv: KvType,
     ) -> Result<ShardInfo> {
+        self.open_on(path, layers, backend, max_tokens, kv, None)
+    }
+
+    /// [`open_with_kv`](Self::open_with_kv) on one GPU, with part of the window or all of it there (ABI 7). An older
+    /// engine puts all of the window on every GPU, as before, and refuses only a part.
+    ///
+    /// # Errors
+    /// As [`open`](Self::open), and a GPU that is not there.
+    pub fn open_on(
+        &mut self,
+        path: &Path,
+        layers: Range<u32>,
+        backend: Backend,
+        max_tokens: u32,
+        kv: KvType,
+        gpu: Option<Gpu>,
+    ) -> Result<ShardInfo> {
         let mut payload = Vec::new();
         put_str(&mut payload, &path.to_string_lossy());
         payload.extend_from_slice(&layers.start.to_le_bytes());
@@ -409,6 +466,19 @@ impl Engine {
             payload.extend_from_slice(&(kv as u32).to_le_bytes());
         } else if kv != KvType::F16 {
             return Err(Error::Protocol(format!("engine ABI {} holds only an f16 KV cache", self.abi_version)));
+        }
+        match gpu {
+            Some(gpu) if self.abi_version >= 7 => {
+                payload.extend_from_slice(&(gpu.index + 1).to_le_bytes());
+                payload.extend_from_slice(&gpu.layers.to_le_bytes());
+            }
+            Some(gpu) if gpu.layers > 0 => {
+                return Err(Error::Protocol(format!(
+                    "engine ABI {} puts no part of a window on a GPU",
+                    self.abi_version
+                )));
+            }
+            _ => {}
         }
         let mut r = self.request(op::OPEN, &payload)?;
         let id = ShardId(r.u32()?);

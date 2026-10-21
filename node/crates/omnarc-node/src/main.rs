@@ -318,6 +318,9 @@ fn ring(args: RingArgs, data: &Path) -> Result<(), ring::BoxError> {
         key: args.key.unwrap_or_else(|| data.join("node.key")),
         engine: args.engine.unwrap_or_else(ring::default_engine_path),
         backend: args.backend,
+        // a ring started by hand keeps to --backend; GPU layers come from a plan
+        gpu: 0,
+        gpu_layers: 0,
         max_tokens: args.max_tokens,
         chunk: args.chunk.max(1),
         kv: args.kv,
@@ -396,20 +399,32 @@ fn accelerators(engine: &Path) -> Vec<omnarc_protocol::v1::Accelerator> {
     let (tx, rx) = std::sync::mpsc::channel();
     let engine = engine.to_path_buf();
     std::thread::spawn(move || {
+        // every GPU is measured, about a second each, so the plan knows what its layers would take there (NO-40)
         let devices = omnarc_engine_host::Engine::spawn(&engine, 1 << 16).and_then(|mut e| {
-            let devices = e.devices();
+            let mut measured = Vec::new();
+            for (i, device) in e.devices()?.into_iter().enumerate() {
+                let bench = (device.backend != omnarc_protocol::v1::Backend::Cpu)
+                    .then(|| e.bench(u32::try_from(i).unwrap_or(u32::MAX), Duration::from_millis(800)).ok())
+                    .flatten();
+                measured.push((device, bench));
+            }
             let _ = e.quit();
-            devices
+            Ok(measured)
         });
         let _ = tx.send(devices);
     });
-    match rx.recv_timeout(Duration::from_secs(10)) {
+    match rx.recv_timeout(Duration::from_secs(30)) {
+        #[allow(clippy::cast_possible_truncation)]
         Ok(Ok(devices)) => devices
             .into_iter()
-            .map(|device| omnarc_protocol::v1::Accelerator {
+            .map(|(device, bench)| omnarc_protocol::v1::Accelerator {
                 backend: device.backend as i32,
                 name: device.name,
-                memory_bytes: device.memory_bytes,
+                // what is free now, not the card's size: a desktop's own windows hold part of it
+                memory_bytes: if device.free_bytes > 0 { device.free_bytes } else { device.memory_bytes },
+                shares_memory: device.integrated,
+                measured_bandwidth_gbps: bench.map_or(0.0, |b| (b.bandwidth_bytes_per_s / 1e9) as f32),
+                measured_fp16_tflops: bench.map_or(0.0, |b| (b.flops / 1e12) as f32),
                 ..Default::default()
             })
             .collect(),

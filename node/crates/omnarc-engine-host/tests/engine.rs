@@ -9,7 +9,7 @@
 
 use std::path::PathBuf;
 
-use omnarc_engine_host::{Backend, DType, Engine, Error, Input, KvType, SamplerParams, Status, Step};
+use omnarc_engine_host::{Backend, DType, Engine, Error, Gpu, Input, KvType, SamplerParams, Status, Step};
 
 fn paths() -> (PathBuf, PathBuf) {
     let get = |name: &str| {
@@ -104,10 +104,44 @@ fn the_engine_names_the_gpus_it_can_use() {
     let mut engine = Engine::spawn(&exe, 1 << 20).unwrap();
     assert!(engine.abi_version() >= 3);
     // a build for the processor names none; a GPU build names each GPU with its backend
-    for device in engine.devices().unwrap() {
+    let devices = engine.devices().unwrap();
+    for (i, device) in devices.iter().enumerate() {
         assert!(!matches!(device.backend, Backend::Cpu | Backend::Unspecified), "{device:?}");
         assert!(!device.name.is_empty(), "{device:?}");
+        // NO-40: each one is measured
+        let bench = engine.bench(u32::try_from(i).unwrap(), std::time::Duration::from_millis(300)).unwrap();
+        assert!(bench.bandwidth_bytes_per_s > 1e8 && bench.flops > 1e9, "{device:?} {bench:?}");
     }
+    // a GPU that is not there is neither measured nor opened on
+    let missing = u32::try_from(devices.len()).unwrap();
+    let error = engine.bench(missing, std::time::Duration::from_millis(10)).unwrap_err();
+    assert!(matches!(error, Error::Engine { status: Status::InvalidArgument, .. }), "{error}");
+    let (_, model) = paths();
+    let gpu = Some(Gpu { index: missing, layers: 1 });
+    let error = engine.open_on(&model, 0..2, Backend::Unspecified, 64, KvType::F16, gpu).unwrap_err();
+    assert!(matches!(error, Error::Engine { status: Status::Unsupported, .. }), "{error}");
+    engine.quit().unwrap();
+}
+
+/// Part of a window on a GPU computes what the processor computes (ABI 7); without a GPU there is nothing to compare.
+#[test]
+fn part_of_a_window_on_a_gpu_computes_the_same() {
+    let (exe, model) = paths();
+    let mut engine = Engine::spawn(&exe, 1 << 22).unwrap();
+    if engine.devices().unwrap().is_empty() {
+        return;
+    }
+    let n = engine.model_info(&model).unwrap().layer_count;
+    let tokens = [1, 450, 4996, 17354];
+    let mut logits = Vec::new();
+    for gpu in [None, Some(Gpu { index: 0, layers: n / 2 })] {
+        let backend = if gpu.is_none() { Backend::Cpu } else { Backend::Unspecified };
+        let shard = engine.open_on(&model, 0..n + 1, backend, 64, KvType::F16, gpu).unwrap();
+        let out = engine.run(&shard, &tokens_step(1, 0, &tokens)).unwrap().to_f32();
+        logits.push(argmax(&out));
+        engine.close(shard.id).unwrap();
+    }
+    assert_eq!(logits[0], logits[1]);
     engine.quit().unwrap();
 }
 

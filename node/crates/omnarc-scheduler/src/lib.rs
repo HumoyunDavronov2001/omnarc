@@ -58,6 +58,19 @@ pub struct Device<K> {
     pub seconds_per_layer: f64,
     /// Time a token's hidden state takes from this device to the next one in the ring.
     pub link_seconds: f64,
+    /// The one GPU the device lends layers to, when it has one worth using (NO-40, NO-51).
+    pub gpu: Option<Gpu>,
+}
+
+/// A GPU of a device: what its owner lets the plan use of it, and how fast it is.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Gpu {
+    /// GPU memory the owner offers (Q1).
+    pub offered_bytes: u64,
+    /// Time this GPU takes for one layer of one token (NO-40).
+    pub seconds_per_layer: f64,
+    /// An integrated GPU: its memory is the device's own, so it adds speed but no room.
+    pub shares_memory: bool,
 }
 
 /// One device's window of layers, in ring order.
@@ -65,6 +78,8 @@ pub struct Device<K> {
 pub struct Stage<K> {
     pub node: K,
     pub layers: Range<u32>,
+    /// How many of the window's layers run on the device's GPU, the last ones; on the head the output goes along.
+    pub gpu_layers: u32,
 }
 
 /// A standby copy of a stage's window on another device.
@@ -72,6 +87,8 @@ pub struct Stage<K> {
 pub struct Replica<K> {
     pub node: K,
     pub layers: Range<u32>,
+    /// As in [`Stage`].
+    pub gpu_layers: u32,
 }
 
 /// Why a device has no part in a plan.
@@ -124,11 +141,60 @@ impl std::error::Error for Error {}
 /// The most devices one placement solves at once (NO-41); larger networks are planned in groups of this size.
 pub const GROUP: usize = 64;
 
+// The GPU layers a window of `layers` gets on `d`, when it fits there at all. A GPU quicker than the processor
+// takes as many layers as it holds; a slower one only what the processor's memory cannot. With any layer on the
+// GPU the head's output goes along, as the engine does it.
+fn fit<K>(model: &Model, d: &Device<K>, layers: u32, head: bool) -> Option<u32> {
+    let per_layer = model.layer_bytes + model.kv_bytes_per_layer;
+    let Some(gpu) = &d.gpu else {
+        return (model.window_bytes(layers, head) <= d.offered_bytes).then_some(0);
+    };
+    let ends = if head { model.head_bytes + model.tail_bytes } else { 0 };
+    let tail = if head { model.tail_bytes } else { 0 };
+    let most = if gpu.offered_bytes >= tail + per_layer {
+        u32::try_from((gpu.offered_bytes - tail) / per_layer).unwrap_or(u32::MAX).min(layers)
+    } else {
+        0
+    };
+    let memory = |g: u32| {
+        if gpu.shares_memory {
+            u64::from(layers) * per_layer + ends
+        } else {
+            u64::from(layers - g) * per_layer + ends - if g > 0 { tail } else { 0 }
+        }
+    };
+    if gpu.seconds_per_layer < d.seconds_per_layer {
+        (memory(most) <= d.offered_bytes).then_some(most)
+    } else {
+        (0..=most).find(|&g| memory(g) <= d.offered_bytes)
+    }
+}
+
+// One token through a window of `layers` with `gpu` of them on the GPU.
+fn window_seconds<K>(d: &Device<K>, layers: u32, gpu: u32) -> f64 {
+    let on_gpu = d.gpu.map_or(0.0, |g| f64::from(gpu) * (g.seconds_per_layer - d.seconds_per_layer));
+    f64::from(layers) * d.seconds_per_layer + on_gpu
+}
+
+// What a device holds, its discrete GPU counted, and its time per layer over all of that: for ranking devices.
+#[allow(clippy::cast_precision_loss)]
+fn capacity<K>(model: &Model, d: &Device<K>) -> (u64, f64) {
+    let Some(gpu) = &d.gpu else { return (d.offered_bytes, d.seconds_per_layer) };
+    let held = d.offered_bytes + if gpu.shares_memory { 0 } else { gpu.offered_bytes };
+    if gpu.seconds_per_layer >= d.seconds_per_layer {
+        return (held, d.seconds_per_layer);
+    }
+    let per_layer = (model.layer_bytes + model.kv_bytes_per_layer).max(1) as f64;
+    let all = (held as f64 / per_layer).max(1.0);
+    let fast = (gpu.offered_bytes as f64 / per_layer).min(all);
+    (held, (fast * gpu.seconds_per_layer + (all - fast) * d.seconds_per_layer) / all)
+}
+
 // The group a large network is planned in: the fastest devices, as many as hold the model with room for the head,
 // and no more than GROUP.
 fn group<'a, K>(model: &Model, usable: &[&'a Device<K>]) -> Vec<&'a Device<K>> {
     let mut by_speed = usable.to_vec();
-    by_speed.sort_by(|a, b| a.seconds_per_layer.total_cmp(&b.seconds_per_layer));
+    by_speed.sort_by(|a, b| capacity(model, a).1.total_cmp(&capacity(model, b).1));
     // room for every window plus the head's extras on any one of them, with a margin for layers that do not divide
     let needed = model.whole_bytes() + (model.layer_bytes + model.kv_bytes_per_layer) * 2;
     let mut held = 0;
@@ -137,7 +203,7 @@ fn group<'a, K>(model: &Model, usable: &[&'a Device<K>]) -> Vec<&'a Device<K>> {
         if chosen.len() == GROUP || (held >= needed && chosen.len() >= 2) {
             break;
         }
-        held += d.offered_bytes;
+        held += capacity(model, d).0;
         chosen.push(d);
     }
     // the ring keeps the order the devices came in
@@ -173,38 +239,37 @@ pub enum Objective {
 ///
 /// As [`place`].
 pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Objective) -> Result<Placement<K>, Error> {
-    let one_layer = model.layer_bytes + model.kv_bytes_per_layer;
-    let (usable, small): (Vec<_>, Vec<_>) = devices.iter().partition(|d| d.offered_bytes >= one_layer);
+    let (usable, small): (Vec<_>, Vec<_>) = devices.iter().partition(|d| fit(model, d, 1, false).is_some());
     let mut left_out: Vec<_> = small.into_iter().map(|d| (d.id.clone(), LeftOut::TooSmall)).collect();
-    let offered = || devices.iter().map(|d| d.offered_bytes).sum();
+    let offered = || devices.iter().map(|d| capacity(model, d).0).sum();
 
-    // R6: a model that fits on one device runs there, on the fastest that can hold it, and nowhere split
+    // R6: a model that fits on one device, its GPU counted, runs there, on the fastest that can hold it, and
+    // nowhere split
     let whole = model.whole_bytes();
     let fastest = usable
         .iter()
-        .filter(|d| d.offered_bytes >= whole)
-        .min_by(|a, b| a.seconds_per_layer.total_cmp(&b.seconds_per_layer));
-    if let Some(best) = fastest {
+        .filter_map(|d| fit(model, d, model.layers, true).map(|g| (*d, g, window_seconds(d, model.layers, g))))
+        .min_by(|a, b| a.2.total_cmp(&b.2));
+    if let Some((best, gpu_layers, seconds)) = fastest {
         let layers = 0..model.layers;
         let mut replicas = Vec::new();
         for d in &usable {
-            if std::ptr::eq(*d, *best) {
+            if std::ptr::eq(*d, best) {
                 continue;
             }
-            if d.offered_bytes >= whole {
-                replicas.push(Replica { node: d.id.clone(), layers: layers.clone() });
-            } else {
-                left_out.push((d.id.clone(), LeftOut::NotNeeded));
+            match fit(model, d, model.layers, true) {
+                Some(g) => replicas.push(Replica { node: d.id.clone(), layers: layers.clone(), gpu_layers: g }),
+                None => left_out.push((d.id.clone(), LeftOut::NotNeeded)),
             }
         }
         return Ok(Placement {
-            stages: vec![Stage { node: best.id.clone(), layers }],
+            stages: vec![Stage { node: best.id.clone(), layers, gpu_layers }],
             replicas,
             left_out,
-            seconds_per_token: f64::from(model.layers) * best.seconds_per_layer,
+            seconds_per_token: seconds,
         });
     }
-    if usable.iter().map(|d| d.offered_bytes).sum::<u64>() < whole {
+    if usable.iter().map(|d| capacity(model, d).0).sum::<u64>() < whole {
         return Err(Error::DoesNotFit { needed: whole, offered: offered() });
     }
 
@@ -229,7 +294,7 @@ pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Obje
         let solved = split(model, &usable, objective);
         (usable, solved)
     };
-    let (windows, head, seconds) = solved.map_err(|e| match e {
+    let (windows, gpu, head, seconds) = solved.map_err(|e| match e {
         Error::DoesNotFit { needed, .. } => Error::DoesNotFit { needed, offered: offered() },
         Error::NoPlan => Error::NoPlan,
     })?;
@@ -237,9 +302,10 @@ pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Obje
     let mut start = 0;
     // the ring order from the head on
     let n = usable.len();
-    for (d, &w) in (0..n).map(|k| (usable[(head + k) % n], &windows[(head + k) % n])) {
+    for k in 0..n {
+        let (d, w, g) = (usable[(head + k) % n], windows[(head + k) % n], gpu[(head + k) % n]);
         if w > 0 {
-            stages.push((d, start..start + w));
+            stages.push((d, start..start + w, g));
             start += w;
         }
     }
@@ -247,14 +313,20 @@ pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Obje
     // a device that neither computes nor stands by is not needed
     for d in &all_usable {
         let used =
-            stages.iter().any(|(s, _)| std::ptr::eq(*s, *d)) || standby.iter().any(|(r, _)| std::ptr::eq(*r, *d));
+            stages.iter().any(|(s, ..)| std::ptr::eq(*s, *d)) || standby.iter().any(|(r, ..)| std::ptr::eq(*r, *d));
         if !used {
             left_out.push((d.id.clone(), LeftOut::NotNeeded));
         }
     }
     Ok(Placement {
-        stages: stages.into_iter().map(|(d, layers)| Stage { node: d.id.clone(), layers }).collect(),
-        replicas: standby.into_iter().map(|(d, layers)| Replica { node: d.id.clone(), layers }).collect(),
+        stages: stages
+            .into_iter()
+            .map(|(d, layers, gpu_layers)| Stage { node: d.id.clone(), layers, gpu_layers })
+            .collect(),
+        replicas: standby
+            .into_iter()
+            .map(|(d, layers, gpu_layers)| Replica { node: d.id.clone(), layers, gpu_layers })
+            .collect(),
         left_out,
         seconds_per_token: seconds,
     })
@@ -269,11 +341,23 @@ pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Obje
 //   Σ w_i = L;  y_i ≤ w_i ≤ L·y_i;  Σ f_i = 1;  f_i ≤ y_i
 //   w_i·(layer + kv) + f_i·(head + tail) ≤ offered_i          (Q1: never more than offered)
 //
+// A device with a GPU lends it the last g_i layers of its window (NO-51); on the head the output goes along:
+//
+//   g_i ∈ [0, w_i] integer   layers on the GPU;  h_i ∈ {0, 1}: it uses the GPU, h_i ≤ g_i ≤ L·h_i
+//   z_i = f_i ∧ h_i          the output on the GPU
+//   g_i·(layer + kv) + z_i·tail ≤ gpu_i
+//   (w_i − g_i)·(layer + kv) + f_i·(head + tail) − z_i·tail ≤ offered_i      (an integrated GPU frees nothing)
+//
 // The ring is a cycle: any device in use can be the head, and the layers run on from it around the ring order.
 //
-//   minimise Σ w_i·t_i + Σ y_i·link_i: one token's compute plus every hop around the ring
-#[allow(clippy::cast_precision_loss)]
-fn split<K>(model: &Model, devices: &[&Device<K>], objective: Objective) -> Result<(Vec<u32>, usize, f64), Error> {
+//   minimise Σ w_i·t_i + Σ g_i·(t_gpu_i − t_i) + Σ y_i·link_i: one token's compute plus every hop around the ring
+// the names are the formulation's above
+#[allow(clippy::cast_precision_loss, clippy::too_many_lines, clippy::many_single_char_names)]
+fn split<K>(
+    model: &Model,
+    devices: &[&Device<K>],
+    objective: Objective,
+) -> Result<(Vec<u32>, Vec<u32>, usize, f64), Error> {
     let n = devices.len();
     let total = f64::from(model.layers);
     let per_layer = (model.layer_bytes + model.kv_bytes_per_layer) as f64;
@@ -285,15 +369,27 @@ fn split<K>(model: &Model, devices: &[&Device<K>], objective: Objective) -> Resu
     let w: Vec<_> = devices.iter().map(|d| pb.add_integer_column(cost(d.seconds_per_layer), 0.0..=total)).collect();
     let y: Vec<_> = devices.iter().map(|d| pb.add_integer_column(cost(d.link_seconds), 0.0..=1.0)).collect();
     let f: Vec<_> = (0..n).map(|_| pb.add_integer_column(0.0, 0.0..=1.0)).collect();
+    // a device without a GPU has its GPU columns fixed at zero; presolve takes them out
+    let gain = |d: &Device<K>| d.gpu.map_or(0.0, |g| g.seconds_per_layer - d.seconds_per_layer);
+    let top = |d: &Device<K>, v: f64| if d.gpu.is_some() { v } else { 0.0 };
+    let g: Vec<_> = devices.iter().map(|d| pb.add_integer_column(cost(gain(d)), 0.0..=top(d, total))).collect();
+    let h: Vec<_> = devices.iter().map(|d| pb.add_integer_column(0.0, 0.0..=top(d, 1.0))).collect();
+    let z: Vec<_> = devices.iter().map(|d| pb.add_integer_column(0.0, 0.0..=top(d, 1.0))).collect();
     if !latency {
         let slowest = pb.add_column(1.0, 0.0..);
         for i in 0..n {
             pb.add_row(
                 0.0..,
-                [(slowest, 1.0), (w[i], -devices[i].seconds_per_layer), (y[i], -devices[i].link_seconds)],
+                [
+                    (slowest, 1.0),
+                    (w[i], -devices[i].seconds_per_layer),
+                    (g[i], -gain(devices[i])),
+                    (y[i], -devices[i].link_seconds),
+                ],
             );
         }
     }
+    let tail = model.tail_bytes as f64;
 
     pb.add_row(total..=total, w.iter().map(|&c| (c, 1.0)).collect::<Vec<_>>());
     pb.add_row(1.0..=1.0, f.iter().map(|&c| (c, 1.0)).collect::<Vec<_>>());
@@ -301,7 +397,24 @@ fn split<K>(model: &Model, devices: &[&Device<K>], objective: Objective) -> Resu
         pb.add_row(0.0.., [(w[i], 1.0), (y[i], -1.0)]);
         pb.add_row(..=0.0, [(w[i], 1.0), (y[i], -total)]);
         pb.add_row(..=0.0, [(f[i], 1.0), (y[i], -1.0)]);
-        pb.add_row(..=devices[i].offered_bytes as f64, [(w[i], per_layer), (f[i], ends)]);
+        let ram = devices[i].offered_bytes as f64;
+        match devices[i].gpu {
+            None => pb.add_row(..=ram, [(w[i], per_layer), (f[i], ends)]),
+            Some(gpu) => {
+                pb.add_row(..=0.0, [(g[i], 1.0), (w[i], -1.0)]);
+                pb.add_row(..=0.0, [(g[i], 1.0), (h[i], -total)]);
+                pb.add_row(..=0.0, [(h[i], 1.0), (g[i], -1.0)]);
+                pb.add_row(..=0.0, [(z[i], 1.0), (f[i], -1.0)]);
+                pb.add_row(..=0.0, [(z[i], 1.0), (h[i], -1.0)]);
+                pb.add_row(-1.0.., [(z[i], 1.0), (f[i], -1.0), (h[i], -1.0)]);
+                pb.add_row(..=gpu.offered_bytes as f64, [(g[i], per_layer), (z[i], tail)]);
+                if gpu.shares_memory {
+                    pb.add_row(..=ram, [(w[i], per_layer), (f[i], ends)]);
+                } else {
+                    pb.add_row(..=ram, [(w[i], per_layer), (g[i], -per_layer), (f[i], ends), (z[i], -tail)]);
+                }
+            }
+        }
     }
 
     let mut highs = pb.optimise(Sense::Minimise);
@@ -321,41 +434,43 @@ fn split<K>(model: &Model, devices: &[&Device<K>], objective: Objective) -> Resu
     if windows.len() != n || windows.iter().sum::<u32>() != model.layers {
         return Err(Error::NoPlan);
     }
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    let gpu: Vec<u32> = (0..n).map(|i| (columns[3 * n + i].round() as u32).min(windows[i])).collect();
     let head = (0..n).max_by(|&a, &b| columns[2 * n + a].total_cmp(&columns[2 * n + b])).ok_or(Error::NoPlan)?;
     if windows[head] == 0 {
         return Err(Error::NoPlan);
     }
     // what one token takes around the ring, whichever objective chose the plan
-    let seconds = devices
-        .iter()
-        .zip(&windows)
-        .filter(|(_, w)| **w > 0)
-        .map(|(d, &w)| f64::from(w) * d.seconds_per_layer + d.link_seconds)
+    let seconds = (0..n)
+        .filter(|&i| windows[i] > 0)
+        .map(|i| window_seconds(devices[i], windows[i], gpu[i]) + devices[i].link_seconds)
         .sum();
-    Ok((windows, head, seconds))
+    Ok((windows, gpu, head, seconds))
 }
 
 // A standby copy for every stage that some unused device can hold: each device stands by for at most one
 // window, the largest window first, each taking the fastest spare device that can hold it.
 fn replicas<'a, K>(
     model: &Model,
-    stages: &[(&Device<K>, Range<u32>)],
+    stages: &[(&Device<K>, Range<u32>, u32)],
     usable: &[&'a Device<K>],
-) -> Vec<(&'a Device<K>, Range<u32>)> {
+) -> Vec<(&'a Device<K>, Range<u32>, u32)> {
     let mut spare: Vec<&'a Device<K>> =
-        usable.iter().copied().filter(|d| !stages.iter().any(|(s, _)| std::ptr::eq(*s, *d))).collect();
-    spare.sort_by(|a, b| a.seconds_per_layer.total_cmp(&b.seconds_per_layer));
+        usable.iter().copied().filter(|d| !stages.iter().any(|(s, ..)| std::ptr::eq(*s, *d))).collect();
+    spare.sort_by(|a, b| capacity(model, a).1.total_cmp(&capacity(model, b).1));
     let mut order: Vec<usize> = (0..stages.len()).collect();
     order.sort_by_key(|&i| std::cmp::Reverse(stages[i].1.len()));
     let mut replicas = Vec::new();
     for i in order {
         let layers = &stages[i].1;
-        let need = model.window_bytes(layers.end - layers.start, i == 0);
-        if let Some(at) = spare.iter().position(|d| d.offered_bytes >= need) {
-            replicas.push((spare.remove(at), layers.clone()));
+        let width = layers.end - layers.start;
+        if let Some((at, g)) =
+            spare.iter().enumerate().find_map(|(at, d)| fit(model, d, width, i == 0).map(|g| (at, g)))
+        {
+            replicas.push((spare.remove(at), layers.clone(), g));
         }
     }
-    replicas.sort_by_key(|(_, layers)| layers.start);
+    replicas.sort_by_key(|(_, layers, _)| layers.start);
     replicas
 }
 

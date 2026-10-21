@@ -55,6 +55,8 @@ message Accelerator {
   float measured_bandwidth_gbps = 5;
   // True when every operation this backend runs passed the accuracy gate.
   bool accuracy_gate_passed = 6;
+  // An integrated GPU: its memory is the processor's, so what it holds counts against the device's budget too.
+  bool shares_memory = 7;
 }
 
 // What a device is and what it can offer. Sent when a device joins and whenever its hardware changes.

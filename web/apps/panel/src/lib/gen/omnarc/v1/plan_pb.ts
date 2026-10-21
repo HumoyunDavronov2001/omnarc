@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file omnarc/v1/plan.proto.
  */
 export const file_omnarc_v1_plan: GenFile = /*@__PURE__*/
-  fileDesc("ChRvbW5hcmMvdjEvcGxhbi5wcm90bxIJb21uYXJjLnYxImcKCE1vZGVsUmVmEgwKBG5hbWUYASABKAkSFAoMcXVhbnRpemF0aW9uGAIgASgJEg4KBmJsYWtlMxgDIAEoDBITCgtsYXllcl9jb3VudBgEIAEoDRISCgpoaWRkZW5fZGltGAUgASgNIosBCgVTdGFnZRIfCgRub2RlGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBITCgtsYXllcl9iZWdpbhgCIAEoDRIRCglsYXllcl9lbmQYAyABKA0SIwoHYmFja2VuZBgEIAEoDjISLm9tbmFyYy52MS5CYWNrZW5kEhQKDHF1YW50aXphdGlvbhgFIAEoCSJSCgdSZXBsaWNhEh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEhMKC2xheWVyX2JlZ2luGAIgASgNEhEKCWxheWVyX2VuZBgDIAEoDSK8AgoNUGxhY2VtZW50UGxhbhIPCgd2ZXJzaW9uGAEgASgEEiIKBW1vZGVsGAIgASgLMhMub21uYXJjLnYxLk1vZGVsUmVmEiAKBG1vZGUYAyABKA4yEi5vbW5hcmMudjEuUnVuTW9kZRIgCgZzdGFnZXMYBCADKAsyEC5vbW5hcmMudjEuU3RhZ2USJAoIcmVwbGljYXMYBSADKAsyEi5vbW5hcmMudjEuUmVwbGljYRIhCgZzb3VyY2UYBiABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB2NvbnRleHQYByABKA0SJgoHYmFja3VwcxgIIAMoCzIVLm9tbmFyYy52MS5CYWNrdXBQbGFuEh4KFmVzdGltYXRlZF9tc19wZXJfdG9rZW4YCSABKAISEAoIa3ZfY2FjaGUYCiABKAkiVQoKQmFja3VwUGxhbhIfCgRnb25lGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBImCgRwbGFuGAIgASgLMhgub21uYXJjLnYxLlBsYWNlbWVudFBsYW4qaQoHUnVuTW9kZRIYChRSVU5fTU9ERV9VTlNQRUNJRklFRBAAEhQKEFJVTl9NT0RFX0xBVEVOQ1kQARIXChNSVU5fTU9ERV9USFJPVUdIUFVUEAISFQoRUlVOX01PREVfQ0FQQUNJVFkQA2IGcHJvdG8z", [file_omnarc_v1_device]);
+  fileDesc("ChRvbW5hcmMvdjEvcGxhbi5wcm90bxIJb21uYXJjLnYxImcKCE1vZGVsUmVmEgwKBG5hbWUYASABKAkSFAoMcXVhbnRpemF0aW9uGAIgASgJEg4KBmJsYWtlMxgDIAEoDBITCgtsYXllcl9jb3VudBgEIAEoDRISCgpoaWRkZW5fZGltGAUgASgNIqwBCgVTdGFnZRIfCgRub2RlGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBITCgtsYXllcl9iZWdpbhgCIAEoDRIRCglsYXllcl9lbmQYAyABKA0SIwoHYmFja2VuZBgEIAEoDjISLm9tbmFyYy52MS5CYWNrZW5kEhQKDHF1YW50aXphdGlvbhgFIAEoCRILCgNncHUYBiABKA0SEgoKZ3B1X2xheWVycxgHIAEoDSJzCgdSZXBsaWNhEh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEhMKC2xheWVyX2JlZ2luGAIgASgNEhEKCWxheWVyX2VuZBgDIAEoDRILCgNncHUYBCABKA0SEgoKZ3B1X2xheWVycxgFIAEoDSK8AgoNUGxhY2VtZW50UGxhbhIPCgd2ZXJzaW9uGAEgASgEEiIKBW1vZGVsGAIgASgLMhMub21uYXJjLnYxLk1vZGVsUmVmEiAKBG1vZGUYAyABKA4yEi5vbW5hcmMudjEuUnVuTW9kZRIgCgZzdGFnZXMYBCADKAsyEC5vbW5hcmMudjEuU3RhZ2USJAoIcmVwbGljYXMYBSADKAsyEi5vbW5hcmMudjEuUmVwbGljYRIhCgZzb3VyY2UYBiABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB2NvbnRleHQYByABKA0SJgoHYmFja3VwcxgIIAMoCzIVLm9tbmFyYy52MS5CYWNrdXBQbGFuEh4KFmVzdGltYXRlZF9tc19wZXJfdG9rZW4YCSABKAISEAoIa3ZfY2FjaGUYCiABKAkiVQoKQmFja3VwUGxhbhIfCgRnb25lGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBImCgRwbGFuGAIgASgLMhgub21uYXJjLnYxLlBsYWNlbWVudFBsYW4qaQoHUnVuTW9kZRIYChRSVU5fTU9ERV9VTlNQRUNJRklFRBAAEhQKEFJVTl9NT0RFX0xBVEVOQ1kQARIXChNSVU5fTU9ERV9USFJPVUdIUFVUEAISFQoRUlVOX01PREVfQ0FQQUNJVFkQA2IGcHJvdG8z", [file_omnarc_v1_device]);
 
 /**
  * @generated from message omnarc.v1.ModelRef
@@ -89,6 +89,20 @@ export type Stage = Message<"omnarc.v1.Stage"> & {
    * @generated from field: string quantization = 5;
    */
   quantization: string;
+
+  /**
+   * 1 + the index of the GPU among the device's accelerators other than its processor; 0: the processor only.
+   *
+   * @generated from field: uint32 gpu = 6;
+   */
+  gpu: number;
+
+  /**
+   * How many of the window's layers run on that GPU, the last ones; the output head goes along on the head (NO-51).
+   *
+   * @generated from field: uint32 gpu_layers = 7;
+   */
+  gpuLayers: number;
 };
 
 /**
@@ -118,6 +132,18 @@ export type Replica = Message<"omnarc.v1.Replica"> & {
    * @generated from field: uint32 layer_end = 3;
    */
   layerEnd: number;
+
+  /**
+   * As in Stage.
+   *
+   * @generated from field: uint32 gpu = 4;
+   */
+  gpu: number;
+
+  /**
+   * @generated from field: uint32 gpu_layers = 5;
+   */
+  gpuLayers: number;
 };
 
 /**

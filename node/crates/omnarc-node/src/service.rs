@@ -168,6 +168,14 @@ async fn profiled(mut device: v1::DeviceInfo, budget: Option<&v1::Budget>) -> v1
         .await
         .unwrap_or(crate::profile::Profile { bandwidth_bytes_per_s: 0.0, flops: 0.0 });
     device.accelerators.retain(|a| a.backend != v1::Backend::Cpu as i32);
+    // the share of each GPU its owner lends (Q1); 0 lends all of it
+    let share = budget.map_or(0.0, |b| b.gpu_share);
+    let share = if share > 0.0 { f64::from(share.min(1.0)) } else { 1.0 };
+    for gpu in &mut device.accelerators {
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_precision_loss)]
+        let lent = (gpu.memory_bytes as f64 * share) as u64;
+        gpu.memory_bytes = lent;
+    }
     #[allow(clippy::cast_possible_truncation)]
     device.accelerators.push(v1::Accelerator {
         backend: v1::Backend::Cpu as i32,
@@ -176,6 +184,7 @@ async fn profiled(mut device: v1::DeviceInfo, budget: Option<&v1::Budget>) -> v1
         measured_fp16_tflops: (profile.flops / 1e12) as f32,
         measured_bandwidth_gbps: (profile.bandwidth_bytes_per_s / 1e9) as f32,
         accuracy_gate_passed: false,
+        shares_memory: false,
     });
     device
 }

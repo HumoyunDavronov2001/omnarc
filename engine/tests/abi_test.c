@@ -15,7 +15,7 @@ static int failures = 0;
 
 int main(void) {
     CHECK(om_abi_version() == OMNARC_ABI_VERSION);
-    CHECK(OMNARC_ABI_VERSION == 6u);
+    CHECK(OMNARC_ABI_VERSION == 7u);
     CHECK(strcmp(om_version_string(), "0.1.0") == 0);
     CHECK(strcmp(om_status_string(OM_OK), "ok") == 0);
     CHECK(strcmp(om_status_string(OM_ERR_NOT_IMPLEMENTED), "not implemented") == 0);
@@ -29,7 +29,13 @@ int main(void) {
     for (size_t i = 0; i < listed && i < 8; i++) {
         CHECK(devices[i].backend != OM_BACKEND_CPU && devices[i].backend != OM_BACKEND_AUTO);
         CHECK(strlen(devices[i].name) > 0);
+        CHECK(devices[i].integrated <= 1);
+        CHECK(devices[i].free_bytes <= devices[i].memory_bytes || devices[i].memory_bytes == 0);
     }
+    /* a GPU that is not there is not measured */
+    double bandwidth = 1, flops = 1;
+    CHECK(om_device_bench((uint32_t)gpus, 10, &bandwidth, &flops) == OM_ERR_INVALID_ARGUMENT);
+    CHECK(om_device_bench(0, 10, NULL, &flops) == OM_ERR_INVALID_ARGUMENT);
 
     om_shard *shard = (om_shard *)1;
     CHECK(om_shard_open(NULL, &shard) == OM_ERR_INVALID_ARGUMENT);

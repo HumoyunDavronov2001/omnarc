@@ -126,7 +126,7 @@
         </p>
         <ul class="m-0 grid list-none gap-1 p-0 text-13 text-text-2">
           {#each suggestion.plan.stages as stage, i (i)}
-            <li>{deviceName(view, hex(stage.node))}: layers {stage.layerBegin}–{stage.layerEnd - 1}{i === 0 ? ', answers' : ''}</li>
+            <li>{deviceName(view, hex(stage.node))}: layers {stage.layerBegin}–{stage.layerEnd - 1}{stage.gpuLayers ? `, ${stage.gpuLayers} on its GPU` : ''}{i === 0 ? ', answers' : ''}</li>
           {/each}
         </ul>
         <div class="flex flex-wrap gap-2">
@@ -235,10 +235,10 @@
                   </p>
                   <ul class="m-0 grid list-none gap-1 p-0 text-13 text-text-2">
                     {#each plan?.stages ?? [] as stage, i (i)}
-                      <li>{deviceName(view, hex(stage.node))}: layers {stage.layerBegin}–{stage.layerEnd - 1}{i === 0 ? ', answers' : ''}</li>
+                      <li>{deviceName(view, hex(stage.node))}: layers {stage.layerBegin}–{stage.layerEnd - 1}{stage.gpuLayers ? `, ${stage.gpuLayers} on its GPU` : ''}{i === 0 ? ', answers' : ''}</li>
                     {/each}
                     {#each plan?.replicas ?? [] as replica, i (i)}
-                      <li>{deviceName(view, hex(replica.node))}: stands by for layers {replica.layerBegin}–{replica.layerEnd - 1}</li>
+                      <li>{deviceName(view, hex(replica.node))}: stands by for layers {replica.layerBegin}–{replica.layerEnd - 1}{replica.gpuLayers ? `, ${replica.gpuLayers} on its GPU` : ''}</li>
                     {/each}
                     {#each preview.answer.leftOut as out, i (i)}
                       <li>{deviceName(view, hex(out.node))}: not used, {reasons[out.reason] ?? out.reason}</li>
