@@ -48,6 +48,16 @@ pub fn fastest_gpu(info: &v1::DeviceInfo) -> Option<(u32, &v1::Accelerator)> {
         .map(|(i, a)| (u32::try_from(i + 1).unwrap_or(0), a))
 }
 
+/// The name of a device's GPU in `slot` as a plan names it (1 + its index without the processor); empty for none.
+pub fn gpu_name(devices: &std::collections::HashMap<EndpointId, v1::DeviceInfo>, id: EndpointId, slot: u32) -> String {
+    let Some(index) = (slot as usize).checked_sub(1) else { return String::new() };
+    devices
+        .get(&id)
+        .and_then(|info| info.accelerators.iter().filter(|a| a.backend != v1::Backend::Cpu as i32).nth(index))
+        .map(|a| a.name.clone())
+        .unwrap_or_default()
+}
+
 /// Names the GPU of every stage and replica that has layers on one, the backups' too.
 pub fn assign_gpus(devices: &std::collections::HashMap<EndpointId, v1::DeviceInfo>, plan: &mut v1::PlacementPlan) {
     let slot = |node: Option<&v1::NodeId>| {
@@ -298,6 +308,7 @@ async fn apply(shared: &Arc<Shared>, plan: &v1::PlacementPlan) -> Result<(), Box
         backend: if role.gpu == 0 { Backend::Cpu } else { Backend::Unspecified },
         gpu: role.gpu,
         gpu_layers: role.gpu_layers,
+        gpu_name: gpu_name(&shared.devices.lock().expect("devices"), me, role.gpu),
         max_tokens: if plan.context == 0 { DEFAULT_CONTEXT } else { plan.context },
         chunk: 256,
         kv: omnarc_engine_host::KvType::from_name(&plan.kv_cache).unwrap_or_default(),

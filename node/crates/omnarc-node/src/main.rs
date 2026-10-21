@@ -321,6 +321,7 @@ fn ring(args: RingArgs, data: &Path) -> Result<(), ring::BoxError> {
         // a ring started by hand keeps to --backend; GPU layers come from a plan
         gpu: 0,
         gpu_layers: 0,
+        gpu_name: String::new(),
         max_tokens: args.max_tokens,
         chunk: args.chunk.max(1),
         kv: args.kv,

@@ -137,6 +137,9 @@ pub struct Config {
     pub gpu: u32,
     /// The window's layers on that GPU, the last ones; the output head goes along on the head.
     pub gpu_layers: u32,
+    /// That GPU's name as this device described itself. It is found by name: Vulkan may list the same GPUs in
+    /// another order in another process, so a position alone could pick the wrong card.
+    pub gpu_name: String,
     pub max_tokens: u32,
     /// Tokens per prefill step.
     pub chunk: u32,
@@ -328,12 +331,18 @@ fn open_node(config: &Config) -> Result<Node, BoxError> {
     // the plan names the GPU as the device's own list does, without the processor; the engine counts it in
     let gpu_index = if config.gpu > 0 && config.gpu_layers > 0 {
         let devices = engine.devices()?;
-        let index = devices
-            .iter()
-            .enumerate()
-            .filter(|(_, d)| d.backend != Backend::Cpu)
-            .nth(config.gpu as usize - 1)
-            .map(|(i, _)| i)
+        let by_name = (!config.gpu_name.is_empty())
+            .then(|| devices.iter().position(|d| d.backend != Backend::Cpu && d.name == config.gpu_name))
+            .flatten();
+        let index = by_name
+            .or_else(|| {
+                devices
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, d)| d.backend != Backend::Cpu)
+                    .nth(config.gpu as usize - 1)
+                    .map(|(i, _)| i)
+            })
             .ok_or("the plan's GPU is not among this device's")?;
         Some(u32::try_from(index)?)
     } else {
