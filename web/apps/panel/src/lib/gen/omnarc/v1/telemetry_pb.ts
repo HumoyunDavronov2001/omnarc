@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file omnarc/v1/telemetry.proto.
  */
 export const file_omnarc_v1_telemetry: GenFile = /*@__PURE__*/
-  fileDesc("ChlvbW5hcmMvdjEvdGVsZW1ldHJ5LnByb3RvEglvbW5hcmMudjEiTAoKUG93ZXJTdGF0ZRISCgpvbl9iYXR0ZXJ5GAEgASgIEhAKCGNoYXJnaW5nGAIgASgIEhgKEGJhdHRlcnlfZnJhY3Rpb24YAyABKAIieAoKTGlua1NhbXBsZRIfCgRwZWVyGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBIhCgRraW5kGAIgASgOMhMub21uYXJjLnYxLkxpbmtLaW5kEg4KBnJ0dF9tcxgDIAEoAhIWCg5iYW5kd2lkdGhfbWJwcxgEIAEoAiJ2CglTdGFnZUxvYWQSFAoMcGxhbl92ZXJzaW9uGAEgASgEEhMKC2xheWVyX2JlZ2luGAIgASgNEhEKCWxheWVyX2VuZBgDIAEoDRIVCg1idXN5X2ZyYWN0aW9uGAQgASgCEhQKDG1zX3Blcl90b2tlbhgFIAEoAiLjAgoJVGVsZW1ldHJ5Eh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB3VuaXhfbXMYAiABKAMSEAoIY3B1X2xvYWQYAyABKAISGQoRbWVtb3J5X3VzZWRfYnl0ZXMYBCABKAQSHAoUbWVtb3J5X29mZmVyZWRfYnl0ZXMYBSABKAQSKAoHdGhlcm1hbBgGIAEoDjIXLm9tbmFyYy52MS5UaGVybWFsU3RhdGUSJAoFcG93ZXIYByABKAsyFS5vbW5hcmMudjEuUG93ZXJTdGF0ZRIkCgVsaW5rcxgIIAMoCzIVLm9tbmFyYy52MS5MaW5rU2FtcGxlEiQKBnN0YWdlcxgJIAMoCzIULm9tbmFyYy52MS5TdGFnZUxvYWQSFAoMdG9rZW5zX3RvZGF5GAogASgEEicKCGZldGNoaW5nGAsgASgLMhUub21uYXJjLnYxLk1vZGVsRmV0Y2giSAoKTW9kZWxGZXRjaBINCgVtb2RlbBgBIAEoCRIWCg5yZWNlaXZlZF9ieXRlcxgCIAEoBBITCgt0b3RhbF9ieXRlcxgDIAEoBCqXAQoMVGhlcm1hbFN0YXRlEh0KGVRIRVJNQUxfU1RBVEVfVU5TUEVDSUZJRUQQABIZChVUSEVSTUFMX1NUQVRFX05PTUlOQUwQARIWChJUSEVSTUFMX1NUQVRFX0ZBSVIQAhIZChVUSEVSTUFMX1NUQVRFX1NFUklPVVMQAxIaChZUSEVSTUFMX1NUQVRFX0NSSVRJQ0FMEAQqqgEKCExpbmtLaW5kEhkKFUxJTktfS0lORF9VTlNQRUNJRklFRBAAEhIKDkxJTktfS0lORF9XSUZJEAESFgoSTElOS19LSU5EX0VUSEVSTkVUEAISEQoNTElOS19LSU5EX1VTQhADEhkKFUxJTktfS0lORF9USFVOREVSQk9MVBAEEhMKD0xJTktfS0lORF9SRUxBWRAFEhQKEExJTktfS0lORF9XRUJSVEMQBmIGcHJvdG8z", [file_omnarc_v1_device]);
+  fileDesc("ChlvbW5hcmMvdjEvdGVsZW1ldHJ5LnByb3RvEglvbW5hcmMudjEiTAoKUG93ZXJTdGF0ZRISCgpvbl9iYXR0ZXJ5GAEgASgIEhAKCGNoYXJnaW5nGAIgASgIEhgKEGJhdHRlcnlfZnJhY3Rpb24YAyABKAIieAoKTGlua1NhbXBsZRIfCgRwZWVyGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBIhCgRraW5kGAIgASgOMhMub21uYXJjLnYxLkxpbmtLaW5kEg4KBnJ0dF9tcxgDIAEoAhIWCg5iYW5kd2lkdGhfbWJwcxgEIAEoAiJ2CglTdGFnZUxvYWQSFAoMcGxhbl92ZXJzaW9uGAEgASgEEhMKC2xheWVyX2JlZ2luGAIgASgNEhEKCWxheWVyX2VuZBgDIAEoDRIVCg1idXN5X2ZyYWN0aW9uGAQgASgCEhQKDG1zX3Blcl90b2tlbhgFIAEoAiKHAwoJVGVsZW1ldHJ5Eh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB3VuaXhfbXMYAiABKAMSEAoIY3B1X2xvYWQYAyABKAISGQoRbWVtb3J5X3VzZWRfYnl0ZXMYBCABKAQSHAoUbWVtb3J5X29mZmVyZWRfYnl0ZXMYBSABKAQSKAoHdGhlcm1hbBgGIAEoDjIXLm9tbmFyYy52MS5UaGVybWFsU3RhdGUSJAoFcG93ZXIYByABKAsyFS5vbW5hcmMudjEuUG93ZXJTdGF0ZRIkCgVsaW5rcxgIIAMoCzIVLm9tbmFyYy52MS5MaW5rU2FtcGxlEiQKBnN0YWdlcxgJIAMoCzIULm9tbmFyYy52MS5TdGFnZUxvYWQSFAoMdG9rZW5zX3RvZGF5GAogASgEEicKCGZldGNoaW5nGAsgASgLMhUub21uYXJjLnYxLk1vZGVsRmV0Y2gSIgoEaGVsZBgMIAMoCzIULm9tbmFyYy52MS5IZWxkTW9kZWwiPgoJSGVsZE1vZGVsEgwKBGhhc2gYASABKAwSDgoGbGF5ZXJzGAIgASgNEhMKC2xheWVyX2NvdW50GAMgASgNIkgKCk1vZGVsRmV0Y2gSDQoFbW9kZWwYASABKAkSFgoOcmVjZWl2ZWRfYnl0ZXMYAiABKAQSEwoLdG90YWxfYnl0ZXMYAyABKAQqlwEKDFRoZXJtYWxTdGF0ZRIdChlUSEVSTUFMX1NUQVRFX1VOU1BFQ0lGSUVEEAASGQoVVEhFUk1BTF9TVEFURV9OT01JTkFMEAESFgoSVEhFUk1BTF9TVEFURV9GQUlSEAISGQoVVEhFUk1BTF9TVEFURV9TRVJJT1VTEAMSGgoWVEhFUk1BTF9TVEFURV9DUklUSUNBTBAEKqoBCghMaW5rS2luZBIZChVMSU5LX0tJTkRfVU5TUEVDSUZJRUQQABISCg5MSU5LX0tJTkRfV0lGSRABEhYKEkxJTktfS0lORF9FVEhFUk5FVBACEhEKDUxJTktfS0lORF9VU0IQAxIZChVMSU5LX0tJTkRfVEhVTkRFUkJPTFQQBBITCg9MSU5LX0tJTkRfUkVMQVkQBRIUChBMSU5LX0tJTkRfV0VCUlRDEAZiBnByb3RvMw", [file_omnarc_v1_device]);
 
 /**
  * @generated from message omnarc.v1.PowerState
@@ -188,6 +188,13 @@ export type Telemetry = Message<"omnarc.v1.Telemetry"> & {
    * @generated from field: omnarc.v1.ModelFetch fetching = 11;
    */
   fetching?: ModelFetch | undefined;
+
+  /**
+   * The models this device holds in its store, so a plan can prefer devices with nothing to fetch.
+   *
+   * @generated from field: repeated omnarc.v1.HeldModel held = 12;
+   */
+  held: HeldModel[];
 };
 
 /**
@@ -196,6 +203,39 @@ export type Telemetry = Message<"omnarc.v1.Telemetry"> & {
  */
 export const TelemetrySchema: GenMessage<Telemetry> = /*@__PURE__*/
   messageDesc(file_omnarc_v1_telemetry, 3);
+
+/**
+ * How much of one model a device holds.
+ *
+ * @generated from message omnarc.v1.HeldModel
+ */
+export type HeldModel = Message<"omnarc.v1.HeldModel"> & {
+  /**
+   * The BLAKE3 hash of the model file.
+   *
+   * @generated from field: bytes hash = 1;
+   */
+  hash: Uint8Array;
+
+  /**
+   * Its repeating layers held whole on this device, of `layer_count`.
+   *
+   * @generated from field: uint32 layers = 2;
+   */
+  layers: number;
+
+  /**
+   * @generated from field: uint32 layer_count = 3;
+   */
+  layerCount: number;
+};
+
+/**
+ * Describes the message omnarc.v1.HeldModel.
+ * Use `create(HeldModelSchema)` to create a new message.
+ */
+export const HeldModelSchema: GenMessage<HeldModel> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_telemetry, 4);
 
 /**
  * @generated from message omnarc.v1.ModelFetch
@@ -224,7 +264,7 @@ export type ModelFetch = Message<"omnarc.v1.ModelFetch"> & {
  * Use `create(ModelFetchSchema)` to create a new message.
  */
 export const ModelFetchSchema: GenMessage<ModelFetch> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_telemetry, 4);
+  messageDesc(file_omnarc_v1_telemetry, 5);
 
 /**
  * Thermal state as reported by the operating system.

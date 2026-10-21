@@ -12,7 +12,15 @@ fn llama_8b() -> Model {
 }
 
 fn device(id: u32, offered_mb: u64, seconds_per_layer: f64) -> Device<u32> {
-    Device { id, offered_bytes: offered_mb * MB, seconds_per_layer, link_seconds: 0.002, gpu: None }
+    Device {
+        id,
+        offered_bytes: offered_mb * MB,
+        seconds_per_layer,
+        link_seconds: 0.002,
+        gpu: None,
+        held: 0.0,
+        fetch_seconds_per_byte: 0.0,
+    }
 }
 
 fn assert_valid(model: &Model, devices: &[Device<u32>], plan: &Placement<u32>) {
@@ -116,6 +124,40 @@ fn sixty_four_devices_with_gpus_are_placed_within_a_second() {
     let plan = place(&model, &devices).unwrap();
     assert!(started.elapsed() < std::time::Duration::from_secs(1), "took {:?}", started.elapsed());
     assert_valid(&model, &devices, &plan);
+}
+
+fn holding(mut d: Device<u32>, held: f64, fetch_seconds_per_byte: f64) -> Device<u32> {
+    d.held = held;
+    d.fetch_seconds_per_byte = fetch_seconds_per_byte;
+    d
+}
+
+#[test]
+fn devices_that_hold_the_model_are_preferred_over_one_that_must_fetch_it_slowly() {
+    // device 3 alone holds the model and is the quickest, but it has none of it and 1 MB/s to fetch it: 95 minutes
+    // before the first answer. Devices 1 and 2 hold it already and split it at once.
+    let model = llama_8b();
+    let devices = [
+        holding(device(1, 3_000, 0.002), 1.0, 0.0),
+        holding(device(2, 3_000, 0.002), 1.0, 0.0),
+        holding(device(3, 8_000, 0.0015), 0.0, 1e-6),
+    ];
+    let plan = place(&model, &devices).unwrap();
+    assert_valid(&model, &devices, &plan);
+    assert!(plan.stages.iter().all(|s| s.node != 3), "nothing waits on the slow fetch: {:?}", plan.stages);
+}
+
+#[test]
+fn a_quick_fetch_does_not_stop_the_quickest_device_from_holding_it_all() {
+    // the same device 3 on a gigabyte a second: its fetch is a few seconds, and alone it is quicker than any split
+    let model = llama_8b();
+    let devices = [
+        holding(device(1, 3_000, 0.002), 1.0, 0.0),
+        holding(device(2, 3_000, 0.002), 1.0, 0.0),
+        holding(device(3, 8_000, 0.0015), 0.0, 1e-9),
+    ];
+    let plan = place(&model, &devices).unwrap();
+    assert_eq!(plan.stages, vec![Stage { node: 3, layers: 0..32, gpu_layers: 0 }]);
 }
 
 #[test]

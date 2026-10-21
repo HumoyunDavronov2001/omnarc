@@ -132,6 +132,8 @@ struct Shared {
     suggestion: Mutex<Option<v1::PlanSuggestion>>,
     // the layers being fetched for the plan, for the telemetry
     fetching: Mutex<Option<v1::ModelFetch>>,
+    /// What models this device holds, counted at most every `HELD_REFRESH`: the store is asked layer by layer.
+    held: Mutex<Option<(std::time::Instant, Vec<v1::HeldModel>)>>,
 }
 
 // What the service keeps doing while it runs.
@@ -311,6 +313,7 @@ impl Service {
             stages: Mutex::default(),
             suggestion: Mutex::default(),
             fetching: Mutex::default(),
+            held: Mutex::default(),
         });
         joins.0.set(Arc::clone(&shared)).expect("set once");
         tensors.0.set(Arc::clone(&shared)).expect("set once");
@@ -1117,6 +1120,8 @@ async fn speak(shared: Arc<Shared>, mut device: v1::DeviceInfo, every: Duration)
             .filter(|(_, at)| at.elapsed() < fresh)
             .map(|(sample, _)| sample.clone())
             .collect();
+        // counted before the message is made: no lock may be held across the await
+        let held = held_models(&shared).await;
         let telemetry = v1::Telemetry {
             node: Some(node_id(shared.key.public())),
             unix_ms: now_unix_ms(),
@@ -1132,6 +1137,7 @@ async fn speak(shared: Arc<Shared>, mut device: v1::DeviceInfo, every: Duration)
             stages: stage_loads(&shared),
             tokens_today: today.tokens(),
             fetching: shared.fetching.lock().expect("fetching").clone(),
+            held,
         };
         // this device's own telemetry reaches the panel the same way as the others'
         shared.telemetry.lock().expect("telemetry").insert(shared.key.public(), telemetry.clone());
@@ -1139,6 +1145,33 @@ async fn speak(shared: Arc<Shared>, mut device: v1::DeviceInfo, every: Duration)
         let payload = v1::GossipPayload { kind: Some(v1::gossip_payload::Kind::Telemetry(telemetry)) };
         let _ = shared.sender.broadcast(gossip::seal(&shared.key, &payload, now_unix_ms()).into()).await;
     }
+}
+
+/// How often a device counts the models it holds again.
+const HELD_REFRESH: Duration = Duration::from_secs(30);
+
+// The models this device holds, whole or in part, as its telemetry announces them; counted again only now and then.
+async fn held_models(shared: &Shared) -> Vec<v1::HeldModel> {
+    if let Some((at, held)) = &*shared.held.lock().expect("held")
+        && at.elapsed() < HELD_REFRESH
+    {
+        return held.clone();
+    }
+    let mut held = Vec::new();
+    for (_, hash) in shared.models.list().await.unwrap_or_default() {
+        let Ok(model) = shared.models.model(&hash.to_hex()).await else { continue };
+        let count = model.layout.layers;
+        let mut layers = 0;
+        for begin in 0..count {
+            let window = omnarc_store::Window { begin, end: begin + 1 };
+            if shared.models.missing(&model, window).await.is_ok_and(|missing| missing == 0) {
+                layers += 1;
+            }
+        }
+        held.push(v1::HeldModel { hash: hash.as_bytes().to_vec(), layers, layer_count: count });
+    }
+    *shared.held.lock().expect("held") = Some((std::time::Instant::now(), held.clone()));
+    held
 }
 
 // Handles what the gossip topic brings.

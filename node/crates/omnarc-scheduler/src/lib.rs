@@ -60,6 +60,20 @@ pub struct Device<K> {
     pub link_seconds: f64,
     /// The one GPU the device lends layers to, when it has one worth using (NO-40, NO-51).
     pub gpu: Option<Gpu>,
+    /// Share of the model's layers the device already holds, 0..=1: those need no fetching.
+    pub held: f64,
+    /// Time one byte of weights it lacks takes to reach it from the best device that has them; 0 when it holds all.
+    pub fetch_seconds_per_byte: f64,
+}
+
+/// A fetch is weighed as spread over the plan's first tokens: moving gigabytes over a slow link costs the first
+/// answers far more than a slightly slower ring does.
+pub const AMORTIZED_TOKENS: f64 = 1000.0;
+
+// The time `bytes` of the model's weights take to reach `d`, the part it already holds left out.
+#[allow(clippy::cast_precision_loss)]
+fn fetch_seconds<K>(d: &Device<K>, bytes: u64) -> f64 {
+    (1.0 - d.held.clamp(0.0, 1.0)) * bytes as f64 * d.fetch_seconds_per_byte
 }
 
 /// A GPU of a device: what its owner lets the plan use of it, and how fast it is.
@@ -243,45 +257,72 @@ pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Obje
     let mut left_out: Vec<_> = small.into_iter().map(|d| (d.id.clone(), LeftOut::TooSmall)).collect();
     let offered = || devices.iter().map(|d| capacity(model, d).0).sum();
 
-    // R6: a model that fits on one device, its GPU counted, runs there, on the fastest that can hold it, and
-    // nowhere split
+    // R6: a model that fits on one device, its GPU counted, runs there, on the device that answers soonest — its
+    // speed and, when it must first fetch the model, the fetch spread over the first tokens — and nowhere split
     let whole = model.whole_bytes();
-    let fastest = usable
+    let alone = usable
         .iter()
-        .filter_map(|d| fit(model, d, model.layers, true).map(|g| (*d, g, window_seconds(d, model.layers, g))))
-        .min_by(|a, b| a.2.total_cmp(&b.2));
-    if let Some((best, gpu_layers, seconds)) = fastest {
-        let layers = 0..model.layers;
-        let mut replicas = Vec::new();
-        for d in &usable {
-            if std::ptr::eq(*d, best) {
-                continue;
+        .filter_map(|d| {
+            fit(model, d, model.layers, true)
+                .map(|g| (*d, g, window_seconds(d, model.layers, g), fetch_seconds(d, whole) / AMORTIZED_TOKENS))
+        })
+        .min_by(|a, b| (a.2 + a.3).total_cmp(&(b.2 + b.3)));
+    // a split is weighed against it only when that device would first fetch what others already hold
+    let split = match alone {
+        Some((.., 0.0)) => None,
+        _ => Some(split_placement(model, &usable, objective)),
+    };
+    if let Some((best, gpu_layers, seconds, fetch)) = alone {
+        let split_sooner = matches!(&split, Some(Ok((p, f))) if p.seconds_per_token + f < seconds + fetch);
+        if !split_sooner {
+            let layers = 0..model.layers;
+            let mut replicas = Vec::new();
+            for d in &usable {
+                if std::ptr::eq(*d, best) {
+                    continue;
+                }
+                match fit(model, d, model.layers, true) {
+                    Some(g) => replicas.push(Replica { node: d.id.clone(), layers: layers.clone(), gpu_layers: g }),
+                    None => left_out.push((d.id.clone(), LeftOut::NotNeeded)),
+                }
             }
-            match fit(model, d, model.layers, true) {
-                Some(g) => replicas.push(Replica { node: d.id.clone(), layers: layers.clone(), gpu_layers: g }),
-                None => left_out.push((d.id.clone(), LeftOut::NotNeeded)),
-            }
+            return Ok(Placement {
+                stages: vec![Stage { node: best.id.clone(), layers, gpu_layers }],
+                replicas,
+                left_out,
+                seconds_per_token: seconds,
+            });
         }
-        return Ok(Placement {
-            stages: vec![Stage { node: best.id.clone(), layers, gpu_layers }],
-            replicas,
-            left_out,
-            seconds_per_token: seconds,
-        });
     }
     if usable.iter().map(|d| capacity(model, d).0).sum::<u64>() < whole {
         return Err(Error::DoesNotFit { needed: whole, offered: offered() });
     }
+    let (mut placement, _) =
+        split.unwrap_or_else(|| split_placement(model, &usable, objective)).map_err(|e| match e {
+            Error::DoesNotFit { needed, .. } => Error::DoesNotFit { needed, offered: offered() },
+            Error::NoPlan => Error::NoPlan,
+        })?;
+    left_out.append(&mut placement.left_out);
+    placement.left_out = left_out;
+    Ok(placement)
+}
 
+// The model split over `usable` in ring order, with standby replicas, and the time its fetches take spread over the
+// first tokens.
+fn split_placement<K: Clone>(
+    model: &Model,
+    usable: &[&Device<K>],
+    objective: Objective,
+) -> Result<(Placement<K>, f64), Error> {
     // a larger network is planned in a group: the fastest devices that hold the model together, at most GROUP of
     // them; the others stand by as replicas where a window fits them
-    let all_usable = usable.clone();
+    let all_usable = usable.to_vec();
     let (usable, solved) = if usable.len() > GROUP {
-        let small = group(model, &usable);
+        let small = group(model, usable);
         match split(model, &small, objective) {
             // the windows did not divide among the fewest that hold the model: the whole group is tried
             Err(Error::DoesNotFit { .. }) => {
-                let mut fastest = usable.clone();
+                let mut fastest = usable.to_vec();
                 fastest.sort_by(|a, b| a.seconds_per_layer.total_cmp(&b.seconds_per_layer));
                 fastest.truncate(GROUP);
                 fastest.sort_by_key(|d| usable.iter().position(|u| std::ptr::eq(*u, *d)));
@@ -291,13 +332,9 @@ pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Obje
             solved => (small, solved),
         }
     } else {
-        let solved = split(model, &usable, objective);
-        (usable, solved)
+        (usable.to_vec(), split(model, usable, objective))
     };
-    let (windows, gpu, head, seconds) = solved.map_err(|e| match e {
-        Error::DoesNotFit { needed, .. } => Error::DoesNotFit { needed, offered: offered() },
-        Error::NoPlan => Error::NoPlan,
-    })?;
+    let (windows, gpu, head, seconds) = solved?;
     let mut stages = Vec::new();
     let mut start = 0;
     // the ring order from the head on
@@ -309,16 +346,25 @@ pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Obje
             start += w;
         }
     }
+    let fetch = stages
+        .iter()
+        .enumerate()
+        .map(|(i, (d, layers, _))| {
+            let ends = if i == 0 { model.head_bytes + model.tail_bytes } else { 0 };
+            fetch_seconds(d, u64::from(layers.end - layers.start) * model.layer_bytes + ends)
+        })
+        .sum::<f64>()
+        / AMORTIZED_TOKENS;
     let standby = replicas(model, &stages, &all_usable);
     // a device that neither computes nor stands by is not needed
-    for d in &all_usable {
-        let used =
-            stages.iter().any(|(s, ..)| std::ptr::eq(*s, *d)) || standby.iter().any(|(r, ..)| std::ptr::eq(*r, *d));
-        if !used {
-            left_out.push((d.id.clone(), LeftOut::NotNeeded));
-        }
-    }
-    Ok(Placement {
+    let left_out = all_usable
+        .iter()
+        .filter(|d| {
+            !stages.iter().any(|(s, ..)| std::ptr::eq(*s, **d)) && !standby.iter().any(|(r, ..)| std::ptr::eq(*r, **d))
+        })
+        .map(|d| (d.id.clone(), LeftOut::NotNeeded))
+        .collect();
+    let placement = Placement {
         stages: stages
             .into_iter()
             .map(|(d, layers, gpu_layers)| Stage { node: d.id.clone(), layers, gpu_layers })
@@ -329,7 +375,8 @@ pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Obje
             .collect(),
         left_out,
         seconds_per_token: seconds,
-    })
+    };
+    Ok((placement, fetch))
 }
 
 // The MILP: how many layers each device holds, in ring order.
@@ -366,9 +413,15 @@ fn split<K>(
     // latency counts every stage's time; throughput counts only the slowest stage's
     let latency = objective == Objective::Latency;
     let cost = |c: f64| if latency { c } else { 0.0 };
-    let w: Vec<_> = devices.iter().map(|d| pb.add_integer_column(cost(d.seconds_per_layer), 0.0..=total)).collect();
+    // a layer the device must first fetch costs its fetch, spread over the first tokens, whatever the objective
+    let fetch_layer = |d: &Device<K>| fetch_seconds(d, model.layer_bytes) / AMORTIZED_TOKENS;
+    let w: Vec<_> = devices
+        .iter()
+        .map(|d| pb.add_integer_column(cost(d.seconds_per_layer) + fetch_layer(d), 0.0..=total))
+        .collect();
     let y: Vec<_> = devices.iter().map(|d| pb.add_integer_column(cost(d.link_seconds), 0.0..=1.0)).collect();
-    let f: Vec<_> = (0..n).map(|_| pb.add_integer_column(0.0, 0.0..=1.0)).collect();
+    let fetch_ends = |d: &Device<K>| fetch_seconds(d, model.head_bytes + model.tail_bytes) / AMORTIZED_TOKENS;
+    let f: Vec<_> = devices.iter().map(|d| pb.add_integer_column(fetch_ends(d), 0.0..=1.0)).collect();
     // a device without a GPU has its GPU columns fixed at zero; presolve takes them out
     let gain = |d: &Device<K>| d.gpu.map_or(0.0, |g| g.seconds_per_layer - d.seconds_per_layer);
     let top = |d: &Device<K>, v: f64| if d.gpu.is_some() { v } else { 0.0 };
@@ -457,7 +510,9 @@ fn replicas<'a, K>(
 ) -> Vec<(&'a Device<K>, Range<u32>, u32)> {
     let mut spare: Vec<&'a Device<K>> =
         usable.iter().copied().filter(|d| !stages.iter().any(|(s, ..)| std::ptr::eq(*s, *d))).collect();
-    spare.sort_by(|a, b| capacity(model, a).1.total_cmp(&capacity(model, b).1));
+    // a device that already holds the weights stands by first, then the quicker
+    let missing = |d: &Device<K>| (1.0 - d.held.clamp(0.0, 1.0)) * d.fetch_seconds_per_byte;
+    spare.sort_by(|a, b| missing(a).total_cmp(&missing(b)).then(capacity(model, a).1.total_cmp(&capacity(model, b).1)));
     let mut order: Vec<usize> = (0..stages.len()).collect();
     order.sort_by_key(|&i| std::cmp::Reverse(stages[i].1.len()));
     let mut replicas = Vec::new();

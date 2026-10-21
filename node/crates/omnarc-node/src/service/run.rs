@@ -374,7 +374,7 @@ async fn fetch(shared: &Shared, plan: &v1::PlacementPlan, hash: Hash, windows: &
             continue;
         }
         let source =
-            endpoint_id(&key(plan.source.as_ref())).ok_or("the plan names no member to fetch the model from")?;
+            sources(shared, plan, hash).into_iter().next().ok_or("no member holds the model to fetch it from")?;
         let connection = shared.endpoint.connect(source, omnarc_store::BLOBS_ALPN).await?;
         let name = plan.model.as_ref().map(|m| m.name.as_str()).filter(|n| !n.is_empty());
         eprintln!("omnarc: fetching layers {window} from {}", source.fmt_short());
@@ -392,6 +392,30 @@ async fn fetch(shared: &Shared, plan: &v1::PlacementPlan, hash: Hash, windows: &
         model = Some(fetched?);
     }
     model.ok_or_else(|| "the model is not on this device".into())
+}
+
+// The members to fetch the model from, the best first: every member that announces all of it, ranked by the link
+// this device measured to it, and the plan's source, which holds it, when nothing better is known.
+fn sources(shared: &Shared, plan: &v1::PlacementPlan, hash: Hash) -> Vec<EndpointId> {
+    let me = shared.key.public();
+    let now = crate::pairing::now_unix_ms();
+    let links = shared.links.lock().expect("links").clone();
+    let speed = |id: &EndpointId| links.get(id).map_or(0.0, |(sample, _)| sample.bandwidth_mbps);
+    let mut holders: Vec<EndpointId> = shared
+        .telemetry
+        .lock()
+        .expect("telemetry")
+        .iter()
+        .filter(|(id, t)| {
+            **id != me
+                && now - t.unix_ms <= GONE_AFTER_MS
+                && t.held.iter().any(|h| h.hash == hash.as_bytes() && h.layer_count > 0 && h.layers >= h.layer_count)
+        })
+        .map(|(id, _)| *id)
+        .collect();
+    holders.extend(endpoint_id(&key(plan.source.as_ref())).filter(|id| *id != me && !holders.contains(id)));
+    holders.sort_by(|a, b| speed(b).total_cmp(&speed(a)));
+    holders
 }
 
 fn direct_addr(shared: &Shared, id: EndpointId) -> std::net::SocketAddr {
@@ -746,7 +770,7 @@ pub fn shape(model: &Model, context: u32, kv: omnarc_engine_host::KvType) -> omn
 // What every member offers now, fastest first: the plan's ring order. A member whose telemetry stopped, or that the
 // profiler has not measured, takes no part.
 #[cfg(feature = "coordinator")]
-fn offers(shared: &Shared, shape: &omnarc_scheduler::Model) -> Vec<omnarc_scheduler::Device<EndpointId>> {
+fn offers(shared: &Shared, shape: &omnarc_scheduler::Model, hash: Hash) -> Vec<omnarc_scheduler::Device<EndpointId>> {
     let devices = shared.devices.lock().expect("devices").clone();
     let telemetry = shared.telemetry.lock().expect("telemetry").clone();
     let links = shared.links.lock().expect("links").clone();
@@ -758,6 +782,19 @@ fn offers(shared: &Shared, shape: &omnarc_scheduler::Model) -> Vec<omnarc_schedu
         .filter_map(|id| {
             let t = telemetry.get(&id).filter(|t| now - t.unix_ms <= GONE_AFTER_MS)?;
             let info = devices.get(&id)?;
+            // what it holds of this model needs no fetching; the rest comes from this device, which holds it all
+            let held = t
+                .held
+                .iter()
+                .find(|h| h.hash == hash.as_bytes() && h.layer_count > 0)
+                .map_or(0.0, |h| (f64::from(h.layers) / f64::from(h.layer_count)).min(1.0));
+            let fetch_seconds_per_byte = if held >= 1.0 || id == shared.key.public() {
+                0.0
+            } else {
+                let mbps = links.get(&id).map_or(0.0, |(sample, _)| f64::from(sample.bandwidth_mbps));
+                // nothing measured yet: 10 Mbit/s
+                8.0 / (if mbps > 0.0 { mbps } else { 10.0 } * 1e6)
+            };
             // the processor's speed alone: a GPU's is its own, below
             let gbps = info
                 .accelerators
@@ -789,6 +826,8 @@ fn offers(shared: &Shared, shape: &omnarc_scheduler::Model) -> Vec<omnarc_schedu
                 seconds_per_layer,
                 link_seconds,
                 gpu,
+                held,
+                fetch_seconds_per_byte,
             })
         })
         .collect();
@@ -870,7 +909,7 @@ pub(super) async fn run_model(
     let kv = omnarc_engine_host::KvType::from_name(&request.kv_cache)
         .ok_or_else(|| format!("unknown KV cache type {}: f16, q8_0 or q4_0", request.kv_cache))?;
     let shape = shape(&model, context, kv);
-    let devices = offers(shared, &shape);
+    let devices = offers(shared, &shape, model.hash);
     let objective = objective(request.mode)?;
     let placement = omnarc_scheduler::place_for(&shape, &devices, objective)?;
     let version = shared.plan.borrow().as_ref().map_or(0, |p| p.version) + 1;
@@ -973,7 +1012,8 @@ async fn better_plan(shared: &Shared) -> Option<v1::PlanSuggestion> {
     let model = shared.models.model(&hash).await.ok()?;
     let kv = omnarc_engine_host::KvType::from_name(&plan.kv_cache).unwrap_or_default();
     let shape = shape(&model, plan.context, kv);
-    let placement = omnarc_scheduler::place_for(&shape, &offers(shared, &shape), objective(plan.mode).ok()?).ok()?;
+    let placement =
+        omnarc_scheduler::place_for(&shape, &offers(shared, &shape, model.hash), objective(plan.mode).ok()?).ok()?;
     #[allow(clippy::cast_possible_truncation)]
     let ms = (placement.seconds_per_token * 1e3) as f32;
     let mut candidate = to_plan(0, &model, plan.context, plan.mode, kv, shared.key.public(), &placement);

@@ -66,6 +66,17 @@ message Telemetry {
   uint64 tokens_today = 10;
   // The layers this device is fetching for the plan, while it fetches them (PA-10).
   ModelFetch fetching = 11;
+  // The models this device holds in its store, so a plan can prefer devices with nothing to fetch.
+  repeated HeldModel held = 12;
+}
+
+// How much of one model a device holds.
+message HeldModel {
+  // The BLAKE3 hash of the model file.
+  bytes hash = 1;
+  // Its repeating layers held whole on this device, of `layer_count`.
+  uint32 layers = 2;
+  uint32 layer_count = 3;
 }
 
 message ModelFetch {
