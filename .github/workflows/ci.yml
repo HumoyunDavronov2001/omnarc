@@ -138,6 +138,8 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-2025, macos-15]
     runs-on: ${{ matrix.os }}
+    # a hung ring test must not hold the queue for the default six hours
+    timeout-minutes: 60
     steps:
       - name: Keep LF line endings (the llama.cpp patches expect them)
         run: git config --global core.autocrlf false
