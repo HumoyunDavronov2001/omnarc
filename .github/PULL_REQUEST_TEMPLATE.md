@@ -1,6 +1,6 @@
 ## What
 
-<!-- One or two sentences. Link the requirement (REQUIREMENTS.md) or stage (PLAN.md §11) it serves. -->
+<!-- One or two sentences. Link the requirement (REQUIREMENTS.md) or stage (PLAN.md §4) it serves. -->
 
 ## How it was checked
 

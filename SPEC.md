@@ -4,7 +4,7 @@
 > **What** gets built and why — [REQUIREMENTS.md](REQUIREMENTS.md); **how** — [PLAN.md](PLAN.md); how the screens
 > look — [design/concept.html](design/concept.html). An Uzbek reading copy: [docs/uz/SPETSIFIKATSIYA.md](docs/uz/SPETSIFIKATSIYA.md).
 
-**State:** ✓ done · ◐ partly done · ○ not started. **Stage:** B0–B9 from [PLAN.md §11](PLAN.md); an item marked
+**State:** ✓ done · ◐ partly done · ○ not started. **Stage:** B0–B9 from [PLAN v3.2 §11](docs/history/PLAN-v3.2.md) (the v4 [PLAN.md](PLAN.md) maps them to S0–S4 once S0 is done); an item marked
 "B? → Bn" has no stage in the plan yet, and Bn is the proposal (§16). **Req:** the requirement it implements
 ([REQUIREMENTS.md](REQUIREMENTS.md) §3–§6, PLAN sections as "P§"). **Design:** a mock-up of the screen exists in the
 design concept (its section number), or "—".

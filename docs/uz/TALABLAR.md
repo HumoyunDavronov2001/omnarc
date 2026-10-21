@@ -226,7 +226,7 @@ Tarmoqdan faqat qisqa xabarlar o'tadi, shuning uchun telefonlar va internet ham 
   takrorlanadigan ko'rsatmalarini saqlaydi — har navbatda faqat yangi tokenlar hisoblanadi; asbob chaqiruvlari,
   tuzilgan javob va uzun kontekst ishlaydi.
 
-**UI/UX (U)** — batafsil [REJA.md §9](REJA.md)
+**UI/UX (U)** — batafsil [REJA v3.2 §9](../history/REJA-v3.2.md)
 - U1 — «Halqa» bosh ekrani. Har qurilma — bitta yoy; yoy uzunligi qatlamlar ulushiga teng, rangi joriy yuklamani
   bildiradi. Token halqa bo'ylab o'lchangan haqiqiy tezlikda yuradi, taxminiy tokenlar ham ko'rinadi.
 - U2 — Bitta dizayn tizimi: tokenlar bitta JSON'dan (W3C DTCG) CSS, Swift va Kotlin'ga yig'iladi.
@@ -245,7 +245,7 @@ Tarmoqdan faqat qisqa xabarlar o'tadi, shuning uchun telefonlar va internet ham 
   portugal va rus tillari. Arab tilida sahifa o'ngdan chapga; sana va raqamlar har tilning o'z formatida.
 - U11 — Tirik belgi (WebGL2 zarrachali halqa) tizim mexanizmini jonli ko'rsatadi: yoy — qurilma, oltin kometa — token,
   oraliq — tarmoq. Kirish sahnasi, 3D og'ish va qurilma qo'shish ta'siri bor. Kam harakat rejimida statik, WebGL2
-  bo'lmasa SVG chiqadi. Batafsil — [REJA.md §9.3](REJA.md).
+  bo'lmasa SVG chiqadi. Batafsil — [REJA v3.2 §9.3](../history/REJA-v3.2.md).
 - U10 — Byudjetlar:
   - panelning boshlang'ich JS hajmi ≤ 180 KB, brauzer tuguni sahifasi ≤ 60 KB;
   - 1000 qurilmada 60 fps;
@@ -287,7 +287,7 @@ Tarmoqdan faqat qisqa xabarlar o'tadi, shuning uchun telefonlar va internet ham 
 
 ## 8. Bosqichlar
 
-B0–B9. Har bosqichning ishi va darvozasi [REJA.md §11](REJA.md) da yozilgan. UI har bosqich bilan birga
+B0–B9. Har bosqichning ishi va darvozasi [REJA v3.2 §11](../history/REJA-v3.2.md) da (v4 bosqichlari S0–S4 — [REJA.md §4](REJA.md)) yozilgan. UI har bosqich bilan birga
 quriladi (U1–U10), oxirga qoldirilmaydi.
 
 | B | Talablar |

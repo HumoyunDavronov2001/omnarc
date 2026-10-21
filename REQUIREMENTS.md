@@ -214,7 +214,7 @@ cross the network, so phones and internet links work as well as a LAN.
 - A4 — Agent backend: OpenClaw, OpenCode and other agents connect through A1. The prefix cache keeps their long,
   repeated instructions, so a turn computes only its new tokens; tool calls, structured output and long contexts work.
 
-**UI/UX (U)** — details in [PLAN.md §9](PLAN.md)
+**UI/UX (U)** — details in [PLAN v3.2 §9](docs/history/PLAN-v3.2.md)
 - U1 — The **Ring** home screen. Every device is one arc; the arc length equals its share of layers and its color
   shows the current load. Tokens travel around the ring at their real measured speed; draft tokens are visible too.
 - U2 — One design system: tokens are built from a single JSON file (W3C DTCG) into CSS, Swift and Kotlin.
@@ -236,7 +236,7 @@ cross the network, so phones and internet links work as well as a LAN.
   - mobile cold start ≤ 1 s.
 - U11 — The **living ring** (a WebGL2 particle ring) shows the system's mechanism live: arc = device,
   gold comet = token, gap = network. It has an intro scene, a 3D tilt and an add-a-device interaction. It is static
-  in reduced-motion mode and falls back to SVG without WebGL2. Details: [PLAN.md §9.3](PLAN.md).
+  in reduced-motion mode and falls back to SVG without WebGL2. Details: [PLAN v3.2 §9.3](docs/history/PLAN-v3.2.md).
 
 ## 6. World-class criteria (measured in the open)
 
@@ -274,7 +274,7 @@ cross the network, so phones and internet links work as well as a LAN.
 
 ## 8. Stages
 
-B0–B9. The work and the gate of every stage are in [PLAN.md §11](PLAN.md). The UI is built together with every
+B0–B9. The work and the gate of every stage are in [PLAN v3.2 §11](docs/history/PLAN-v3.2.md); v4 stages S0–S4 are in [PLAN.md §4](PLAN.md). The UI is built together with every
 stage (U1–U11), never left for the end.
 
 | Stage | Requirements |
