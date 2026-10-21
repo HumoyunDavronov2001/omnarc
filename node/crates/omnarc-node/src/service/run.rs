@@ -33,6 +33,9 @@ pub(super) const SPREAD_EVERY: Duration = Duration::from_secs(5);
 /// What each stage keeps aside for the engine's compute buffers, besides its windows.
 pub const ENGINE_RESERVE: u64 = 192 << 20;
 
+/// Tokens the engine computes in one graph (kMaxUbatch in engine/src/omnarc.cpp): its compute buffers are sized for it.
+const COMPUTE_BATCH: u32 = 512;
+
 /// GPU memory kept free of layers: the compute buffers and the driver's own.
 pub const GPU_RESERVE: u64 = 384 << 20;
 
@@ -95,6 +98,8 @@ pub(super) struct Running {
     head: Option<Arc<Head>>,
     // a stage or a replica that serves the ring until the plan changes
     serving: Option<AbortOnDropHandle<()>>,
+    // why this device could not play its part in the plan, told to whoever asks it
+    failed: Option<String>,
 }
 
 impl std::fmt::Debug for Running {
@@ -249,7 +254,7 @@ pub(super) async fn carry_out(shared: Arc<Shared>) {
                 eprintln!("omnarc: plan {version} cannot run here: {e}");
                 // nothing half-started stays behind
                 let mut running = shared.running.lock().await;
-                *running = Running { version, ..Running::default() };
+                *running = Running { version, failed: Some(e.to_string()), ..Running::default() };
                 shared.stages.lock().expect("stages").clear();
             }
         }
@@ -494,11 +499,12 @@ async fn answer(
     if request.paths > 1 {
         return accuracy(shared, request, &tx).await;
     }
-    let head = shared.running.lock().await.head.clone();
-    if let Some(head) = head {
+    let plan = shared.plan.borrow().clone().filter(|p| !p.stages.is_empty()).ok_or("no model runs in the cluster")?;
+    let me = shared.key.public();
+    if heads(&plan).iter().any(|k| k.as_slice() == me.as_bytes()) {
+        let head = own_head(shared)?;
         return answer_here(&head, &request, &tx).await;
     }
-    let plan = shared.plan.borrow().clone().filter(|p| !p.stages.is_empty()).ok_or("no model runs in the cluster")?;
     let id = route(shared, &plan).ok_or("the plan names no head")?;
     ask_remote(shared, id, request, &tx).await
 }
@@ -526,6 +532,31 @@ async fn ask_remote(
     }
     connection.close(0u32.into(), b"answered");
     Ok(())
+}
+
+/// This device's head, without waiting: while a plan is carried out here its layers are fetched and loaded, which can
+/// take minutes, and a question is told so at once rather than left waiting; one that could not start says why.
+fn own_head(shared: &Shared) -> Result<Arc<Head>, BoxError> {
+    let Ok(running) = shared.running.try_lock() else {
+        let fetching = shared.fetching.lock().expect("fetching").clone();
+        return Err(match fetching {
+            Some(f) if f.total_bytes > 0 => format!(
+                "the model is still starting: {} of its layers fetched",
+                format_args!("{}%", (f.received_bytes.saturating_mul(100) / f.total_bytes).min(100))
+            ),
+            Some(_) => "the model is still starting: its layers are being fetched".to_owned(),
+            None => "the model is still starting: its layers are loading".to_owned(),
+        }
+        .into());
+    };
+    if let Some(head) = running.head.clone() {
+        return Ok(head);
+    }
+    Err(match &running.failed {
+        Some(why) => format!("the model could not start on its head: {why}"),
+        None => "this device holds no head".to_owned(),
+    }
+    .into())
 }
 
 /// The devices that answer prompts in `plan`: the head, and every whole copy of a model that fits on one device.
@@ -630,10 +661,11 @@ async fn collect(
 ) -> Result<(String, Option<v1::AskDone>), BoxError> {
     use v1::ask_response::Step;
     let (tx, mut rx) = mpsc::unbounded_channel();
-    let local = if id == shared.key.public() { shared.running.lock().await.head.clone() } else { None };
-    match local {
-        Some(head) => answer_here(&head, &request, &tx).await?,
-        None => ask_remote(shared, id, request, &tx).await?,
+    if id == shared.key.public() {
+        let head = own_head(shared)?;
+        answer_here(&head, &request, &tx).await?;
+    } else {
+        ask_remote(shared, id, request, &tx).await?;
     }
     drop(tx);
     let (mut text, mut done) = (String::new(), None);
@@ -700,11 +732,13 @@ impl ProtocolHandler for AskHandler {
             _ => None,
         };
         let Some(request) = request else { return Ok(()) };
-        let head = shared.running.lock().await.head.clone();
-        let Some(head) = head else {
-            let _ = write_frame(&mut send, 1, b"this device holds no head").await;
-            let _ = send.finish();
-            return Ok(());
+        let head = match own_head(&shared) {
+            Ok(head) => head,
+            Err(e) => {
+                let _ = write_frame(&mut send, 1, e.to_string().as_bytes()).await;
+                let _ = send.finish();
+                return Ok(());
+            }
         };
         let (tx, mut rx) = mpsc::unbounded_channel();
         // the sender goes with the answer: when it is done, the relay below runs dry
@@ -766,6 +800,13 @@ pub fn shape(model: &Model, context: u32, kv: omnarc_engine_host::KvType) -> omn
     let values = u64::from(context) * kv_heads * (key_len + value_len);
     #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_precision_loss)]
     let kv_bytes = (values as f64 * kv.bytes_per_value()).ceil() as u64;
+    // the output's compute buffer: the engine reserves the logits of a whole batch, which for a large vocabulary is
+    // as much as a few layers (Qwen3: 512 x 151 936 x 4 bytes, 311 MB) and sits where the output does
+    let vocab = match header.get("tokenizer.ggml.tokens") {
+        Some(omnarc_store::gguf::Value::Array { len, .. }) => *len,
+        _ => 0,
+    };
+    tail += u64::from(COMPUTE_BATCH.min(context.max(1))) * vocab * 4;
     omnarc_scheduler::Model {
         layers: layout.layers,
         // the largest layer: a window is planned for its worst case

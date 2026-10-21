@@ -349,26 +349,30 @@ fn open_node(config: &Config) -> Result<Node, BoxError> {
         None
     };
 
-    let mut shards = Vec::new();
     for window in &config.windows {
         if window.0.end > info.layer_count + 1 {
             return Err(format!("window {window} ends after the output head (layer {})", info.layer_count).into());
         }
-        // the window's last gpu_layers layers on the GPU; all of them (0) when that is the whole window, and the
-        // output window goes along whole
-        let repeating = window.0.end.min(info.layer_count).saturating_sub(window.0.start);
-        let gpu = gpu_index.map(|index| omnarc_engine_host::Gpu {
-            index,
-            layers: if repeating == 0 || config.gpu_layers >= repeating { 0 } else { config.gpu_layers },
-        });
-        let shard =
-            engine.open_on(&config.model, window.0.clone(), config.backend, config.max_tokens, config.kv, gpu)?;
-        if config.threads > 0 {
-            engine.set_threads(shard.id, config.threads)?;
+    }
+    // the plan's share of the GPU first; a GPU with less room than the plan counted on (its driver, the desktop,
+    // another program) gets half of it, then none: the ring runs slower rather than not at all
+    let mut tries = vec![config.gpu_layers];
+    if gpu_index.is_some() {
+        tries.extend([config.gpu_layers / 2, 0]);
+        tries.dedup();
+    }
+    let mut shards = Vec::new();
+    for (attempt, &gpu_layers) in tries.iter().enumerate() {
+        match open_windows(&mut engine, config, &info, gpu_index.filter(|_| gpu_layers > 0), gpu_layers) {
+            Ok(opened) => {
+                shards = opened;
+                break;
+            }
+            Err(e) if attempt + 1 < tries.len() && is_out_of_memory(&e) => {
+                eprintln!("omnarc: {gpu_layers} layers do not fit on the GPU ({e}); trying {}", tries[attempt + 1]);
+            }
+            Err(e) => return Err(e.into()),
         }
-        let backend = shard.backend.as_str_name().trim_start_matches("BACKEND_").to_lowercase();
-        eprintln!("omnarc: layers {window} loaded on {backend}");
-        shards.push(shard);
     }
     Ok(Node {
         engine: Arc::new(Mutex::new(engine)),
@@ -377,6 +381,55 @@ fn open_node(config: &Config) -> Result<Node, BoxError> {
         vocab_size: info.vocab_size,
         wire: config.wire,
     })
+}
+
+/// Opens every window of `config`, the last `gpu_layers` of each on `gpu`; on an error closes what it opened.
+fn open_windows(
+    engine: &mut Engine,
+    config: &Config,
+    info: &omnarc_engine_host::ModelInfo,
+    gpu: Option<u32>,
+    gpu_layers: u32,
+) -> Result<Vec<ShardInfo>, omnarc_engine_host::Error> {
+    let backend = if gpu.is_none() && config.gpu > 0 { Backend::Cpu } else { config.backend };
+    let mut shards = Vec::new();
+    for window in &config.windows {
+        // the window's last gpu_layers layers on the GPU; all of them (0) when that is the whole window, and the
+        // output window goes along whole
+        let repeating = window.0.end.min(info.layer_count).saturating_sub(window.0.start);
+        let on = gpu.map(|index| omnarc_engine_host::Gpu {
+            index,
+            layers: if repeating == 0 || gpu_layers >= repeating { 0 } else { gpu_layers },
+        });
+        let opened = engine
+            .open_on(&config.model, window.0.clone(), backend, config.max_tokens, config.kv, on)
+            .and_then(|shard| {
+                if config.threads > 0 {
+                    engine.set_threads(shard.id, config.threads)?;
+                }
+                Ok(shard)
+            });
+        match opened {
+            Ok(shard) => {
+                let name = shard.backend.as_str_name().trim_start_matches("BACKEND_").to_lowercase();
+                eprintln!("omnarc: layers {window} loaded on {name}");
+                shards.push(shard);
+            }
+            Err(e) => {
+                for shard in &shards {
+                    let _ = engine.close(shard.id);
+                }
+                return Err(e);
+            }
+        }
+    }
+    Ok(shards)
+}
+
+/// The engine ran out of memory, or its backend failed to allocate: a GPU too full for what it was given.
+fn is_out_of_memory(e: &omnarc_engine_host::Error) -> bool {
+    use omnarc_engine_host::{Error, Status};
+    matches!(e, Error::Engine { status: Status::OutOfMemory | Status::Backend, .. })
 }
 
 /// Connects to the next node, retrying while it starts, and opens one link per window boundary that leads to it.
