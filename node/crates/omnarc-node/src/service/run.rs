@@ -736,13 +736,22 @@ pub fn shape(model: &Model, context: u32, kv: omnarc_engine_host::KvType) -> omn
     use omnarc_store::layers::Part;
     let layout = &model.layout;
     let mut per_layer = vec![0u64; layout.layers as usize];
-    // the header, the embedding, the output and what every window loads all stay with the head
+    // the head holds the header, the embedding and what every window loads; the output is its tail, which goes onto
+    // the GPU with any of the head's layers there — so the plan must count it there
     let mut head = layout.header.end - layout.header.start;
+    let mut tail = 0;
     for (part, range) in &layout.tensors {
         let bytes = range.end - range.start;
         match *part {
             Part::Layer(n) => per_layer[n as usize] += bytes,
-            _ => head += bytes,
+            Part::Output => tail += bytes,
+            // tied embeddings serve the input and the output: on a GPU the engine gives the output a copy. On the
+            // processor that counts them twice, which only errs on the side of memory.
+            Part::Embeddings => {
+                head += bytes;
+                tail += bytes;
+            }
+            Part::Input | Part::Shared => head += bytes,
         }
     }
     let header = &model.header;
@@ -763,7 +772,7 @@ pub fn shape(model: &Model, context: u32, kv: omnarc_engine_host::KvType) -> omn
         layer_bytes: per_layer.iter().copied().max().unwrap_or(0),
         kv_bytes_per_layer: kv_bytes,
         head_bytes: head,
-        tail_bytes: 0,
+        tail_bytes: tail,
     }
 }
 
