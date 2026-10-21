@@ -758,7 +758,9 @@ fn offers(shared: &Shared, shape: &omnarc_scheduler::Model) -> Vec<omnarc_schedu
                 return None;
             }
             #[allow(clippy::cast_precision_loss)]
-            let gpu = fastest_gpu(info).map(|(_, a)| omnarc_scheduler::Gpu {
+            // a device lends its GPU only while it offers anything: its memory offer falls to nothing outside the
+            // owner's hours, and the GPU's share was measured once, so it must follow (Q1)
+            let gpu = fastest_gpu(info).filter(|_| t.memory_offered_bytes > 0).map(|(_, a)| omnarc_scheduler::Gpu {
                 offered_bytes: a.memory_bytes.saturating_sub(GPU_RESERVE),
                 seconds_per_layer: shape.layer_bytes as f64 / (f64::from(a.measured_bandwidth_gbps) * 1e9),
                 shares_memory: a.shares_memory,

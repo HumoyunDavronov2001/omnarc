@@ -15,9 +15,9 @@ maketi dizayn konsepsiyasida bo'lsa — uning bo'lim raqami, bo'lmasa «—».
 
 | Qism | Ekranlar | Funksiyalar | ✓ tayyor | ◐ qisman | ○ boshlanmagan | Tayyorlik |
 |---|---|---|---|---|---|---|
-| Dvigatel | 0 | 30 | 8 | 2 | 20 | 30 % |
-| Tugun agenti va API | 0 | 40 | 9 | 10 | 21 | 35 % |
-| Panel | 24 | 7 | 3 | 7 | 21 | 21 % |
+| Dvigatel | 0 | 30 | 9 | 8 | 13 | 43 % |
+| Tugun agenti va API | 0 | 42 | 16 | 14 | 12 | 55 % |
+| Panel | 24 | 7 | 5 | 12 | 14 | 35 % |
 | Ish stoli ilovasi | 4 | 5 | 0 | 0 | 9 | 0 % |
 | Android ilovasi | 7 | 8 | 0 | 2 | 13 | 7 % |
 | iOS ilovasi | 8 | 6 | 0 | 2 | 12 | 7 % |
@@ -28,7 +28,7 @@ maketi dizayn konsepsiyasida bo'lsa — uning bo'lim raqami, bo'lmasa «—».
 | Orollar | 0 | 3 | 0 | 0 | 3 | 0 % |
 | O'lchovlar, saytlar va relizlar | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Dizayn tizimi va barcha ilovalardagi sifat | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **Jami** | **50** | **141** | **28** | **29** | **134** | **22 %** |
+| **Jami** | **50** | **143** | **38** | **44** | **111** | **31 %** |
 
 «Tayyorlik» ustunida qisman bajarilgan band yarim hisoblanadi. Bosqichlar bo'yicha — har bosqich nimani topshirishi
 kerak:
@@ -38,8 +38,8 @@ kerak:
 | B0 | 10 | 9 | 1 | 0 |
 | B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
-| B3 | 14 | 0 | 0 | 14 |
-| B4 | 18 | 0 | 0 | 18 |
+| B3 | 16 | 10 | 5 | 1 |
+| B4 | 18 | 0 | 10 | 8 |
 | B5 | 53 | 0 | 5 | 48 |
 | B6 | 23 | 0 | 0 | 23 |
 | B7 | 9 | 0 | 0 | 9 |
