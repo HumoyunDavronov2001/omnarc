@@ -156,6 +156,25 @@ fn a_network_larger_than_a_group_is_planned_within_a_second() {
     assert!(took.as_secs_f64() <= 1.0, "placing 200 devices took {took:?}");
 }
 
+#[test]
+fn throughput_balances_the_stages_latency_favors_the_fastest() {
+    let model = llama_8b();
+    // the fast device holds most of the model, the slower one the rest
+    let devices = [device(1, 5_000, 0.001), device(2, 3_500, 0.002)];
+    let slowest = |plan: &Placement<u32>| {
+        plan.stages
+            .iter()
+            .map(|s| f64::from(s.layers.end - s.layers.start) * if s.node == 1 { 0.001 } else { 0.002 })
+            .fold(0.0, f64::max)
+    };
+    let latency = place_for(&model, &devices, Objective::Latency).unwrap();
+    let throughput = place_for(&model, &devices, Objective::Throughput).unwrap();
+    assert_valid(&model, &devices, &latency);
+    assert_valid(&model, &devices, &throughput);
+    assert!(slowest(&throughput) < slowest(&latency), "{throughput:?} against {latency:?}");
+    assert!(latency.seconds_per_token <= throughput.seconds_per_token);
+}
+
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(64))]
 

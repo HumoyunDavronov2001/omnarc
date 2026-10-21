@@ -3,6 +3,7 @@
   import { Button, Card, Chip, EmptyState, Status } from '@omnarc/ui';
   import { api, cluster } from '$lib/cluster.svelte';
   import type { ModelInfo, RunModelResponse } from '$lib/gen/omnarc/v1/cluster_service_pb';
+  import { RunMode } from '$lib/gen/omnarc/v1/plan_pb';
   import { deviceName, formatSize, hex, planPart, ringPath } from '$lib/model';
 
   const view = $derived(cluster.view);
@@ -16,6 +17,8 @@
   let context = $state(4096);
   // the KV cache's element type (EN-16): 8 and 4 bits fit about two and three and a half times the context
   let kvCache = $state('f16');
+  // what the plan is chosen for (NO-45): one answer fast, or many people at once
+  let mode = $state(RunMode.LATENCY);
 
   async function load() {
     try {
@@ -37,7 +40,7 @@
     busy = model.blake3;
     failed = '';
     try {
-      const answer = await api.runModel({ model: model.blake3, context, dryRun, kvCache });
+      const answer = await api.runModel({ model: model.blake3, context, dryRun, kvCache, mode });
       preview = dryRun ? { model: model.blake3, answer } : null;
     } catch (e) {
       failed = message(e);
@@ -195,6 +198,13 @@
             {/each}
           </select>
           <span>longer contexts need more memory on every device</span>
+        </label>
+        <label class="flex flex-wrap items-center gap-3 text-13 text-text-2">
+          Plan for
+          <select class="h-9 rounded-lg border border-line-2 bg-surface-2 px-2 text-13 text-text-1" bind:value={mode}>
+            <option value={RunMode.LATENCY}>one answer as fast as it goes</option>
+            <option value={RunMode.THROUGHPUT}>many people at once</option>
+          </select>
         </label>
         <label class="flex flex-wrap items-center gap-3 text-13 text-text-2">
           KV cache

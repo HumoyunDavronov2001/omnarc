@@ -785,11 +785,12 @@ pub(super) async fn run_model(
         .ok_or_else(|| format!("unknown KV cache type {}: f16, q8_0 or q4_0", request.kv_cache))?;
     let shape = shape(&model, context, kv);
     let devices = offers(shared, &shape);
-    let placement = omnarc_scheduler::place(&shape, &devices)?;
+    let objective = objective(request.mode)?;
+    let placement = omnarc_scheduler::place_for(&shape, &devices, objective)?;
     let version = shared.plan.borrow().as_ref().map_or(0, |p| p.version) + 1;
     let me = shared.key.public();
     let mut plan = to_plan(version, &model, context, request.mode, kv, me, &placement);
-    plan.backups = omnarc_scheduler::backups(&shape, &devices, &placement)
+    plan.backups = omnarc_scheduler::backups_for(&shape, &devices, &placement, objective)
         .into_iter()
         .map(|(gone, backup)| v1::BackupPlan {
             gone: Some(node_id(gone)),
@@ -834,6 +835,18 @@ async fn pick(shared: &Shared, name: &str) -> Result<Model, BoxError> {
     }
 }
 
+/// What a run mode asks the placement for (NO-45).
+#[cfg(feature = "coordinator")]
+fn objective(mode: i32) -> Result<omnarc_scheduler::Objective, BoxError> {
+    match v1::RunMode::try_from(mode).unwrap_or(v1::RunMode::Unspecified) {
+        v1::RunMode::Throughput => Ok(omnarc_scheduler::Objective::Throughput),
+        v1::RunMode::Capacity => {
+            Err("capacity mode -- weights read from disk while the ring runs -- is not available yet".into())
+        }
+        v1::RunMode::Latency | v1::RunMode::Unspecified => Ok(omnarc_scheduler::Objective::Latency),
+    }
+}
+
 /// How often the device that started the model looks for a faster plan for it.
 #[cfg(feature = "coordinator")]
 const SUGGEST_EVERY: Duration = Duration::from_secs(15);
@@ -873,7 +886,7 @@ async fn better_plan(shared: &Shared) -> Option<v1::PlanSuggestion> {
     let model = shared.models.model(&hash).await.ok()?;
     let kv = omnarc_engine_host::KvType::from_name(&plan.kv_cache).unwrap_or_default();
     let shape = shape(&model, plan.context, kv);
-    let placement = omnarc_scheduler::place(&shape, &offers(shared, &shape)).ok()?;
+    let placement = omnarc_scheduler::place_for(&shape, &offers(shared, &shape), objective(plan.mode).ok()?).ok()?;
     #[allow(clippy::cast_possible_truncation)]
     let ms = (placement.seconds_per_token * 1e3) as f32;
     let candidate = to_plan(0, &model, plan.context, plan.mode, kv, shared.key.public(), &placement);

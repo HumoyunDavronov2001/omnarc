@@ -154,6 +154,25 @@ pub const TIME_LIMIT: Duration = Duration::from_millis(900);
 ///
 /// [`Error::DoesNotFit`] when no assignment stays within what the devices offer.
 pub fn place<K: Clone>(model: &Model, devices: &[Device<K>]) -> Result<Placement<K>, Error> {
+    place_for(model, devices, Objective::Latency)
+}
+
+/// What a plan is chosen for (NO-45).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Objective {
+    /// One request as fast as it goes: the least time a token takes around the ring.
+    #[default]
+    Latency,
+    /// Many requests at once: the ring is as fast as its slowest stage, so that one is made as quick as it can be.
+    Throughput,
+}
+
+/// [`place`] for `objective`.
+///
+/// # Errors
+///
+/// As [`place`].
+pub fn place_for<K: Clone>(model: &Model, devices: &[Device<K>], objective: Objective) -> Result<Placement<K>, Error> {
     let one_layer = model.layer_bytes + model.kv_bytes_per_layer;
     let (usable, small): (Vec<_>, Vec<_>) = devices.iter().partition(|d| d.offered_bytes >= one_layer);
     let mut left_out: Vec<_> = small.into_iter().map(|d| (d.id.clone(), LeftOut::TooSmall)).collect();
@@ -194,20 +213,20 @@ pub fn place<K: Clone>(model: &Model, devices: &[Device<K>]) -> Result<Placement
     let all_usable = usable.clone();
     let (usable, solved) = if usable.len() > GROUP {
         let small = group(model, &usable);
-        match split(model, &small) {
+        match split(model, &small, objective) {
             // the windows did not divide among the fewest that hold the model: the whole group is tried
             Err(Error::DoesNotFit { .. }) => {
                 let mut fastest = usable.clone();
                 fastest.sort_by(|a, b| a.seconds_per_layer.total_cmp(&b.seconds_per_layer));
                 fastest.truncate(GROUP);
                 fastest.sort_by_key(|d| usable.iter().position(|u| std::ptr::eq(*u, *d)));
-                let solved = split(model, &fastest);
+                let solved = split(model, &fastest, objective);
                 (fastest, solved)
             }
             solved => (small, solved),
         }
     } else {
-        let solved = split(model, &usable);
+        let solved = split(model, &usable, objective);
         (usable, solved)
     };
     let (windows, head, seconds) = solved.map_err(|e| match e {
@@ -254,15 +273,27 @@ pub fn place<K: Clone>(model: &Model, devices: &[Device<K>]) -> Result<Placement
 //
 //   minimise Σ w_i·t_i + Σ y_i·link_i: one token's compute plus every hop around the ring
 #[allow(clippy::cast_precision_loss)]
-fn split<K>(model: &Model, devices: &[&Device<K>]) -> Result<(Vec<u32>, usize, f64), Error> {
+fn split<K>(model: &Model, devices: &[&Device<K>], objective: Objective) -> Result<(Vec<u32>, usize, f64), Error> {
     let n = devices.len();
     let total = f64::from(model.layers);
     let per_layer = (model.layer_bytes + model.kv_bytes_per_layer) as f64;
     let ends = (model.head_bytes + model.tail_bytes) as f64;
     let mut pb = RowProblem::default();
-    let w: Vec<_> = devices.iter().map(|d| pb.add_integer_column(d.seconds_per_layer, 0.0..=total)).collect();
-    let y: Vec<_> = devices.iter().map(|d| pb.add_integer_column(d.link_seconds, 0.0..=1.0)).collect();
+    // latency counts every stage's time; throughput counts only the slowest stage's
+    let latency = objective == Objective::Latency;
+    let cost = |c: f64| if latency { c } else { 0.0 };
+    let w: Vec<_> = devices.iter().map(|d| pb.add_integer_column(cost(d.seconds_per_layer), 0.0..=total)).collect();
+    let y: Vec<_> = devices.iter().map(|d| pb.add_integer_column(cost(d.link_seconds), 0.0..=1.0)).collect();
     let f: Vec<_> = (0..n).map(|_| pb.add_integer_column(0.0, 0.0..=1.0)).collect();
+    if !latency {
+        let slowest = pb.add_column(1.0, 0.0..);
+        for i in 0..n {
+            pb.add_row(
+                0.0..,
+                [(slowest, 1.0), (w[i], -devices[i].seconds_per_layer), (y[i], -devices[i].link_seconds)],
+            );
+        }
+    }
 
     pb.add_row(total..=total, w.iter().map(|&c| (c, 1.0)).collect::<Vec<_>>());
     pb.add_row(1.0..=1.0, f.iter().map(|&c| (c, 1.0)).collect::<Vec<_>>());
@@ -294,7 +325,14 @@ fn split<K>(model: &Model, devices: &[&Device<K>]) -> Result<(Vec<u32>, usize, f
     if windows[head] == 0 {
         return Err(Error::NoPlan);
     }
-    Ok((windows, head, solved.objective_value()))
+    // what one token takes around the ring, whichever objective chose the plan
+    let seconds = devices
+        .iter()
+        .zip(&windows)
+        .filter(|(_, w)| **w > 0)
+        .map(|(d, &w)| f64::from(w) * d.seconds_per_layer + d.link_seconds)
+        .sum();
+    Ok((windows, head, seconds))
 }
 
 // A standby copy for every stage that some unused device can hold: each device stands by for at most one
@@ -329,12 +367,23 @@ pub fn backups<K: Clone + PartialEq>(
     devices: &[Device<K>],
     placement: &Placement<K>,
 ) -> Vec<(K, Placement<K>)> {
+    backups_for(model, devices, placement, Objective::Latency)
+}
+
+/// [`backups`] solved for `objective`, as the plan they stand in for was.
+#[must_use]
+pub fn backups_for<K: Clone + PartialEq>(
+    model: &Model,
+    devices: &[Device<K>],
+    placement: &Placement<K>,
+    objective: Objective,
+) -> Vec<(K, Placement<K>)> {
     placement
         .stages
         .iter()
         .filter_map(|stage| {
             let rest: Vec<_> = devices.iter().filter(|d| d.id != stage.node).cloned().collect();
-            place(model, &rest).ok().map(|plan| (stage.node.clone(), plan))
+            place_for(model, &rest, objective).ok().map(|plan| (stage.node.clone(), plan))
         })
         .collect()
 }
