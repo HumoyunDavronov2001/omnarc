@@ -37,6 +37,7 @@
     { href: '/devices', label: 'Devices', icon: 'devices' },
     { href: '/models', label: 'Models', icon: 'cube' },
     { href: '/chat', label: 'Chat', icon: 'chat' },
+    { href: '/observe', label: 'Observe', icon: 'observe' },
     { href: '/settings', label: 'Settings', icon: 'settings' },
   ];
 </script>
