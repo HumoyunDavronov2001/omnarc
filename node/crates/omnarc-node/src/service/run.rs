@@ -3,6 +3,8 @@
 //! Every member then carries out its own part: it fetches the bytes of its windows, loads them and takes its place in
 //! the ring. The head answers prompts, and a prompt asked anywhere in the cluster is passed on to it.
 
+#[cfg(feature = "coordinator")]
+use std::collections::HashSet;
 use std::ops::Range;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -906,13 +908,28 @@ pub(super) async fn stop_model(shared: &Arc<Shared>) -> Result<(), BoxError> {
 pub(super) async fn keep_running(shared: Arc<Shared>) {
     let Some(consensus) = shared.consensus.clone() else { return };
     let mut ticks = tokio::time::interval(Duration::from_secs(1));
+    let mut events = shared.events.subscribe();
     let mut since_spread = Duration::ZERO;
-    // a device just started has heard nobody yet: nobody has left before they had time to speak
+    // members that said they are leaving: they need not go quiet first, so their backup takes over at once
+    let mut leaving: HashSet<EndpointId> = HashSet::new();
+    // a device just started has heard nobody yet: nobody has gone quiet before they had time to speak
     let started = std::time::Instant::now();
     let grace = Duration::from_millis(2 * GONE_AFTER_MS.unsigned_abs());
     loop {
-        ticks.tick().await;
-        since_spread += Duration::from_secs(1);
+        tokio::select! {
+            _ = ticks.tick() => since_spread += Duration::from_secs(1),
+            event = events.recv() => match event {
+                Ok(super::Event::MemberLeft(id)) => {
+                    leaving.insert(id);
+                }
+                Ok(super::Event::Telemetry(id, _)) => {
+                    leaving.remove(&id);
+                    continue;
+                }
+                Err(tokio::sync::broadcast::error::RecvError::Closed) => return,
+                _ => continue,
+            },
+        }
         if !consensus.is_leader() {
             continue;
         }
@@ -921,13 +938,13 @@ pub(super) async fn keep_running(shared: Arc<Shared>) {
             since_spread = Duration::ZERO;
             super::spread_plan(&shared, &plan).await;
         }
-        if started.elapsed() < grace {
-            continue;
-        }
+        let settled = started.elapsed() >= grace;
         let now = crate::pairing::now_unix_ms();
         let quiet = |id: EndpointId| {
             let telemetry = shared.telemetry.lock().expect("telemetry");
-            !shared.members.contains(&id) || telemetry.get(&id).is_none_or(|t| now - t.unix_ms > GONE_AFTER_MS)
+            leaving.contains(&id)
+                || !shared.members.contains(&id)
+                || (settled && telemetry.get(&id).is_none_or(|t| now - t.unix_ms > GONE_AFTER_MS))
         };
         let gone = plan.stages.iter().filter_map(|s| endpoint_id(&key(s.node.as_ref()))).find(|id| quiet(*id));
         let Some(gone) = gone else { continue };

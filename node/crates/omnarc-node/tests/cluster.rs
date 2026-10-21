@@ -279,6 +279,7 @@ async fn when_a_device_of_the_ring_leaves_its_standby_takes_its_place() {
 
     // the device running the second window leaves: the cluster switches to the plan solved for it
     let gone = running.id();
+    let leaving = std::time::Instant::now();
     running.shutdown().await;
     eventually("the backup plan takes over", || {
         desktop
@@ -289,6 +290,10 @@ async fn when_a_device_of_the_ring_leaves_its_standby_takes_its_place() {
             .any(|p| p.version > plan.version && p.stages.iter().all(|s| key(&s.node) != gone.as_bytes().to_vec()))
     })
     .await;
+    // NO-43: a device that says it leaves is answered by the plan solved for it within a second
+    let took = leaving.elapsed();
+    eprintln!("the backup plan took over {took:?} after the device began to leave");
+    assert!(took <= Duration::from_secs(1), "the backup plan took {took:?}");
     eventually("the standby runs the window now", || serving(&standby, plan.version + 1)).await;
     assert_eq!(ask(&desktop).await, expected, "the answer is the same without the device that left");
 
