@@ -3,12 +3,10 @@
 //! Every member then carries out its own part: it fetches the bytes of its windows, loads them and takes its place in
 //! the ring. The head answers prompts, and a prompt asked anywhere in the cluster is passed on to it.
 
-#[cfg(feature = "coordinator")]
 use std::collections::HashSet;
 use std::ops::Range;
 use std::path::PathBuf;
 use std::sync::Arc;
-#[cfg(feature = "coordinator")]
 use std::time::Duration;
 
 use n0_future::boxed::BoxStream;
@@ -21,16 +19,15 @@ use omnarc_store::{Hash, Model, Window};
 use prost::Message;
 use tokio::sync::mpsc;
 
-use super::Shared;
 #[cfg(feature = "coordinator")]
-use super::{Command, node_id};
+use super::node_id;
+use super::{Command, Shared};
 use crate::ring::{self, BoxError, Head, Net};
 
 /// The protocol that carries a prompt to the head and the answer back.
 pub const ASK_ALPN: &[u8] = b"omnarc/ask/1";
 
 /// How often the computers' leader repeats the plan over gossip, for members that missed it.
-#[cfg(feature = "coordinator")]
 pub(super) const SPREAD_EVERY: Duration = Duration::from_secs(5);
 
 /// What each stage keeps aside for the engine's compute buffers, besides its windows.
@@ -40,7 +37,6 @@ pub const ENGINE_RESERVE: u64 = 192 << 20;
 pub const DEFAULT_CONTEXT: u32 = 4096;
 
 /// A member gone quiet this long, in milliseconds, has left as far as the plan is concerned (NO-43).
-#[cfg(feature = "coordinator")]
 const GONE_AFTER_MS: i64 = 5_000;
 
 /// What this device runs now.
@@ -920,9 +916,8 @@ pub(super) async fn stop_model(shared: &Arc<Shared>) -> Result<(), BoxError> {
     consensus.propose(Command::SetPlan(plan.encode_to_vec())).await
 }
 
-/// On the computers' leader: tells the phones the plan now and then, and when a device of the plan goes quiet,
+/// On the computers' leader -- whichever of them it is, coordinator or not: tells the phones the plan now and then, and when a device of the plan goes quiet,
 /// switches to the backup solved for its leaving (NO-43).
-#[cfg(feature = "coordinator")]
 pub(super) async fn keep_running(shared: Arc<Shared>) {
     let Some(consensus) = shared.consensus.clone() else { return };
     let mut ticks = tokio::time::interval(Duration::from_secs(1));

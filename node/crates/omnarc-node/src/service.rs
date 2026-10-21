@@ -154,7 +154,6 @@ fn spawn_tasks(
     if shared.consensus.is_some() {
         tasks.push(tokio::spawn(follow(Arc::clone(shared))));
         tasks.push(tokio::spawn(steward(Arc::clone(shared))));
-        #[cfg(feature = "coordinator")]
         tasks.push(tokio::spawn(run::keep_running(Arc::clone(shared))));
         #[cfg(feature = "coordinator")]
         tasks.push(tokio::spawn(run::suggest(Arc::clone(shared))));
