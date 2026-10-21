@@ -100,7 +100,10 @@ async fn a_ring_generates_what_one_device_generates() {
     );
 
     let worker_task = tokio::spawn(ring::serve(worker));
-    let report = ring::generate(head).await.unwrap();
+    let report = tokio::time::timeout(std::time::Duration::from_secs(120), ring::generate(head))
+        .await
+        .expect("the ring answers within two minutes")
+        .unwrap();
     worker_task.abort();
 
     let expected = tokio::task::spawn_blocking(move || generate_whole(&engine, &model, layers)).await.unwrap();
@@ -204,7 +207,10 @@ async fn a_replica_mirrors_the_frames_without_changing_the_answer() {
     let head_replica_task = tokio::spawn(ring::serve(head_replica));
     let replica_task = tokio::spawn(ring::serve(replica));
     let worker_task = tokio::spawn(ring::serve(worker));
-    let report = ring::generate(head).await.unwrap();
+    let report = tokio::time::timeout(std::time::Duration::from_secs(120), ring::generate(head))
+        .await
+        .expect("the ring answers within two minutes")
+        .unwrap();
     worker_task.abort();
     replica_task.abort();
     head_replica_task.abort();
@@ -305,7 +311,11 @@ async fn a_replica_takes_over_when_the_device_holding_a_window_leaves() {
     tokio::time::sleep(std::time::Duration::from_millis(350)).await;
     worker_task.abort();
 
-    let report = head_task.await.unwrap().unwrap();
+    let report = tokio::time::timeout(std::time::Duration::from_secs(120), head_task)
+        .await
+        .expect("the ring answers within two minutes")
+        .unwrap()
+        .unwrap();
     spare_task.abort();
 
     let expected = tokio::task::spawn_blocking(move || generate_whole(&engine, &model, layers)).await.unwrap();

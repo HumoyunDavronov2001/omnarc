@@ -380,6 +380,10 @@ async fn forward(
     Ok(())
 }
 
+/// How long the head waits for the ring to bring a step back: a long prompt chunk on a slow device takes a while,
+/// a ring that went silent takes forever.
+const STEP_PATIENCE: Duration = Duration::from_secs(300);
+
 /// The latest copy the replica confirmed holding: the request and the position after its last token.
 type Acks = watch::Receiver<(u64, u32)>;
 
@@ -740,7 +744,10 @@ impl Head {
         let mut drafts: Vec<i32> = Vec::new();
         loop {
             let message = tokio::select! {
-                message = inbox.recv() => message,
+                message = tokio::time::timeout(STEP_PATIENCE, inbox.recv()) => {
+                    // a ring that stopped answering without closing is an error, not a wait without end
+                    message.map_err(|_| format!("no answer from the ring for {} s", STEP_PATIENCE.as_secs()))?
+                }
                 () = closed(next.as_ref()) => {
                     // the device after this one has gone: its window goes to the replica, the steps it was working on
                     // are resent there, and the frames that come back now come from the replica (NO-43)
