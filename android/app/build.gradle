@@ -1,0 +1,35 @@
+plugins { id 'com.android.application'; id 'org.jetbrains.kotlin.android' }
+
+android {
+    namespace 'org.omnarc.app'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'org.omnarc.app'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName '0.1.0'
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
+    }
+    // the node and the engine are executables shipped as lib*.so: Android only lets an app run a file from its
+    // native library directory, and only when the libraries are extracted there rather than read from the APK
+    packaging { jniLibs { useLegacyPackaging = true } }
+    // the panel keeps its scripts in _app/: the default asset rules drop every directory that starts with _
+    androidResources { ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~' }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    kotlinOptions { jvmTarget = '17' }
+    buildFeatures { compose true }
+    composeOptions { kotlinCompilerExtensionVersion '1.5.14' }
+    // the colour, type and spacing tokens are built from design/tokens.json for every platform; the app uses them as is
+    sourceSets { main { java.srcDirs += '../../design/platforms' } }
+}
+
+dependencies {
+    implementation platform('androidx.compose:compose-bom:2024.06.00')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.foundation:foundation'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.activity:activity-compose:1.9.0'
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.2'
+}

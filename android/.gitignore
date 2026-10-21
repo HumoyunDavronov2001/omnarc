@@ -1,0 +1,7 @@
+# built from engine/ and node/ by build.sh, never committed
+app/src/main/jniLibs/
+app/src/main/assets/panel/
+.gradle/
+build/
+app/build/
+local.properties
