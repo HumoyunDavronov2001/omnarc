@@ -320,21 +320,36 @@ impl ModelStore {
             ranges.extend(model.layout.ranges(window).map_err(Error)?);
         }
         // the header and the shared tensors come with every window: each byte is written once
-        ranges.sort_by_key(|r| r.start);
-        let mut merged: Vec<std::ops::Range<u64>> = Vec::with_capacity(ranges.len());
-        for range in ranges {
-            match merged.last_mut() {
-                Some(last) if range.start <= last.end => last.end = last.end.max(range.end),
-                _ => merged.push(range),
-            }
-        }
-        let ranges = merged;
+        let merged = merge(ranges);
         let target_name = target.display().to_string();
-        let file = std::fs::File::create(target).map_err(|e| Error::new(&target_name, e))?;
-        // sparse before it grows, or Windows allocates the whole length; without sparse files the holes are written
-        let _ = sparse::make_sparse(&file);
+        // a file this model was exported to before keeps what it holds: only the bytes it lacks are written, so a new
+        // plan that moves a layer or two writes those and not the whole model again (9 GB took 8 minutes on a disk)
+        let written_list = target.with_extension("ranges");
+        let written = match std::fs::metadata(target) {
+            Ok(meta) if meta.len() == model.layout.file_len => read_ranges(&written_list),
+            _ => Vec::new(),
+        };
+        let wanted = merged;
+        let ranges = subtract(&wanted, &written);
+        if ranges.is_empty() {
+            return Ok(());
+        }
+        let fresh = written.is_empty();
+        let file = if fresh {
+            let _ = std::fs::remove_file(&written_list);
+            let file = create_unmapped(target).await.map_err(|e| Error::new(&target_name, e))?;
+            // sparse before it grows, or Windows allocates the whole length; without sparse files the holes are written
+            let _ = sparse::make_sparse(&file);
+            file
+        } else {
+            // neither truncated nor resized: Windows refuses both while the engine of the plan before still maps the
+            // file, and writes into it are what it allows
+            std::fs::OpenOptions::new().write(true).open(target).map_err(|e| Error::new(&target_name, e))?
+        };
         let mut file = tokio::fs::File::from_std(file);
-        file.set_len(model.layout.file_len).await.map_err(|e| Error::new(&target_name, e))?;
+        if fresh {
+            file.set_len(model.layout.file_len).await.map_err(|e| Error::new(&target_name, e))?;
+        }
         for range in ranges {
             // the store hands out 1 KiB leaves; they are gathered into large writes
             let mut buffer = Vec::with_capacity(WRITE_BYTES);
@@ -365,6 +380,15 @@ impl ModelStore {
             }
         }
         file.sync_all().await.map_err(|e| Error::new(&target_name, e))?;
+        // only once the bytes are on the disk does the list say so: an export cut short is written again
+        let mut held = written;
+        held.extend(wanted);
+        let list = merge(held).iter().fold(String::new(), |mut list, r| {
+            use std::fmt::Write as _;
+            let _ = writeln!(list, "{}-{}", r.start, r.end);
+            list
+        });
+        std::fs::write(&written_list, list).map_err(|e| Error::new(&written_list.display().to_string(), e))?;
         Ok(())
     }
 
@@ -372,6 +396,69 @@ impl ModelStore {
     pub async fn shutdown(&self) {
         let _ = self.store.shutdown().await;
     }
+}
+
+/// Creates (or truncates) `path`. On Windows a file another process still maps cannot be truncated: the engine of
+/// the plan before may take a moment to exit, so it is tried again for a while.
+async fn create_unmapped(path: &Path) -> std::io::Result<std::fs::File> {
+    /// `ERROR_USER_MAPPED_FILE`
+    const MAPPED: i32 = 1224;
+    let mut tries = 0;
+    loop {
+        match std::fs::File::create(path) {
+            Err(e) if e.raw_os_error() == Some(MAPPED) && tries < 60 => {
+                tries += 1;
+                tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+            }
+            result => return result,
+        }
+    }
+}
+
+/// The byte ranges a list written by [`ModelStore::export_windows`] names; none when it is missing or unreadable.
+fn read_ranges(path: &Path) -> Vec<Range<u64>> {
+    let Ok(text) = std::fs::read_to_string(path) else { return Vec::new() };
+    let parsed: Option<Vec<Range<u64>>> = text
+        .lines()
+        .filter(|l| !l.is_empty())
+        .map(|l| {
+            let (a, b) = l.split_once('-')?;
+            Some(a.parse().ok()?..b.parse().ok()?)
+        })
+        .collect();
+    merge(parsed.unwrap_or_default())
+}
+
+/// `ranges` sorted, with those that touch or overlap made one.
+fn merge(mut ranges: Vec<Range<u64>>) -> Vec<Range<u64>> {
+    ranges.retain(|r| r.start < r.end);
+    ranges.sort_by_key(|r| r.start);
+    let mut merged: Vec<Range<u64>> = Vec::with_capacity(ranges.len());
+    for range in ranges {
+        match merged.last_mut() {
+            Some(last) if range.start <= last.end => last.end = last.end.max(range.end),
+            _ => merged.push(range),
+        }
+    }
+    merged
+}
+
+/// The parts of `wanted` that `held` lacks; both sorted and merged.
+fn subtract(wanted: &[Range<u64>], held: &[Range<u64>]) -> Vec<Range<u64>> {
+    let mut out = Vec::new();
+    for w in wanted {
+        let mut at = w.start;
+        for h in held.iter().filter(|h| h.end > w.start && h.start < w.end) {
+            if h.start > at {
+                out.push(at..h.start);
+            }
+            at = at.max(h.end);
+        }
+        if at < w.end {
+            out.push(at..w.end);
+        }
+    }
+    out
 }
 
 /// The request for the chunks of `window`.
@@ -415,5 +502,19 @@ async fn read_header_from_file(path: &PathBuf) -> Result<Header> {
             }
             Err(e) => return Err(Error::new(&name, e)),
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::single_range_in_vec_init)]
+mod range_tests {
+    use super::{merge, subtract};
+
+    #[test]
+    fn only_what_is_not_held_is_written_again() {
+        assert_eq!(merge(vec![5..9, 0..3, 3..4, 8..12]), vec![0..4, 5..12]);
+        assert_eq!(subtract(&[0..10, 20..30], &[]), vec![0..10, 20..30]);
+        assert_eq!(subtract(&[0..10, 30..40], &[2..4, 6..20]), vec![0..2, 4..6, 30..40]);
+        assert_eq!(subtract(&[0..4, 8..12], &[0..12]), Vec::<std::ops::Range<u64>>::new());
     }
 }

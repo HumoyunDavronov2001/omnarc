@@ -520,17 +520,23 @@ async fn ask_remote(
     let (mut send, mut recv) = connection.open_bi().await?;
     write_frame(&mut send, 0, &request.encode_to_vec()).await?;
     send.finish()?;
+    let mut finished = false;
     while let Some((kind, bytes)) = read_frame(&mut recv).await? {
         if kind == 1 {
+            connection.close(0u32.into(), b"answered");
             return Err(String::from_utf8_lossy(&bytes).into_owned().into());
         }
         let step = v1::AskResponse::decode(bytes.as_slice())?;
-        let done = matches!(step.step, Some(v1::ask_response::Step::Done(_)));
-        if tx.send(Ok(step)).is_err() || done {
+        finished = matches!(step.step, Some(v1::ask_response::Step::Done(_)));
+        if tx.send(Ok(step)).is_err() || finished {
             break;
         }
     }
     connection.close(0u32.into(), b"answered");
+    // an answer that stops without its end is not an answer: the asker hears so rather than nothing
+    if !finished && !tx.is_closed() {
+        return Err(format!("the head {} stopped before the answer was done", id.fmt_short()).into());
+    }
     Ok(())
 }
 
@@ -612,6 +618,9 @@ async fn answer_here(
     let _ = tx.send(Ok(v1::AskResponse { step: Some(Step::Done(done)) }));
     Ok(())
 }
+
+/// How long a head keeps a connection open after telling an asker why it cannot answer, for the reason to arrive.
+const ANSWER_LINGER: Duration = Duration::from_secs(5);
 
 /// The most paths accuracy mode runs for one question.
 const MAX_PATHS: u32 = 8;
@@ -737,6 +746,8 @@ impl ProtocolHandler for AskHandler {
             Err(e) => {
                 let _ = write_frame(&mut send, 1, e.to_string().as_bytes()).await;
                 let _ = send.finish();
+                // the asker closes the connection once it has read why: dropping it now would lose the reason
+                let _ = tokio::time::timeout(ANSWER_LINGER, connection.closed()).await;
                 return Ok(());
             }
         };
