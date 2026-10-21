@@ -121,6 +121,30 @@ impl fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
+/// The most devices one placement solves at once (NO-41); larger networks are planned in groups of this size.
+pub const GROUP: usize = 64;
+
+// The group a large network is planned in: the fastest devices, as many as hold the model with room for the head,
+// and no more than GROUP.
+fn group<'a, K>(model: &Model, usable: &[&'a Device<K>]) -> Vec<&'a Device<K>> {
+    let mut by_speed = usable.to_vec();
+    by_speed.sort_by(|a, b| a.seconds_per_layer.total_cmp(&b.seconds_per_layer));
+    // room for every window plus the head's extras on any one of them, with a margin for layers that do not divide
+    let needed = model.whole_bytes() + (model.layer_bytes + model.kv_bytes_per_layer) * 2;
+    let mut held = 0;
+    let mut chosen = Vec::new();
+    for d in by_speed {
+        if chosen.len() == GROUP || (held >= needed && chosen.len() >= 2) {
+            break;
+        }
+        held += d.offered_bytes;
+        chosen.push(d);
+    }
+    // the ring keeps the order the devices came in
+    chosen.sort_by_key(|d| usable.iter().position(|u| std::ptr::eq(*u, *d)));
+    chosen
+}
+
 /// The time `HiGHS` may take for one plan (W6: a plan for 64 devices within a second).
 pub const TIME_LIMIT: Duration = Duration::from_millis(900);
 
@@ -165,7 +189,28 @@ pub fn place<K: Clone>(model: &Model, devices: &[Device<K>]) -> Result<Placement
         return Err(Error::DoesNotFit { needed: whole, offered: offered() });
     }
 
-    let (windows, head, seconds) = split(model, &usable).map_err(|e| match e {
+    // a larger network is planned in a group: the fastest devices that hold the model together, at most GROUP of
+    // them; the others stand by as replicas where a window fits them
+    let all_usable = usable.clone();
+    let (usable, solved) = if usable.len() > GROUP {
+        let small = group(model, &usable);
+        match split(model, &small) {
+            // the windows did not divide among the fewest that hold the model: the whole group is tried
+            Err(Error::DoesNotFit { .. }) => {
+                let mut fastest = usable.clone();
+                fastest.sort_by(|a, b| a.seconds_per_layer.total_cmp(&b.seconds_per_layer));
+                fastest.truncate(GROUP);
+                fastest.sort_by_key(|d| usable.iter().position(|u| std::ptr::eq(*u, *d)));
+                let solved = split(model, &fastest);
+                (fastest, solved)
+            }
+            solved => (small, solved),
+        }
+    } else {
+        let solved = split(model, &usable);
+        (usable, solved)
+    };
+    let (windows, head, seconds) = solved.map_err(|e| match e {
         Error::DoesNotFit { needed, .. } => Error::DoesNotFit { needed, offered: offered() },
         Error::NoPlan => Error::NoPlan,
     })?;
@@ -174,17 +219,23 @@ pub fn place<K: Clone>(model: &Model, devices: &[Device<K>]) -> Result<Placement
     // the ring order from the head on
     let n = usable.len();
     for (d, &w) in (0..n).map(|k| (usable[(head + k) % n], &windows[(head + k) % n])) {
-        if w == 0 {
-            left_out.push((d.id.clone(), LeftOut::NotNeeded));
-        } else {
+        if w > 0 {
             stages.push((d, start..start + w));
             start += w;
         }
     }
-    let replicas = replicas(model, &stages, &usable);
+    let standby = replicas(model, &stages, &all_usable);
+    // a device that neither computes nor stands by is not needed
+    for d in &all_usable {
+        let used =
+            stages.iter().any(|(s, _)| std::ptr::eq(*s, *d)) || standby.iter().any(|(r, _)| std::ptr::eq(*r, *d));
+        if !used {
+            left_out.push((d.id.clone(), LeftOut::NotNeeded));
+        }
+    }
     Ok(Placement {
         stages: stages.into_iter().map(|(d, layers)| Stage { node: d.id.clone(), layers }).collect(),
-        replicas,
+        replicas: standby.into_iter().map(|(d, layers)| Replica { node: d.id.clone(), layers }).collect(),
         left_out,
         seconds_per_token: seconds,
     })
@@ -248,8 +299,12 @@ fn split<K>(model: &Model, devices: &[&Device<K>]) -> Result<(Vec<u32>, usize, f
 
 // A standby copy for every stage that some unused device can hold: each device stands by for at most one
 // window, the largest window first, each taking the fastest spare device that can hold it.
-fn replicas<K: Clone>(model: &Model, stages: &[(&Device<K>, Range<u32>)], usable: &[&Device<K>]) -> Vec<Replica<K>> {
-    let mut spare: Vec<&Device<K>> =
+fn replicas<'a, K>(
+    model: &Model,
+    stages: &[(&Device<K>, Range<u32>)],
+    usable: &[&'a Device<K>],
+) -> Vec<(&'a Device<K>, Range<u32>)> {
+    let mut spare: Vec<&'a Device<K>> =
         usable.iter().copied().filter(|d| !stages.iter().any(|(s, _)| std::ptr::eq(*s, *d))).collect();
     spare.sort_by(|a, b| a.seconds_per_layer.total_cmp(&b.seconds_per_layer));
     let mut order: Vec<usize> = (0..stages.len()).collect();
@@ -259,11 +314,10 @@ fn replicas<K: Clone>(model: &Model, stages: &[(&Device<K>, Range<u32>)], usable
         let layers = &stages[i].1;
         let need = model.window_bytes(layers.end - layers.start, i == 0);
         if let Some(at) = spare.iter().position(|d| d.offered_bytes >= need) {
-            let d = spare.remove(at);
-            replicas.push(Replica { node: d.id.clone(), layers: layers.clone() });
+            replicas.push((spare.remove(at), layers.clone()));
         }
     }
-    replicas.sort_by_key(|r| r.layers.start);
+    replicas.sort_by_key(|(_, layers)| layers.start);
     replicas
 }
 

@@ -15,7 +15,7 @@ design concept (its section number), or "—".
 | Part | Screens | Functions | ✓ done | ◐ partly | ○ not started | Ready |
 |---|---|---|---|---|---|---|
 | Engine | 0 | 30 | 9 | 7 | 14 | 42 % |
-| Node agent and API | 0 | 42 | 13 | 17 | 12 | 51 % |
+| Node agent and API | 0 | 42 | 14 | 16 | 12 | 52 % |
 | Panel | 24 | 7 | 5 | 12 | 14 | 35 % |
 | Desktop app | 4 | 5 | 0 | 0 | 9 | 0 % |
 | Android app | 7 | 8 | 0 | 2 | 13 | 7 % |
@@ -27,7 +27,7 @@ design concept (its section number), or "—".
 | Islands | 0 | 3 | 0 | 0 | 3 | 0 % |
 | Benchmarks, sites and releases | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Design system and quality across all apps | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **All** | **50** | **143** | **35** | **46** | **112** | **30 %** |
+| **All** | **50** | **143** | **36** | **45** | **112** | **30 %** |
 
 "Ready" counts a partly done item as half. By stage — what each stage has to deliver:
 
@@ -36,7 +36,7 @@ design concept (its section number), or "—".
 | B0 | 10 | 9 | 1 | 0 |
 | B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
-| B3 | 16 | 7 | 8 | 1 |
+| B3 | 16 | 8 | 7 | 1 |
 | B4 | 18 | 0 | 9 | 9 |
 | B5 | 53 | 0 | 5 | 48 |
 | B6 | 23 | 0 | 0 | 23 |
@@ -142,7 +142,7 @@ design concept (its section number), or "—".
 | ID | What | Kind | Req | Stage | Design | State |
 |---|---|---|---|---|---|---|
 | NO-40 | Profiler: a 20-second benchmark of compute, memory bandwidth, disk and NPU when a device joins | function | R1 | B3 | — | ◐ |
-| NO-41 | Placement with HiGHS (≤ 1 s for 64 devices; larger networks in groups) | function | R1, W6 | B3 | 04 | ◐ |
+| NO-41 | Placement with HiGHS (≤ 1 s for 64 devices; larger networks in groups) | function | R1, W6 | B3 | 04 | ✓ |
 | NO-42 | Routing every request through the replicas (Parallax) | function | R1 | B3 | — | ◐ |
 | NO-43 | Devices join and leave while models run; a precomputed backup plan takes over within 1 s | function | R2, R3 | B3 | — | ◐ |
 | NO-51 | A device announces a budget (memory, cores or GPU share, hours) and the placement never exceeds it | function | Q1, Q7 | B3 | — | ◐ |

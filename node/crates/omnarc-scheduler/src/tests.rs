@@ -131,6 +131,31 @@ fn sixty_four_devices_are_placed_within_a_second() {
     assert!(took.as_secs_f64() <= 1.0, "placing 64 devices took {took:?}");
 }
 
+#[test]
+fn a_network_larger_than_a_group_is_planned_within_a_second() {
+    // Llama 3.1 70B on 200 devices of 2-6 GB: the fastest that hold it are planned, the rest stand by or wait
+    let model = Model {
+        layers: 80,
+        layer_bytes: 520 * MB,
+        kv_bytes_per_layer: 40 * MB,
+        head_bytes: 1_100 * MB,
+        tail_bytes: 1_100 * MB,
+    };
+    let devices: Vec<_> =
+        (0..200u32).map(|i| device(i, 2_000 + u64::from(i % 5) * 1_000, 0.002 + f64::from(i % 7) * 0.001)).collect();
+    let started = Instant::now();
+    let plan = place(&model, &devices).unwrap();
+    let took = started.elapsed();
+    assert_valid(&model, &devices, &plan);
+    assert!(plan.stages.len() <= GROUP);
+    assert_eq!(
+        plan.stages.len() + plan.replicas.len() + plan.left_out.len(),
+        devices.len(),
+        "every device is accounted for"
+    );
+    assert!(took.as_secs_f64() <= 1.0, "placing 200 devices took {took:?}");
+}
+
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(64))]
 
