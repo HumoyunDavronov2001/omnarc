@@ -14,9 +14,9 @@ design concept (its section number), or "—".
 <!-- count:begin — written by .github/scripts/spec_count.py from the tables below; do not edit by hand -->
 | Part | Screens | Functions | ✓ done | ◐ partly | ○ not started | Ready |
 |---|---|---|---|---|---|---|
-| Engine | 0 | 30 | 9 | 2 | 19 | 33 % |
-| Node agent and API | 0 | 40 | 9 | 10 | 21 | 35 % |
-| Panel | 24 | 7 | 3 | 7 | 21 | 21 % |
+| Engine | 0 | 30 | 9 | 5 | 16 | 38 % |
+| Node agent and API | 0 | 42 | 12 | 16 | 14 | 48 % |
+| Panel | 24 | 7 | 3 | 8 | 20 | 23 % |
 | Desktop app | 4 | 5 | 0 | 0 | 9 | 0 % |
 | Android app | 7 | 8 | 0 | 2 | 13 | 7 % |
 | iOS app | 8 | 6 | 0 | 2 | 12 | 7 % |
@@ -27,7 +27,7 @@ design concept (its section number), or "—".
 | Islands | 0 | 3 | 0 | 0 | 3 | 0 % |
 | Benchmarks, sites and releases | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Design system and quality across all apps | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **All** | **50** | **141** | **29** | **29** | **133** | **23 %** |
+| **All** | **50** | **143** | **32** | **39** | **122** | **27 %** |
 
 "Ready" counts a partly done item as half. By stage — what each stage has to deliver:
 
@@ -36,8 +36,8 @@ design concept (its section number), or "—".
 | B0 | 10 | 9 | 1 | 0 |
 | B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
-| B3 | 14 | 1 | 0 | 13 |
-| B4 | 18 | 0 | 0 | 18 |
+| B3 | 16 | 4 | 5 | 7 |
+| B4 | 18 | 0 | 5 | 13 |
 | B5 | 53 | 0 | 5 | 48 |
 | B6 | 23 | 0 | 0 | 23 |
 | B7 | 9 | 0 | 0 | 9 |
