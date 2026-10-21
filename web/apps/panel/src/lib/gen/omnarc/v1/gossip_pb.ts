@@ -8,6 +8,8 @@ import type { Member } from "./cluster_pb";
 import { file_omnarc_v1_cluster } from "./cluster_pb";
 import type { DeviceInfo, NodeId } from "./device_pb";
 import { file_omnarc_v1_device } from "./device_pb";
+import type { PlacementPlan } from "./plan_pb";
+import { file_omnarc_v1_plan } from "./plan_pb";
 import type { Telemetry } from "./telemetry_pb";
 import { file_omnarc_v1_telemetry } from "./telemetry_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -16,7 +18,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file omnarc/v1/gossip.proto.
  */
 export const file_omnarc_v1_gossip: GenFile = /*@__PURE__*/
-  fileDesc("ChZvbW5hcmMvdjEvZ29zc2lwLnByb3RvEglvbW5hcmMudjEiuQEKDUdvc3NpcFBheWxvYWQSKQoJdGVsZW1ldHJ5GAEgASgLMhQub21uYXJjLnYxLlRlbGVtZXRyeUgAEicKBmRldmljZRgCIAEoCzIVLm9tbmFyYy52MS5EZXZpY2VJbmZvSAASJwoFbGVhdmUYAyABKAsyFi5vbW5hcmMudjEuTGVhdmVOb3RpY2VIABIjCgZtZW1iZXIYBCABKAsyES5vbW5hcmMudjEuTWVtYmVySABCBgoEa2luZCINCgtMZWF2ZU5vdGljZSJmCgxTaWduZWRHb3NzaXASIQoGc2VuZGVyGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBIPCgd1bml4X21zGAIgASgDEg8KB3BheWxvYWQYAyABKAwSEQoJc2lnbmF0dXJlGAQgASgMYgZwcm90bzM", [file_omnarc_v1_cluster, file_omnarc_v1_device, file_omnarc_v1_telemetry]);
+  fileDesc("ChZvbW5hcmMvdjEvZ29zc2lwLnByb3RvEglvbW5hcmMudjEi4wEKDUdvc3NpcFBheWxvYWQSKQoJdGVsZW1ldHJ5GAEgASgLMhQub21uYXJjLnYxLlRlbGVtZXRyeUgAEicKBmRldmljZRgCIAEoCzIVLm9tbmFyYy52MS5EZXZpY2VJbmZvSAASJwoFbGVhdmUYAyABKAsyFi5vbW5hcmMudjEuTGVhdmVOb3RpY2VIABIjCgZtZW1iZXIYBCABKAsyES5vbW5hcmMudjEuTWVtYmVySAASKAoEcGxhbhgFIAEoCzIYLm9tbmFyYy52MS5QbGFjZW1lbnRQbGFuSABCBgoEa2luZCINCgtMZWF2ZU5vdGljZSJmCgxTaWduZWRHb3NzaXASIQoGc2VuZGVyGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBIPCgd1bml4X21zGAIgASgDEg8KB3BheWxvYWQYAyABKAwSEQoJc2lnbmF0dXJlGAQgASgMYgZwcm90bzM", [file_omnarc_v1_cluster, file_omnarc_v1_device, file_omnarc_v1_plan, file_omnarc_v1_telemetry]);
 
 /**
  * Everything a member says on the cluster's gossip topic (protocol/CLUSTER.md §3.1).
@@ -59,6 +61,14 @@ export type GossipPayload = Message<"omnarc.v1.GossipPayload"> & {
      */
     value: Member;
     case: "member";
+  } | {
+    /**
+     * The plan the cluster's computers agreed on, for the members that do not keep the log (phones, browsers).
+     *
+     * @generated from field: omnarc.v1.PlacementPlan plan = 5;
+     */
+    value: PlacementPlan;
+    case: "plan";
   } | { case: undefined; value?: undefined };
 };
 

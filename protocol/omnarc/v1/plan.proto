@@ -50,4 +50,15 @@ message PlacementPlan {
   RunMode mode = 3;
   repeated Stage stages = 4;
   repeated Replica replicas = 5;
+  // A member that holds the whole model file: the others fetch their windows from it.
+  NodeId source = 6;
+  // Context length the KV caches are sized for.
+  uint32 context = 7;
+  // The plan for each stage's device leaving, solved with this one, so a departure is answered at once (NO-43).
+  repeated BackupPlan backups = 8;
+}
+
+message BackupPlan {
+  NodeId gone = 1;
+  PlacementPlan plan = 2;
 }

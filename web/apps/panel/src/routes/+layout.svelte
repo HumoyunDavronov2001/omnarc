@@ -35,6 +35,8 @@
   const sections: { href: string; label: string; icon: IconName }[] = [
     { href: '/', label: 'Ring', icon: 'ring' },
     { href: '/devices', label: 'Devices', icon: 'devices' },
+    { href: '/models', label: 'Models', icon: 'cube' },
+    { href: '/chat', label: 'Chat', icon: 'chat' },
     { href: '/settings', label: 'Settings', icon: 'settings' },
   ];
 </script>

@@ -75,6 +75,8 @@ async fn a_ring_generates_what_one_device_generates() {
         max_tokens: 512,
         chunk: 8, // a prompt of several chunks
         wire: DType::F32,
+        threads: 0,
+        draft: 4,
         prompt,
         generate: GENERATE,
     };
@@ -148,6 +150,8 @@ async fn a_replica_mirrors_the_frames_without_changing_the_answer() {
         max_tokens: 512,
         chunk: 8,
         wire: DType::F32,
+        threads: 0,
+        draft: 4,
         prompt,
         generate: GENERATE,
     };
@@ -213,8 +217,7 @@ async fn a_replica_mirrors_the_frames_without_changing_the_answer() {
 /// EN-17, takes its place and the answer finishes without being computed again. A ring that broke here
 /// would either hang or give a different answer, so the assertion is the whole answer.
 #[tokio::test(flavor = "multi_thread", worker_threads = 6)]
-#[ignore = "NO-43 is half built: failover happens on a send that fails, but a head waiting for a frame \
-            sees the loss on the receive side, and accept_prev only accepts once per session"]
+#[cfg_attr(not(feature = "engine-tests"), ignore = "set OMNARC_ENGINE and OMNARC_TEST_MODEL")]
 async fn a_replica_takes_over_when_the_device_holding_a_window_leaves() {
     let engine = env_path("OMNARC_ENGINE");
     let model = env_path("OMNARC_TEST_MODEL");
@@ -249,6 +252,8 @@ async fn a_replica_takes_over_when_the_device_holding_a_window_leaves() {
             max_tokens: 512,
             chunk: 8,
             wire: DType::F32,
+            threads: 0,
+            draft: 4,
             prompt,
             generate: GENERATE,
         }

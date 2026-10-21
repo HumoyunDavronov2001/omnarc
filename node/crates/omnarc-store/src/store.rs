@@ -300,17 +300,42 @@ impl ModelStore {
     /// # Errors
     /// The store does not hold the whole window, or the file cannot be written.
     pub async fn export(&self, model: &Model, window: Window, target: &Path) -> Result<()> {
-        let missing = self.missing(model, window).await?;
-        if missing > 0 {
-            return Err(Error(format!("{missing} bytes of the layers {window} of {} are not here yet", model.name)));
+        self.export_windows(model, &[window], target).await
+    }
+
+    /// [`export`](Self::export) for several windows in one file: the head of a ring holds layer 0 and the output.
+    ///
+    /// # Errors
+    /// As [`export`](Self::export).
+    pub async fn export_windows(&self, model: &Model, windows: &[Window], target: &Path) -> Result<()> {
+        let mut ranges: Vec<std::ops::Range<u64>> = Vec::new();
+        for &window in windows {
+            let missing = self.missing(model, window).await?;
+            if missing > 0 {
+                return Err(Error(format!(
+                    "{missing} bytes of the layers {window} of {} are not here yet",
+                    model.name
+                )));
+            }
+            ranges.extend(model.layout.ranges(window).map_err(Error)?);
         }
+        // the header and the shared tensors come with every window: each byte is written once
+        ranges.sort_by_key(|r| r.start);
+        let mut merged: Vec<std::ops::Range<u64>> = Vec::with_capacity(ranges.len());
+        for range in ranges {
+            match merged.last_mut() {
+                Some(last) if range.start <= last.end => last.end = last.end.max(range.end),
+                _ => merged.push(range),
+            }
+        }
+        let ranges = merged;
         let target_name = target.display().to_string();
         let file = std::fs::File::create(target).map_err(|e| Error::new(&target_name, e))?;
         // sparse before it grows, or Windows allocates the whole length; without sparse files the holes are written
         let _ = sparse::make_sparse(&file);
         let mut file = tokio::fs::File::from_std(file);
         file.set_len(model.layout.file_len).await.map_err(|e| Error::new(&target_name, e))?;
-        for range in model.layout.ranges(window).map_err(Error)? {
+        for range in ranges {
             // the store hands out 1 KiB leaves; they are gathered into large writes
             let mut buffer = Vec::with_capacity(WRITE_BYTES);
             let mut at = range.start;

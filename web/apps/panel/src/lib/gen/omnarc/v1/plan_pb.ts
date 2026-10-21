@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file omnarc/v1/plan.proto.
  */
 export const file_omnarc_v1_plan: GenFile = /*@__PURE__*/
-  fileDesc("ChRvbW5hcmMvdjEvcGxhbi5wcm90bxIJb21uYXJjLnYxImcKCE1vZGVsUmVmEgwKBG5hbWUYASABKAkSFAoMcXVhbnRpemF0aW9uGAIgASgJEg4KBmJsYWtlMxgDIAEoDBITCgtsYXllcl9jb3VudBgEIAEoDRISCgpoaWRkZW5fZGltGAUgASgNIosBCgVTdGFnZRIfCgRub2RlGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBITCgtsYXllcl9iZWdpbhgCIAEoDRIRCglsYXllcl9lbmQYAyABKA0SIwoHYmFja2VuZBgEIAEoDjISLm9tbmFyYy52MS5CYWNrZW5kEhQKDHF1YW50aXphdGlvbhgFIAEoCSJSCgdSZXBsaWNhEh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEhMKC2xheWVyX2JlZ2luGAIgASgNEhEKCWxheWVyX2VuZBgDIAEoDSKuAQoNUGxhY2VtZW50UGxhbhIPCgd2ZXJzaW9uGAEgASgEEiIKBW1vZGVsGAIgASgLMhMub21uYXJjLnYxLk1vZGVsUmVmEiAKBG1vZGUYAyABKA4yEi5vbW5hcmMudjEuUnVuTW9kZRIgCgZzdGFnZXMYBCADKAsyEC5vbW5hcmMudjEuU3RhZ2USJAoIcmVwbGljYXMYBSADKAsyEi5vbW5hcmMudjEuUmVwbGljYSppCgdSdW5Nb2RlEhgKFFJVTl9NT0RFX1VOU1BFQ0lGSUVEEAASFAoQUlVOX01PREVfTEFURU5DWRABEhcKE1JVTl9NT0RFX1RIUk9VR0hQVVQQAhIVChFSVU5fTU9ERV9DQVBBQ0lUWRADYgZwcm90bzM", [file_omnarc_v1_device]);
+  fileDesc("ChRvbW5hcmMvdjEvcGxhbi5wcm90bxIJb21uYXJjLnYxImcKCE1vZGVsUmVmEgwKBG5hbWUYASABKAkSFAoMcXVhbnRpemF0aW9uGAIgASgJEg4KBmJsYWtlMxgDIAEoDBITCgtsYXllcl9jb3VudBgEIAEoDRISCgpoaWRkZW5fZGltGAUgASgNIosBCgVTdGFnZRIfCgRub2RlGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBITCgtsYXllcl9iZWdpbhgCIAEoDRIRCglsYXllcl9lbmQYAyABKA0SIwoHYmFja2VuZBgEIAEoDjISLm9tbmFyYy52MS5CYWNrZW5kEhQKDHF1YW50aXphdGlvbhgFIAEoCSJSCgdSZXBsaWNhEh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEhMKC2xheWVyX2JlZ2luGAIgASgNEhEKCWxheWVyX2VuZBgDIAEoDSKKAgoNUGxhY2VtZW50UGxhbhIPCgd2ZXJzaW9uGAEgASgEEiIKBW1vZGVsGAIgASgLMhMub21uYXJjLnYxLk1vZGVsUmVmEiAKBG1vZGUYAyABKA4yEi5vbW5hcmMudjEuUnVuTW9kZRIgCgZzdGFnZXMYBCADKAsyEC5vbW5hcmMudjEuU3RhZ2USJAoIcmVwbGljYXMYBSADKAsyEi5vbW5hcmMudjEuUmVwbGljYRIhCgZzb3VyY2UYBiABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB2NvbnRleHQYByABKA0SJgoHYmFja3VwcxgIIAMoCzIVLm9tbmFyYy52MS5CYWNrdXBQbGFuIlUKCkJhY2t1cFBsYW4SHwoEZ29uZRgBIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQSJgoEcGxhbhgCIAEoCzIYLm9tbmFyYy52MS5QbGFjZW1lbnRQbGFuKmkKB1J1bk1vZGUSGAoUUlVOX01PREVfVU5TUEVDSUZJRUQQABIUChBSVU5fTU9ERV9MQVRFTkNZEAESFwoTUlVOX01PREVfVEhST1VHSFBVVBACEhUKEVJVTl9NT0RFX0NBUEFDSVRZEANiBnByb3RvMw", [file_omnarc_v1_device]);
 
 /**
  * @generated from message omnarc.v1.ModelRef
@@ -159,6 +159,27 @@ export type PlacementPlan = Message<"omnarc.v1.PlacementPlan"> & {
    * @generated from field: repeated omnarc.v1.Replica replicas = 5;
    */
   replicas: Replica[];
+
+  /**
+   * A member that holds the whole model file: the others fetch their windows from it.
+   *
+   * @generated from field: omnarc.v1.NodeId source = 6;
+   */
+  source?: NodeId | undefined;
+
+  /**
+   * Context length the KV caches are sized for.
+   *
+   * @generated from field: uint32 context = 7;
+   */
+  context: number;
+
+  /**
+   * The plan for each stage's device leaving, solved with this one, so a departure is answered at once (NO-43).
+   *
+   * @generated from field: repeated omnarc.v1.BackupPlan backups = 8;
+   */
+  backups: BackupPlan[];
 };
 
 /**
@@ -167,6 +188,28 @@ export type PlacementPlan = Message<"omnarc.v1.PlacementPlan"> & {
  */
 export const PlacementPlanSchema: GenMessage<PlacementPlan> = /*@__PURE__*/
   messageDesc(file_omnarc_v1_plan, 3);
+
+/**
+ * @generated from message omnarc.v1.BackupPlan
+ */
+export type BackupPlan = Message<"omnarc.v1.BackupPlan"> & {
+  /**
+   * @generated from field: omnarc.v1.NodeId gone = 1;
+   */
+  gone?: NodeId | undefined;
+
+  /**
+   * @generated from field: omnarc.v1.PlacementPlan plan = 2;
+   */
+  plan?: PlacementPlan | undefined;
+};
+
+/**
+ * Describes the message omnarc.v1.BackupPlan.
+ * Use `create(BackupPlanSchema)` to create a new message.
+ */
+export const BackupPlanSchema: GenMessage<BackupPlan> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_plan, 4);
 
 /**
  * @generated from enum omnarc.v1.RunMode

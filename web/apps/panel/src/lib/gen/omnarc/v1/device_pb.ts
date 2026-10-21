@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file omnarc/v1/device.proto.
  */
 export const file_omnarc_v1_device: GenFile = /*@__PURE__*/
-  fileDesc("ChZvbW5hcmMvdjEvZGV2aWNlLnByb3RvEglvbW5hcmMudjEiJAoGTm9kZUlkEhoKEmVkMjU1MTlfcHVibGljX2tleRgBIAEoDCInCglDbHVzdGVySWQSGgoSZWQyNTUxOV9wdWJsaWNfa2V5GAEgASgMIrMBCgtBY2NlbGVyYXRvchIjCgdiYWNrZW5kGAEgASgOMhIub21uYXJjLnYxLkJhY2tlbmQSDAoEbmFtZRgCIAEoCRIUCgxtZW1vcnlfYnl0ZXMYAyABKAQSHAoUbWVhc3VyZWRfZnAxNl90ZmxvcHMYBCABKAISHwoXbWVhc3VyZWRfYmFuZHdpZHRoX2dicHMYBSABKAISHAoUYWNjdXJhY3lfZ2F0ZV9wYXNzZWQYBiABKAgiyQIKCkRldmljZUluZm8SHQoCaWQYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEgwKBG5hbWUYAiABKAkSJQoIcGxhdGZvcm0YAyABKA4yEy5vbW5hcmMudjEuUGxhdGZvcm0SEgoKb3NfdmVyc2lvbhgEIAEoCRIRCgljcHVfbW9kZWwYBSABKAkSEQoJY3B1X2NvcmVzGAYgASgNEhoKEm1lbW9yeV90b3RhbF9ieXRlcxgHIAEoBBIsCgxhY2NlbGVyYXRvcnMYCCADKAsyFi5vbW5hcmMudjEuQWNjZWxlcmF0b3ISHwoXbWVhc3VyZWRfZGlza19yZWFkX21icHMYCSABKAISFQoNYWdlbnRfdmVyc2lvbhgKIAEoCRIYChBkaXJlY3RfYWRkcmVzc2VzGAsgAygJEhEKCXJlbGF5X3VybBgMIAEoCSqgAQoIUGxhdGZvcm0SGAoUUExBVEZPUk1fVU5TUEVDSUZJRUQQABISCg5QTEFURk9STV9MSU5VWBABEhQKEFBMQVRGT1JNX1dJTkRPV1MQAhISCg5QTEFURk9STV9NQUNPUxADEhQKEFBMQVRGT1JNX0FORFJPSUQQBBIQCgxQTEFURk9STV9JT1MQBRIUChBQTEFURk9STV9CUk9XU0VSEAYqlQIKB0JhY2tlbmQSFwoTQkFDS0VORF9VTlNQRUNJRklFRBAAEg8KC0JBQ0tFTkRfQ1BVEAESEAoMQkFDS0VORF9DVURBEAISDwoLQkFDS0VORF9ISVAQAxISCg5CQUNLRU5EX1ZVTEtBThAEEhEKDUJBQ0tFTkRfTUVUQUwQBRISCg5CQUNLRU5EX09QRU5DTBAGEhMKD0JBQ0tFTkRfSEVYQUdPThAHEhAKDEJBQ0tFTkRfU1lDTBAIEhAKDEJBQ0tFTkRfQ0FOThAJEhIKDkJBQ0tFTkRfV0VCR1BVEAoSDwoLQkFDS0VORF9NTFgQCxIQCgxCQUNLRU5EX1ZMTE0QDBISCg5CQUNLRU5EX1NHTEFORxANYgZwcm90bzM");
+  fileDesc("ChZvbW5hcmMvdjEvZGV2aWNlLnByb3RvEglvbW5hcmMudjEiJAoGTm9kZUlkEhoKEmVkMjU1MTlfcHVibGljX2tleRgBIAEoDCInCglDbHVzdGVySWQSGgoSZWQyNTUxOV9wdWJsaWNfa2V5GAEgASgMIrMBCgtBY2NlbGVyYXRvchIjCgdiYWNrZW5kGAEgASgOMhIub21uYXJjLnYxLkJhY2tlbmQSDAoEbmFtZRgCIAEoCRIUCgxtZW1vcnlfYnl0ZXMYAyABKAQSHAoUbWVhc3VyZWRfZnAxNl90ZmxvcHMYBCABKAISHwoXbWVhc3VyZWRfYmFuZHdpZHRoX2dicHMYBSABKAISHAoUYWNjdXJhY3lfZ2F0ZV9wYXNzZWQYBiABKAgi7AIKCkRldmljZUluZm8SHQoCaWQYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEgwKBG5hbWUYAiABKAkSJQoIcGxhdGZvcm0YAyABKA4yEy5vbW5hcmMudjEuUGxhdGZvcm0SEgoKb3NfdmVyc2lvbhgEIAEoCRIRCgljcHVfbW9kZWwYBSABKAkSEQoJY3B1X2NvcmVzGAYgASgNEhoKEm1lbW9yeV90b3RhbF9ieXRlcxgHIAEoBBIsCgxhY2NlbGVyYXRvcnMYCCADKAsyFi5vbW5hcmMudjEuQWNjZWxlcmF0b3ISHwoXbWVhc3VyZWRfZGlza19yZWFkX21icHMYCSABKAISFQoNYWdlbnRfdmVyc2lvbhgKIAEoCRIYChBkaXJlY3RfYWRkcmVzc2VzGAsgAygJEhEKCXJlbGF5X3VybBgMIAEoCRIhCgZidWRnZXQYDSABKAsyES5vbW5hcmMudjEuQnVkZ2V0ImsKBkJ1ZGdldBIUCgxtZW1vcnlfYnl0ZXMYASABKAQSEQoJY3B1X2NvcmVzGAIgASgNEhEKCWdwdV9zaGFyZRgDIAEoAhIlCgVob3VycxgEIAMoCzIWLm9tbmFyYy52MS5Ib3Vyc1dpbmRvdyJJCgtIb3Vyc1dpbmRvdxIUCgxzdGFydF9taW51dGUYASABKA0SEgoKZW5kX21pbnV0ZRgCIAEoDRIQCgh3ZWVrZGF5cxgDIAEoDSqgAQoIUGxhdGZvcm0SGAoUUExBVEZPUk1fVU5TUEVDSUZJRUQQABISCg5QTEFURk9STV9MSU5VWBABEhQKEFBMQVRGT1JNX1dJTkRPV1MQAhISCg5QTEFURk9STV9NQUNPUxADEhQKEFBMQVRGT1JNX0FORFJPSUQQBBIQCgxQTEFURk9STV9JT1MQBRIUChBQTEFURk9STV9CUk9XU0VSEAYqlQIKB0JhY2tlbmQSFwoTQkFDS0VORF9VTlNQRUNJRklFRBAAEg8KC0JBQ0tFTkRfQ1BVEAESEAoMQkFDS0VORF9DVURBEAISDwoLQkFDS0VORF9ISVAQAxISCg5CQUNLRU5EX1ZVTEtBThAEEhEKDUJBQ0tFTkRfTUVUQUwQBRISCg5CQUNLRU5EX09QRU5DTBAGEhMKD0JBQ0tFTkRfSEVYQUdPThAHEhAKDEJBQ0tFTkRfU1lDTBAIEhAKDEJBQ0tFTkRfQ0FOThAJEhIKDkJBQ0tFTkRfV0VCR1BVEAoSDwoLQkFDS0VORF9NTFgQCxIQCgxCQUNLRU5EX1ZMTE0QDBISCg5CQUNLRU5EX1NHTEFORxANYgZwcm90bzM");
 
 /**
  * A device is identified by its Ed25519 public key (the iroh NodeId).
@@ -185,6 +185,13 @@ export type DeviceInfo = Message<"omnarc.v1.DeviceInfo"> & {
    * @generated from field: string relay_url = 12;
    */
   relayUrl: string;
+
+  /**
+   * What the owner offers the cluster (REQUIREMENTS Q1); the placement never uses more (NO-51).
+   *
+   * @generated from field: omnarc.v1.Budget budget = 13;
+   */
+  budget?: Budget | undefined;
 };
 
 /**
@@ -193,6 +200,81 @@ export type DeviceInfo = Message<"omnarc.v1.DeviceInfo"> & {
  */
 export const DeviceInfoSchema: GenMessage<DeviceInfo> = /*@__PURE__*/
   messageDesc(file_omnarc_v1_device, 3);
+
+/**
+ * What a device's owner lets Omnarc use. Unset limits mean all of it.
+ *
+ * @generated from message omnarc.v1.Budget
+ */
+export type Budget = Message<"omnarc.v1.Budget"> & {
+  /**
+   * Memory for weights and KV cache; 0: whatever the device can spare.
+   *
+   * @generated from field: uint64 memory_bytes = 1;
+   */
+  memoryBytes: bigint;
+
+  /**
+   * CPU cores Omnarc may keep busy; 0: all of them.
+   *
+   * @generated from field: uint32 cpu_cores = 2;
+   */
+  cpuCores: number;
+
+  /**
+   * Share of the GPU, 0..1; 0: all of it.
+   *
+   * @generated from field: float gpu_share = 3;
+   */
+  gpuShare: number;
+
+  /**
+   * When the device offers anything; empty: always.
+   *
+   * @generated from field: repeated omnarc.v1.HoursWindow hours = 4;
+   */
+  hours: HoursWindow[];
+};
+
+/**
+ * Describes the message omnarc.v1.Budget.
+ * Use `create(BudgetSchema)` to create a new message.
+ */
+export const BudgetSchema: GenMessage<Budget> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_device, 4);
+
+/**
+ * A daily window in local time, e.g. 19:00-08:00 (it may run past midnight).
+ *
+ * @generated from message omnarc.v1.HoursWindow
+ */
+export type HoursWindow = Message<"omnarc.v1.HoursWindow"> & {
+  /**
+   * Minutes after midnight.
+   *
+   * @generated from field: uint32 start_minute = 1;
+   */
+  startMinute: number;
+
+  /**
+   * @generated from field: uint32 end_minute = 2;
+   */
+  endMinute: number;
+
+  /**
+   * Days it applies to, bit 0 = Monday; 0: every day.
+   *
+   * @generated from field: uint32 weekdays = 3;
+   */
+  weekdays: number;
+};
+
+/**
+ * Describes the message omnarc.v1.HoursWindow.
+ * Use `create(HoursWindowSchema)` to create a new message.
+ */
+export const HoursWindowSchema: GenMessage<HoursWindow> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_device, 5);
 
 /**
  * @generated from enum omnarc.v1.Platform

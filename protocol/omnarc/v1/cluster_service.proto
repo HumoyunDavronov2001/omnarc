@@ -26,6 +26,16 @@ service ClusterService {
   // On a device that belongs to no cluster yet: joins one with a ticket. First come the four symbols to compare with
   // the inviting device's screen, then, once its owner confirms, the cluster's name.
   rpc JoinCluster(JoinClusterRequest) returns (stream JoinClusterResponse);
+  // What this device offers the cluster from now on (REQUIREMENTS Q1). Only this device's owner can change it.
+  rpc SetBudget(SetBudgetRequest) returns (SetBudgetResponse);
+  // Places a model on the cluster's devices within what each offers, and starts it (NO-41).
+  rpc RunModel(RunModelRequest) returns (RunModelResponse);
+  // Stops the model that runs, and frees what it took.
+  rpc StopModel(StopModelRequest) returns (StopModelResponse);
+  // Asks the running model; the answer streams back piece by piece, from whichever device holds the head.
+  rpc Ask(AskRequest) returns (stream AskResponse);
+  // The models this device holds, in whole or in part.
+  rpc ListModels(ListModelsRequest) returns (ListModelsResponse);
 }
 
 message ClusterSnapshot {
@@ -144,3 +154,85 @@ message UpdateClusterRequest {
 }
 
 message UpdateClusterResponse {}
+
+message SetBudgetRequest {
+  Budget budget = 1;
+}
+
+message SetBudgetResponse {}
+
+message RunModelRequest {
+  // A model in some member's store, by its BLAKE3 hash (hex) or its name; empty: the only one there is.
+  string model = 1;
+  RunMode mode = 2;
+  // Context length the KV cache is planned for; 0: 4096.
+  uint32 context = 3;
+  // Only answer "Will it fit?": the plan the model would get, without starting it.
+  bool dry_run = 4;
+}
+
+message RunModelResponse {
+  PlacementPlan plan = 1;
+  // The devices the plan leaves out, and why.
+  repeated LeftOutDevice left_out = 2;
+  // What the plan expects one token to take, in milliseconds.
+  float estimated_ms_per_token = 3;
+}
+
+message LeftOutDevice {
+  NodeId node = 1;
+  // "too_small": it offers less than one layer needs; "not_needed": the model runs faster without it.
+  string reason = 2;
+}
+
+message ListModelsRequest {}
+
+message ListModelsResponse {
+  repeated ModelInfo models = 1;
+}
+
+message ModelInfo {
+  string name = 1;
+  // BLAKE3 hash of the GGUF file, hex.
+  string blake3 = 2;
+  uint64 file_bytes = 3;
+  uint32 layer_count = 4;
+  // Whether every byte of the file is on this device: only then can it start the model.
+  bool complete = 5;
+}
+
+message StopModelRequest {}
+
+message StopModelResponse {}
+
+message AskRequest {
+  string prompt = 1;
+  // At most this many tokens; 0: 256.
+  uint32 max_tokens = 2;
+  // Accuracy mode (EN-23): the question is answered this many times, on the model's whole copies where there are
+  // several, and the answer most of them agree on is the one given; 0 or 1: one answer.
+  uint32 paths = 3;
+  // Sampling temperature; 0: greedy. Accuracy mode samples each path, at 0.7 when this is 0.
+  float temperature = 4;
+  // The sampler's seed, so the paths of accuracy mode differ.
+  uint64 seed = 5;
+}
+
+message AskResponse {
+  oneof step {
+    // The next piece of the answer.
+    string piece = 1;
+    AskDone done = 2;
+  }
+}
+
+message AskDone {
+  uint32 prompt_tokens = 1;
+  uint32 generated_tokens = 2;
+  // Time to the first token and mean time per token after it, in milliseconds.
+  float ttft_ms = 3;
+  float tpot_ms = 4;
+  // In accuracy mode: the paths answered, and how many of them gave the answer chosen.
+  uint32 paths = 5;
+  uint32 agreed = 6;
+}

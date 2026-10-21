@@ -2,6 +2,7 @@
 
 import type { RingMarker } from '@omnarc/ui';
 import type { ClusterSnapshot, JoinAttempt, WatchClusterResponse } from './gen/omnarc/v1/cluster_service_pb';
+import type { PlacementPlan } from './gen/omnarc/v1/plan_pb';
 import { Backend, Platform, type DeviceInfo, type NodeId } from './gen/omnarc/v1/device_pb';
 import { LinkKind, ThermalState, type LinkSample, type PowerState, type Telemetry } from './gen/omnarc/v1/telemetry_pb';
 
@@ -26,6 +27,8 @@ export interface ClusterView {
   seen: Record<string, number>;
   /** A device that asks to join and waits for the owner. */
   joinAttempt: JoinAttempt | null;
+  /** The model the cluster runs and where; null while none runs. */
+  plan: PlacementPlan | null;
 }
 
 export function emptyView(): ClusterView {
@@ -40,6 +43,7 @@ export function emptyView(): ClusterView {
     heard: {},
     seen: {},
     joinAttempt: null,
+    plan: null,
   };
 }
 
@@ -59,6 +63,7 @@ export function fromSnapshot(snapshot: ClusterSnapshot, now: number): ClusterVie
   view.thisNode = hex(snapshot.thisNode);
   view.canInvite = snapshot.canInvite;
   view.relays = [...snapshot.relays];
+  view.plan = snapshot.plans.find((plan) => plan.stages.length > 0) ?? null;
   for (const device of snapshot.devices) view.devices[hex(device.id)] = device;
   for (const telemetry of snapshot.telemetry) {
     const id = hex(telemetry.node);
@@ -107,6 +112,10 @@ export function apply(view: ClusterView, response: WatchClusterResponse, now: nu
     case 'joinAttempt':
       view.joinAttempt = event.value;
       break;
+    case 'planChanged':
+      // a plan without stages: the model stopped
+      if (!view.plan || event.value.version > view.plan.version) view.plan = event.value.stages.length ? event.value : null;
+      break;
     default:
       break;
   }
@@ -119,6 +128,12 @@ export function isOnline(view: ClusterView, id: string, now: number): boolean {
 
 export function gib(bytes: bigint | number): number {
   return Number(bytes) / 2 ** 30;
+}
+
+/** A size in the unit that reads best: MB below a GiB. */
+export function formatSize(bytes: bigint | number): string {
+  const n = Number(bytes);
+  return n < 2 ** 30 ? `${Math.max(1, Math.round(n / 2 ** 20))} MB` : formatGib(bytes);
 }
 
 export function formatGib(bytes: bigint | number): string {
@@ -281,4 +296,35 @@ export function formatAgo(seconds: number): string {
   if (seconds < 86_400) return `${Math.floor(seconds / 3_600)} h ago`;
   const days = Math.floor(seconds / 86_400);
   return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+}
+
+/** What a device does in the plan: the layers it runs, or the window it stands by for. */
+export interface PlanPart {
+  role: 'head' | 'stage' | 'replica';
+  begin: number;
+  end: number;
+}
+
+export function planPart(plan: PlacementPlan | null, id: string): PlanPart | null {
+  if (!plan) return null;
+  const index = plan.stages.findIndex((stage) => hex(stage.node) === id);
+  if (index >= 0) {
+    const stage = plan.stages[index];
+    return { role: index === 0 ? 'head' : 'stage', begin: stage.layerBegin, end: stage.layerEnd };
+  }
+  const replica = plan.replicas.find((r) => hex(r.node) === id);
+  return replica ? { role: 'replica', begin: replica.layerBegin, end: replica.layerEnd } : null;
+}
+
+/** "layers 0–15 · head", for a device's line. */
+export function describePart(part: PlanPart): string {
+  const layers = `layers ${part.begin}–${part.end - 1}`;
+  return part.role === 'head' ? `${layers} · answers` : part.role === 'replica' ? `stands by for ${layers}` : layers;
+}
+
+/** The path one token takes: the devices of the plan in ring order, back to the head. */
+export function ringPath(view: ClusterView): string[] {
+  if (!view.plan) return [];
+  const names = view.plan.stages.map((stage) => deviceName(view, hex(stage.node)));
+  return names.length > 1 ? [...names, names[0]] : names;
 }

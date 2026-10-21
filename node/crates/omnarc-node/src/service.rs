@@ -10,6 +10,7 @@
 use std::collections::{HashMap, HashSet};
 use std::net::SocketAddr;
 use std::path::PathBuf;
+use std::sync::atomic::Ordering;
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
@@ -27,6 +28,7 @@ use omnarc_network::ticket::Ticket;
 use omnarc_network::{Connection, Endpoint, EndpointAddr, EndpointId, MemoryLookup, Router, SecretKey, TransportAddr};
 use omnarc_protocol::v1;
 use omnarc_store::{BLOBS_ALPN, Hash, Model, ModelStore, Window};
+use prost::Message as _;
 use tokio::sync::{broadcast, oneshot};
 
 use crate::consensus::network::RAFT_ALPN;
@@ -34,6 +36,12 @@ use crate::consensus::{Agreed, Command, Consensus};
 use crate::pairing::now_unix_ms;
 use crate::ring::BoxError;
 use crate::state::{Cluster, Member, Store};
+
+mod run;
+
+#[cfg(feature = "coordinator")]
+pub use run::shape;
+pub use run::{ASK_ALPN, DEFAULT_CONTEXT, ENGINE_RESERVE, Role, role};
 
 /// What the service reports as it happens.
 #[derive(Clone, Debug)]
@@ -52,6 +60,8 @@ pub enum Event {
     MemberRemoved(EndpointId),
     /// The cluster was renamed or its relays changed.
     ClusterChanged,
+    /// The cluster runs another plan, or stopped its model (a plan without stages).
+    PlanChanged(v1::PlacementPlan),
     /// A device asks to join and waits for the owner to compare the symbols: answer with [`Service::answer_join`].
     JoinAttempt(JoinAttempt),
 }
@@ -107,7 +117,66 @@ struct Shared {
     removing: Mutex<HashSet<EndpointId>>,
     // the cluster's name as the cluster last agreed on it
     name: Mutex<String>,
+    data: PathBuf,
+    // what the owner offers (Q1); none until the owner names it
+    budget: Mutex<Option<v1::Budget>>,
+    // the plan the cluster runs, as this device last heard it
+    plan: tokio::sync::watch::Sender<Option<v1::PlacementPlan>>,
+    // what this device runs of it
+    running: tokio::sync::Mutex<run::Running>,
+    // where the tensor connections members open go: the ring this device serves, if any
+    tensors: Mutex<Option<tokio::sync::mpsc::Sender<Connection>>>,
+    // this device's windows in the plan, for its telemetry
+    stages: Mutex<Vec<v1::StageLoad>>,
 }
+
+// What the service keeps doing while it runs.
+fn spawn_tasks(
+    shared: &Arc<Shared>,
+    receiver: GossipReceiver,
+    device: v1::DeviceInfo,
+    every: Duration,
+    lan: Option<omnarc_network::MdnsAddressLookup>,
+) -> Vec<tokio::task::JoinHandle<()>> {
+    let mut tasks = vec![
+        tokio::spawn(listen(Arc::clone(shared), receiver)),
+        tokio::spawn(speak(Arc::clone(shared), device, every)),
+        tokio::spawn(measure(Arc::clone(shared), every)),
+        tokio::spawn(run::carry_out(Arc::clone(shared))),
+    ];
+    if let Some(lan) = lan {
+        tasks.push(tokio::spawn(discover(Arc::clone(shared), lan)));
+    }
+    if shared.consensus.is_some() {
+        tasks.push(tokio::spawn(follow(Arc::clone(shared))));
+        tasks.push(tokio::spawn(steward(Arc::clone(shared))));
+        #[cfg(feature = "coordinator")]
+        tasks.push(tokio::spawn(run::keep_running(Arc::clone(shared))));
+    }
+    tasks
+}
+
+// The device with what the profiler measured within what the owner offers, on as many cores as are offered (NO-40).
+async fn profiled(mut device: v1::DeviceInfo, budget: Option<&v1::Budget>) -> v1::DeviceInfo {
+    let cores = crate::budget::offered_cores(budget, device.cpu_cores);
+    let profile = tokio::task::spawn_blocking(move || crate::profile::measure(cores, PROFILE_TIME))
+        .await
+        .unwrap_or(crate::profile::Profile { bandwidth_bytes_per_s: 0.0, flops: 0.0 });
+    device.accelerators.retain(|a| a.backend != v1::Backend::Cpu as i32);
+    #[allow(clippy::cast_possible_truncation)]
+    device.accelerators.push(v1::Accelerator {
+        backend: v1::Backend::Cpu as i32,
+        name: device.cpu_model.clone(),
+        memory_bytes: crate::budget::offered_memory_now(budget, device.memory_total_bytes),
+        measured_fp16_tflops: (profile.flops / 1e12) as f32,
+        measured_bandwidth_gbps: (profile.bandwidth_bytes_per_s / 1e9) as f32,
+        accuracy_gate_passed: false,
+    });
+    device
+}
+
+/// How long the profiler measures this device when the service starts.
+const PROFILE_TIME: Duration = Duration::from_secs(2);
 
 /// Telemetry ticks between two announcements of the device even when nothing changed.
 const ANNOUNCE_EVERY: u32 = 60;
@@ -154,13 +223,17 @@ impl Service {
         }
 
         let models = crate::models::open(&config.data).await?;
+        let budget = crate::budget::load(&config.data);
+        let mut device = profiled(config.device, budget.as_ref()).await;
         // a network without multicast only loses the local discovery
         let lan = if config.lan { omnarc_network::lan_lookup(key.public()).ok() } else { None };
         let endpoint =
             omnarc_network::bind_cluster(key.clone(), config.listen, lookup.clone(), lan.clone(), &relays).await?;
         let gossip = Gossip::builder().spawn(endpoint.clone());
         let joins = JoinHandler(Arc::new(OnceLock::new()));
-        let raft = if keeps_raft(config.device.platform) {
+        let tensors = run::TensorHandler(Arc::new(OnceLock::new()));
+        let asks = run::AskHandler(Arc::new(OnceLock::new()));
+        let raft = if keeps_raft(device.platform) {
             Some(Consensus::start(&config.data, endpoint.clone()).await?)
         } else {
             None
@@ -169,7 +242,9 @@ impl Service {
             .accept(GOSSIP_ALPN, MembersOnly::new(gossip.clone(), members.clone()))
             .accept(JOIN_ALPN, joins.clone())
             .accept(BLOBS_ALPN, MembersOnly::new(models.protocol(), members.clone()))
-            .accept(PROBE_ALPN, MembersOnly::new(ProbeHandler, members.clone()));
+            .accept(PROBE_ALPN, MembersOnly::new(ProbeHandler, members.clone()))
+            .accept(omnarc_network::TENSOR_ALPN, MembersOnly::new(tensors.clone(), members.clone()))
+            .accept(ASK_ALPN, MembersOnly::new(asks.clone(), members.clone()));
         let consensus = match raft {
             Some((consensus, handler)) => {
                 router = router.accept(RAFT_ALPN, MembersOnly::new(handler, members.clone()));
@@ -211,29 +286,25 @@ impl Service {
             name,
             consensus,
             removing: Mutex::default(),
+            data: config.data.clone(),
+            budget: Mutex::new(budget),
+            plan: tokio::sync::watch::Sender::new(None),
+            running: tokio::sync::Mutex::default(),
+            tensors: Mutex::default(),
+            stages: Mutex::default(),
         });
         joins.0.set(Arc::clone(&shared)).expect("set once");
+        tensors.0.set(Arc::clone(&shared)).expect("set once");
+        asks.0.set(Arc::clone(&shared)).expect("set once");
 
         // the name the owner gave this device when it joined or created the cluster stays its name
-        let mut device = config.device;
         if let Some(me) = known.iter().find(|member| member.id == shared.key.public())
             && !me.device.name.is_empty()
         {
             device.name.clone_from(&me.device.name);
         }
         device.id = Some(node_id(shared.key.public()));
-        let mut tasks = vec![
-            tokio::spawn(listen(Arc::clone(&shared), receiver)),
-            tokio::spawn(speak(Arc::clone(&shared), device, config.telemetry_every)),
-            tokio::spawn(measure(Arc::clone(&shared), config.telemetry_every)),
-        ];
-        if let Some(lan) = lan {
-            tasks.push(tokio::spawn(discover(Arc::clone(&shared), lan)));
-        }
-        if shared.consensus.is_some() {
-            tasks.push(tokio::spawn(follow(Arc::clone(&shared))));
-            tasks.push(tokio::spawn(steward(Arc::clone(&shared))));
-        }
+        let tasks = spawn_tasks(&shared, receiver, device, config.telemetry_every, lan);
         Ok(Self { shared, router, tasks })
     }
 
@@ -457,7 +528,7 @@ impl omnarc_api::Cluster for ApiView {
             name: shared.name.lock().expect("name").clone(),
             devices: shared.members.list().into_iter().map(|id| self.device(id)).collect(),
             telemetry: shared.telemetry.lock().expect("telemetry").values().cloned().collect(),
-            plans: vec![],
+            plans: shared.plan.borrow().clone().filter(|p| !p.stages.is_empty()).into_iter().collect(),
             this_node: Some(node_id(shared.key.public())),
             can_invite: shared.cluster_key.is_some(),
             relays: relay::parse_all(&shared.store.relays().unwrap_or_default())
@@ -481,6 +552,7 @@ impl omnarc_api::Cluster for ApiView {
                     Ok(Event::MemberLeft(id)) => Out::DeviceLeft(node_id(id)),
                     Ok(Event::MemberRemoved(id)) => Out::DeviceRemoved(node_id(id)),
                     Ok(Event::ClusterChanged) => Out::Snapshot(view.snapshot()),
+                    Ok(Event::PlanChanged(plan)) => Out::PlanChanged(plan),
                     Ok(Event::JoinAttempt(attempt)) => Out::JoinAttempt(v1::JoinAttempt {
                         joiner: Some(node_id(attempt.joiner)),
                         device: Some(attempt.device),
@@ -574,6 +646,128 @@ impl omnarc_api::Cluster for ApiView {
             })
         })
     }
+    fn set_budget(&self, budget: v1::Budget) -> Result<(), omnarc_api::Error> {
+        use omnarc_api::{Code, Error};
+        crate::budget::save(&self.0.data, &budget).map_err(|e| Error::new(Code::InvalidArgument, e.to_string()))?;
+        *self.0.budget.lock().expect("budget") = Some(budget);
+        // the cluster hears of it with the next announcement, which goes out now
+        self.0.announce.notify_one();
+        Ok(())
+    }
+
+    fn run_model(
+        &self,
+        request: v1::RunModelRequest,
+    ) -> n0_future::boxed::BoxFuture<Result<v1::RunModelResponse, omnarc_api::Error>> {
+        let shared = Arc::clone(&self.0);
+        Box::pin(async move {
+            #[cfg(feature = "coordinator")]
+            {
+                run::run_model(&shared, request)
+                    .await
+                    .map_err(|e| omnarc_api::Error::new(omnarc_api::Code::FailedPrecondition, e.to_string()))
+            }
+            #[cfg(not(feature = "coordinator"))]
+            {
+                let _ = (shared, request);
+                Err(omnarc_api::Error::new(
+                    omnarc_api::Code::FailedPrecondition,
+                    "this device follows the cluster's plan: start a model from one of its computers",
+                ))
+            }
+        })
+    }
+
+    fn stop_model(&self) -> n0_future::boxed::BoxFuture<Result<(), omnarc_api::Error>> {
+        let shared = Arc::clone(&self.0);
+        Box::pin(async move {
+            #[cfg(feature = "coordinator")]
+            {
+                run::stop_model(&shared)
+                    .await
+                    .map_err(|e| omnarc_api::Error::new(omnarc_api::Code::FailedPrecondition, e.to_string()))
+            }
+            #[cfg(not(feature = "coordinator"))]
+            {
+                let _ = shared;
+                Err(omnarc_api::Error::new(
+                    omnarc_api::Code::FailedPrecondition,
+                    "this device follows the cluster's plan: stop the model from one of its computers",
+                ))
+            }
+        })
+    }
+
+    fn metrics(&self) -> String {
+        use std::fmt::Write as _;
+        let shared = &self.0;
+        let me = shared.key.public();
+        let telemetry = shared.telemetry.lock().expect("telemetry").get(&me).cloned().unwrap_or_default();
+        let plan = shared.plan.borrow().clone().unwrap_or_default();
+        let mut out = String::new();
+        let mut gauge = |name: &str, help: &str, kind: &str, value: f64| {
+            let _ = writeln!(out, "# HELP omnarc_{name} {help}\n# TYPE omnarc_{name} {kind}\nomnarc_{name} {value}");
+        };
+        #[allow(clippy::cast_precision_loss)]
+        {
+            gauge(
+                "tokens_computed_total",
+                "Tokens this device's windows computed since the service started.",
+                "counter",
+                crate::ring::TOKENS_COMPUTED.load(Ordering::Relaxed) as f64,
+            );
+            gauge(
+                "compute_seconds_total",
+                "Time this device's windows spent computing.",
+                "counter",
+                crate::ring::MICROS_COMPUTING.load(Ordering::Relaxed) as f64 / 1e6,
+            );
+            gauge("members", "Devices in the cluster.", "gauge", shared.members.list().len() as f64);
+            gauge("plan_version", "The version of the plan this device runs.", "gauge", plan.version as f64);
+            gauge(
+                "plan_stages",
+                "Devices computing the running model; 0 when none runs.",
+                "gauge",
+                plan.stages.len() as f64,
+            );
+            gauge(
+                "memory_offered_bytes",
+                "Memory this device offers the cluster now.",
+                "gauge",
+                telemetry.memory_offered_bytes as f64,
+            );
+            gauge("memory_used_bytes", "Memory in use on this device.", "gauge", telemetry.memory_used_bytes as f64);
+            gauge("cpu_load", "This device's CPU load, 0 to 1.", "gauge", f64::from(telemetry.cpu_load));
+        }
+        out
+    }
+
+    fn list_models(&self) -> n0_future::boxed::BoxFuture<Result<v1::ListModelsResponse, omnarc_api::Error>> {
+        let shared = Arc::clone(&self.0);
+        Box::pin(async move {
+            let internal = |e: omnarc_store::Error| omnarc_api::Error::new(omnarc_api::Code::Internal, e.to_string());
+            let mut models = Vec::new();
+            for (_, hash) in shared.models.list().await.map_err(internal)? {
+                let model = shared.models.model(&hash.to_hex()).await.map_err(internal)?;
+                let complete = shared.models.missing(&model, model.layout.all()).await.map_err(internal)? == 0;
+                models.push(v1::ModelInfo {
+                    name: model.name.clone(),
+                    blake3: hash.to_hex(),
+                    file_bytes: model.layout.file_len,
+                    layer_count: model.layout.layers,
+                    complete,
+                });
+            }
+            Ok(v1::ListModelsResponse { models })
+        })
+    }
+
+    fn ask(&self, request: v1::AskRequest) -> n0_future::boxed::BoxStream<Result<v1::AskResponse, omnarc_api::Error>> {
+        Box::pin(
+            run::ask(Arc::clone(&self.0), request)
+                .map(|step| step.map_err(|e| omnarc_api::Error::new(omnarc_api::Code::Unavailable, e))),
+        )
+    }
 }
 
 fn node_id(id: EndpointId) -> v1::NodeId {
@@ -630,6 +824,12 @@ async fn follow(shared: Arc<Shared>) {
             }
             if renamed || relays_changed {
                 let _ = shared.events.send(Event::ClusterChanged);
+            }
+        }
+        if let Some(plan) = state.plan.as_deref().and_then(|bytes| v1::PlacementPlan::decode(bytes).ok()) {
+            run::adopt(&shared, plan.clone());
+            if consensus.is_leader() {
+                spread_plan(&shared, &plan).await;
             }
         }
         for id in state.removed.iter().filter_map(|id| parse_id(id)) {
@@ -720,6 +920,7 @@ async fn discover(shared: Arc<Shared>, lan: omnarc_network::MdnsAddressLookup) {
 // tasks when they are dropped: with a member that leaves, and with this task when the service stops.
 async fn measure(shared: Arc<Shared>, every: Duration) {
     let mut tasks: HashMap<EndpointId, AbortOnDropHandle<()>> = HashMap::new();
+    let mut rejoined: HashMap<EndpointId, Instant> = HashMap::new();
     let mut ticks = tokio::time::interval(every);
     loop {
         ticks.tick().await;
@@ -732,6 +933,26 @@ async fn measure(shared: Arc<Shared>, every: Duration) {
             }
             keep
         });
+        // a member this device reaches but no longer hears from has dropped out of its gossip neighbors -- as when
+        // it restarted and its old connection lingers here -- so it is asked to join again
+        let now = now_unix_ms();
+        let deaf: Vec<EndpointId> = {
+            let telemetry = shared.telemetry.lock().expect("telemetry");
+            let links = shared.links.lock().expect("links");
+            members
+                .iter()
+                .copied()
+                .filter(|id| links.get(id).is_some_and(|(_, at)| at.elapsed() < every * 5 + Duration::from_secs(2)))
+                .filter(|id| telemetry.get(id).is_none_or(|t| now - t.unix_ms > UNHEARD_MS))
+                .filter(|id| rejoined.get(id).is_none_or(|at: &Instant| at.elapsed() > REJOIN_EVERY))
+                .collect()
+        };
+        if !deaf.is_empty() {
+            for id in &deaf {
+                rejoined.insert(*id, Instant::now());
+            }
+            let _ = shared.sender.join_peers(deaf).await;
+        }
         for id in members {
             tasks
                 .entry(id)
@@ -739,6 +960,10 @@ async fn measure(shared: Arc<Shared>, every: Duration) {
         }
     }
 }
+
+/// A member reached over its link but unheard over gossip this long is asked to join again; at most this often.
+const UNHEARD_MS: i64 = 10_000;
+const REJOIN_EVERY: Duration = Duration::from_secs(15);
 
 // Keeps a probe connection to `member` and measures it: a ping every `every`, the bandwidth once a minute and when
 // the kind of link changes. A probe aims at about a quarter of a second of sending, so it grows on fast links.
@@ -787,7 +1012,43 @@ async fn measure_link(shared: Arc<Shared>, member: EndpointId, every: Duration) 
 }
 
 // Sends this node's device once and its telemetry every `every`.
+// The tokens this device computed since local midnight.
+struct Today {
+    day: chrono::NaiveDate,
+    // the process's count when the day began
+    base: u64,
+}
+
+impl Today {
+    fn new() -> Self {
+        Self { day: chrono::Local::now().date_naive(), base: crate::ring::TOKENS_COMPUTED.load(Ordering::Relaxed) }
+    }
+
+    fn tokens(&mut self) -> u64 {
+        let total = crate::ring::TOKENS_COMPUTED.load(Ordering::Relaxed);
+        let day = chrono::Local::now().date_naive();
+        if day != self.day {
+            *self = Self { day, base: total };
+        }
+        total - self.base
+    }
+}
+
+// This device's windows in the plan, with the mean time a token takes in them so far.
+fn stage_loads(shared: &Shared) -> Vec<v1::StageLoad> {
+    let tokens = crate::ring::TOKENS_COMPUTED.load(Ordering::Relaxed);
+    let micros = crate::ring::MICROS_COMPUTING.load(Ordering::Relaxed);
+    #[allow(clippy::cast_precision_loss)]
+    let ms_per_token = if tokens == 0 { 0.0 } else { micros as f32 / tokens as f32 / 1000.0 };
+    let mut loads = shared.stages.lock().expect("stages").clone();
+    for load in &mut loads {
+        load.ms_per_token = ms_per_token;
+    }
+    loads
+}
+
 async fn speak(shared: Arc<Shared>, mut device: v1::DeviceInfo, every: Duration) {
+    let mut today = Today::new();
     let mut system = sysinfo::System::new();
     let mut sensors = crate::sensors::Sensors::new();
     let mut ticks = tokio::time::interval(every);
@@ -801,16 +1062,19 @@ async fn speak(shared: Arc<Shared>, mut device: v1::DeviceInfo, every: Duration)
         // and then
         let addrs: Vec<String> = own_addrs(&shared.endpoint).iter().map(ToString::to_string).collect();
         let relay_url = shared.endpoint.addr().relay_urls().next().map(ToString::to_string).unwrap_or_default();
+        let budget = shared.budget.lock().expect("budget").clone();
         since_announced += 1;
         if woken
             || since_announced >= ANNOUNCE_EVERY
             || addrs != device.direct_addresses
             || relay_url != device.relay_url
+            || budget != device.budget
             || !shared.devices.lock().expect("devices").contains_key(&shared.key.public())
         {
             since_announced = 0;
             device.direct_addresses = addrs;
             device.relay_url = relay_url;
+            device.budget = budget;
             shared.devices.lock().expect("devices").insert(shared.key.public(), device.clone());
             let _ = shared.events.send(Event::Device(shared.key.public(), device.clone()));
             let payload = v1::GossipPayload { kind: Some(v1::gossip_payload::Kind::Device(device.clone())) };
@@ -839,7 +1103,12 @@ async fn speak(shared: Arc<Shared>, mut device: v1::DeviceInfo, every: Duration)
             thermal: sensors.thermal() as i32,
             power: crate::sensors::power(),
             links,
-            ..Default::default()
+            memory_offered_bytes: crate::budget::offered_memory_now(
+                shared.budget.lock().expect("budget").as_ref(),
+                system.total_memory(),
+            ),
+            stages: stage_loads(&shared),
+            tokens_today: today.tokens(),
         };
         // this device's own telemetry reaches the panel the same way as the others'
         shared.telemetry.lock().expect("telemetry").insert(shared.key.public(), telemetry.clone());
@@ -886,11 +1155,19 @@ fn hear(shared: &Shared, heard: gossip::Heard) {
             let _ = shared.events.send(Event::Device(heard.sender, device));
         }
         Some(Kind::Member(member)) => admit_announced(shared, &member),
+        // the computers keep the plan in their log; the others take it from them
+        Some(Kind::Plan(plan)) if shared.consensus.is_none() => run::adopt(shared, plan),
         Some(Kind::Leave(_)) => {
             let _ = shared.events.send(Event::MemberLeft(heard.sender));
         }
-        None => {}
+        Some(Kind::Plan(_)) | None => {}
     }
+}
+
+// Tells the members that keep no log the plan the computers agreed on.
+async fn spread_plan(shared: &Shared, plan: &v1::PlacementPlan) {
+    let payload = v1::GossipPayload { kind: Some(v1::gossip_payload::Kind::Plan(plan.clone())) };
+    let _ = shared.sender.broadcast(gossip::seal(&shared.key, &payload, now_unix_ms()).into()).await;
 }
 
 // A member announced by an admin: let it in once its token proves it.

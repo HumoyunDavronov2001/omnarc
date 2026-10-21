@@ -53,6 +53,8 @@ pub enum Command {
     SetName(String),
     /// The cluster's relays, with their tokens.
     SetRelays(Vec<String>),
+    /// The placement plan (`omnarc.v1.PlacementPlan`, encoded); one without stages stops the model.
+    SetPlan(Vec<u8>),
 }
 
 /// What the cluster agreed on.
@@ -67,6 +69,9 @@ pub struct Agreed {
     /// Revocation ids (hex) of the tokens of removed members.
     pub revoked: BTreeSet<String>,
     pub relays: Vec<String>,
+    /// The placement plan the cluster runs (`omnarc.v1.PlacementPlan`, encoded); none while no model runs.
+    #[serde(default)]
+    pub plan: Option<Vec<u8>>,
 }
 
 impl Agreed {
@@ -84,6 +89,7 @@ impl Agreed {
             }
             Command::SetName(name) => name.clone_into(&mut self.name),
             Command::SetRelays(relays) => relays.clone_into(&mut self.relays),
+            Command::SetPlan(plan) => self.plan = Some(plan.clone()),
         }
     }
 }

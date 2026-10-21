@@ -1,0 +1,17 @@
+[package]
+name = "omnarc-scheduler"
+description = "The placement of an Omnarc cluster: which device holds which layers, solved as a MILP with HiGHS within what every device offers."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+highs = "1"
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

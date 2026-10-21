@@ -19,12 +19,19 @@ path = "src/main.rs"
 windows-sys = { version = "0.61", features = ["Win32_System_Power"] }
 
 [features]
+default = ["coordinator"]
+# the placement runs on the computers that keep the cluster's log; phones and browsers only follow it
+coordinator = ["dep:omnarc-scheduler"]
 # Integration tests that run a ring with a real omnarc-engine; they need OMNARC_ENGINE and OMNARC_TEST_MODEL.
 engine-tests = []
 
 [[test]]
 name = "ring"
 required-features = ["engine-tests"]
+
+[[test]]
+name = "cluster"
+required-features = ["engine-tests", "coordinator"]
 
 [dependencies]
 omnarc-engine-host.workspace = true
@@ -48,6 +55,9 @@ rustls = { version = "0.23", default-features = false, features = ["ring"] }
 ring = "0.17"
 serde.workspace = true
 axum.workspace = true
+# the owner's hours (Q1) are local time
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+omnarc-scheduler = { path = "../omnarc-scheduler", optional = true }
 
 [dev-dependencies]
 omnarc-store = { workspace = true, features = ["testing"] }

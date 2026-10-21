@@ -257,6 +257,12 @@ struct RingArgs {
     /// Prompt tokens per prefill step.
     #[arg(long, default_value_t = 256)]
     chunk: u32,
+    /// Threads for this node's layers; 0: all physical cores.
+    #[arg(long, default_value_t = 0)]
+    threads: u32,
+    /// Head: tokens guessed ahead and checked by the ring in one round (greedy sampling only); 0: none.
+    #[arg(long, default_value_t = 4)]
+    draft: u32,
     /// Element type of the hidden state between nodes: f16, bf16 or f32; the same on every node.
     #[arg(long, default_value = "f16", value_parser = parse_wire)]
     wire: DType,
@@ -307,6 +313,8 @@ fn ring(args: RingArgs, data: &Path) -> Result<(), ring::BoxError> {
         wire: args.wire,
         mirror_only: args.mirror_only,
         replica: args.replica,
+        threads: args.threads,
+        draft: args.draft,
         prompt: args.prompt,
         generate: args.generate,
     };
@@ -515,6 +523,13 @@ async fn serve(
                 Ok(Event::MemberLeft(id)) => println!("{} left.", names(id, &service)),
                 Ok(Event::MemberRemoved(id)) => println!("{} was removed from the cluster.", id.fmt_short()),
                 Ok(Event::ClusterChanged) => println!("The cluster's name or relays changed."),
+                Ok(Event::PlanChanged(plan)) if plan.stages.is_empty() => println!("The model stopped."),
+                Ok(Event::PlanChanged(plan)) => println!(
+                    "Plan {}: {} on {} device(s).",
+                    plan.version,
+                    plan.model.as_ref().map_or("a model", |m| m.name.as_str()),
+                    plan.stages.len()
+                ),
                 Ok(Event::Neighbor { id, up }) => println!("{} {}.", names(id, &service), if up { "connected" } else { "disconnected" }),
                 Ok(Event::JoinAttempt(attempt)) => {
                     // the owner answers here when someone sits at this terminal, otherwise in the panel

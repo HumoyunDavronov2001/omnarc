@@ -65,6 +65,13 @@ fn control_messages_roundtrip() {
             ..Default::default()
         }],
         replicas: vec![],
+        context: 4096,
+        // the plan for the first stage's device leaving travels with the plan
+        backups: vec![v1::BackupPlan {
+            gone: Some(v1::NodeId { ed25519_public_key: vec![7; 32] }),
+            plan: Some(v1::PlacementPlan { version: 4, ..Default::default() }),
+        }],
+        ..Default::default()
     };
     let bytes = plan.encode_to_vec();
     assert_eq!(v1::PlacementPlan::decode(bytes.as_slice()).unwrap(), plan);

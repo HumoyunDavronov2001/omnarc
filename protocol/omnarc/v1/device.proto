@@ -77,4 +77,27 @@ message DeviceInfo {
   repeated string direct_addresses = 11;
   // The relay the device can be reached through from other networks (protocol/CLUSTER.md §3.5); empty without one.
   string relay_url = 12;
+  // What the owner offers the cluster (REQUIREMENTS Q1); the placement never uses more (NO-51).
+  Budget budget = 13;
+}
+
+// What a device's owner lets Omnarc use. Unset limits mean all of it.
+message Budget {
+  // Memory for weights and KV cache; 0: whatever the device can spare.
+  uint64 memory_bytes = 1;
+  // CPU cores Omnarc may keep busy; 0: all of them.
+  uint32 cpu_cores = 2;
+  // Share of the GPU, 0..1; 0: all of it.
+  float gpu_share = 3;
+  // When the device offers anything; empty: always.
+  repeated HoursWindow hours = 4;
+}
+
+// A daily window in local time, e.g. 19:00-08:00 (it may run past midnight).
+message HoursWindow {
+  // Minutes after midnight.
+  uint32 start_minute = 1;
+  uint32 end_minute = 2;
+  // Days it applies to, bit 0 = Monday; 0: every day.
+  uint32 weekdays = 3;
 }

@@ -34,6 +34,8 @@ pub enum Code {
     PermissionDenied,
     Unimplemented,
     Internal,
+    /// What was asked for is not there right now, such as a model the cluster no longer runs.
+    Unavailable,
 }
 
 impl Code {
@@ -45,6 +47,7 @@ impl Code {
             Self::PermissionDenied => "permission_denied",
             Self::Unimplemented => "unimplemented",
             Self::Internal => "internal",
+            Self::Unavailable => "unavailable",
         }
     }
 
@@ -55,6 +58,7 @@ impl Code {
             Self::PermissionDenied => StatusCode::FORBIDDEN,
             Self::Unimplemented => StatusCode::NOT_IMPLEMENTED,
             Self::Internal => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Unavailable => StatusCode::SERVICE_UNAVAILABLE,
         }
     }
 }
@@ -141,6 +145,48 @@ pub trait Cluster: Send + Sync + 'static {
         })
         .boxed()
     }
+
+    /// What this device offers the cluster from now on (REQUIREMENTS Q1).
+    ///
+    /// # Errors
+    /// The budget is not one, or it cannot be kept.
+    fn set_budget(&self, budget: v1::Budget) -> Result<(), Error> {
+        let _ = budget;
+        Err(Error::new(Code::FailedPrecondition, "this device belongs to no cluster yet"))
+    }
+
+    /// Places a model within what every member offers, and starts it.
+    ///
+    /// # Errors
+    /// The model is not here, the members do not offer enough, or the cluster cannot agree now.
+    fn run_model(&self, request: v1::RunModelRequest) -> BoxFuture<'static, Result<v1::RunModelResponse, Error>> {
+        let _ = request;
+        Box::pin(async { Err(Error::new(Code::FailedPrecondition, "this device belongs to no cluster yet")) })
+    }
+
+    /// Stops the model that runs.
+    ///
+    /// # Errors
+    /// The cluster cannot agree now.
+    fn stop_model(&self) -> BoxFuture<'static, Result<(), Error>> {
+        Box::pin(async { Err(Error::new(Code::FailedPrecondition, "this device belongs to no cluster yet")) })
+    }
+
+    /// Metrics in the Prometheus text format, for a scraper on this device (AP-08); nothing is sent anywhere.
+    fn metrics(&self) -> String {
+        String::new()
+    }
+
+    /// The models this device holds.
+    fn list_models(&self) -> BoxFuture<'static, Result<v1::ListModelsResponse, Error>> {
+        Box::pin(async { Ok(v1::ListModelsResponse::default()) })
+    }
+
+    /// Asks the running model; the answer streams piece by piece.
+    fn ask(&self, request: v1::AskRequest) -> BoxStream<'static, Result<v1::AskResponse, Error>> {
+        let _ = request;
+        futures_util::stream::once(async { Err(Error::new(Code::FailedPrecondition, "no model runs here")) }).boxed()
+    }
 }
 
 /// The API's routes for `cluster`, and the panel's files from `panel` when given.
@@ -154,6 +200,12 @@ pub fn router(cluster: Arc<dyn Cluster>, panel: Option<PathBuf>) -> Router {
         .route(&format!("{SERVICE}/UpdateCluster"), post(update_cluster))
         .route(&format!("{SERVICE}/CreateCluster"), post(create_cluster))
         .route(&format!("{SERVICE}/JoinCluster"), post(join_cluster))
+        .route(&format!("{SERVICE}/SetBudget"), post(set_budget))
+        .route(&format!("{SERVICE}/RunModel"), post(run_model))
+        .route(&format!("{SERVICE}/StopModel"), post(stop_model))
+        .route(&format!("{SERVICE}/Ask"), post(ask))
+        .route(&format!("{SERVICE}/ListModels"), post(list_models))
+        .route("/metrics", axum::routing::get(metrics))
         .with_state(cluster);
     match panel {
         Some(dir) => {
@@ -180,6 +232,64 @@ async fn answer_join(State(cluster): ClusterState, headers: HeaderMap, body: Byt
     unary(&headers, &body, |request: v1::AnswerJoinRequest| {
         cluster.answer_join(&request).map(|waited| v1::AnswerJoinResponse { waited })
     })
+}
+
+async fn set_budget(State(cluster): ClusterState, headers: HeaderMap, body: Bytes) -> Response {
+    unary(&headers, &body, |request: v1::SetBudgetRequest| {
+        cluster.set_budget(request.budget.unwrap_or_default()).map(|()| v1::SetBudgetResponse {})
+    })
+}
+
+async fn run_model(State(cluster): ClusterState, headers: HeaderMap, body: Bytes) -> Response {
+    let request: v1::RunModelRequest = match decode(&headers, &body) {
+        Ok(request) => request,
+        Err(error) => return error.into_response(),
+    };
+    match cluster.run_model(request).await {
+        Ok(response) => respond(&response),
+        Err(error) => error.into_response(),
+    }
+}
+
+async fn metrics(State(cluster): ClusterState) -> Response {
+    let mut response = cluster.metrics().into_response();
+    response.headers_mut().insert(header::CONTENT_TYPE, HeaderValue::from_static("text/plain; version=0.0.4"));
+    response
+}
+
+async fn list_models(State(cluster): ClusterState, headers: HeaderMap, body: Bytes) -> Response {
+    if let Err(error) = decode::<v1::ListModelsRequest>(&headers, &body) {
+        return error.into_response();
+    }
+    match cluster.list_models().await {
+        Ok(response) => respond(&response),
+        Err(error) => error.into_response(),
+    }
+}
+
+async fn stop_model(State(cluster): ClusterState, headers: HeaderMap, body: Bytes) -> Response {
+    if let Err(error) = decode::<v1::StopModelRequest>(&headers, &body) {
+        return error.into_response();
+    }
+    match cluster.stop_model().await {
+        Ok(()) => respond(&v1::StopModelResponse {}),
+        Err(error) => error.into_response(),
+    }
+}
+
+async fn ask(State(cluster): ClusterState, headers: HeaderMap, body: Bytes) -> Response {
+    if !content_type_is(&headers, "application/connect+proto") {
+        return Error::new(
+            Code::Unimplemented,
+            "a stream speaks Connect with binary messages (application/connect+proto)",
+        )
+        .into_response();
+    }
+    let request: v1::AskRequest = match open_envelope(&body) {
+        Ok(request) => request,
+        Err(error) => return error.into_response(),
+    };
+    stream_response(cluster.ask(request))
 }
 
 async fn remove_member(State(cluster): ClusterState, headers: HeaderMap, body: Bytes) -> Response {
@@ -230,8 +340,11 @@ async fn join_cluster(State(cluster): ClusterState, headers: HeaderMap, body: By
         Ok(request) => request,
         Err(error) => return error.into_response(),
     };
-    // the messages, then Connect's end of the stream: empty, or the error that ended it
-    let steps = cluster.join_cluster(request);
+    stream_response(cluster.join_cluster(request))
+}
+
+// The messages of a server stream, then Connect's end of the stream: empty, or the error that ended it.
+fn stream_response<M: Message + Send + 'static>(steps: BoxStream<'static, Result<M, Error>>) -> Response {
     let frames = futures_util::stream::unfold((steps, false), |(mut steps, done)| async move {
         if done {
             return None;

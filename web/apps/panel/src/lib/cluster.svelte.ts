@@ -38,6 +38,26 @@ class LiveCluster {
     } else if (event.case === 'deviceRemoved') {
       const name = deviceName(this.view, hex(event.value));
       toasts.show({ kind: 'info', title: `${name} was removed`, body: 'The cluster lets it in no more.' });
+    } else if (event.case === 'planChanged') {
+      const before = this.view.plan;
+      const after = event.value;
+      if (before && after.version <= before.version) return;
+      if (!after.stages.length) {
+        if (before) toasts.show({ kind: 'info', title: 'The model stopped', body: 'Every device freed what it held for it.' });
+      } else if (!before) {
+        const devices = after.stages.length === 1 ? 'one device' : `${after.stages.length} devices`;
+        toasts.show({ kind: 'good', title: `${after.model?.name || 'The model'} runs`, body: `Its layers are on ${devices}.` });
+      } else {
+        // a device of the ring left: the plan solved for its leaving took over
+        const gone = before.stages.map((s) => hex(s.node)).filter((id) => !after.stages.some((s) => hex(s.node) === id));
+        if (gone.length) {
+          toasts.show({
+            kind: 'warning',
+            title: `${deviceName(this.view, gone[0])} left`,
+            body: 'Its standby took its layers; the model goes on.',
+          });
+        }
+      }
     }
   }
 

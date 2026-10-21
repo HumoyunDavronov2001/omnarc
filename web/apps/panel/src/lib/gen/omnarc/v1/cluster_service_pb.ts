@@ -4,11 +4,11 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { ClusterId, DeviceInfo, NodeId } from "./device_pb";
+import type { Budget, ClusterId, DeviceInfo, NodeId } from "./device_pb";
 import { file_omnarc_v1_device } from "./device_pb";
 import type { ClusterTicket } from "./pairing_pb";
 import { file_omnarc_v1_pairing } from "./pairing_pb";
-import type { PlacementPlan } from "./plan_pb";
+import type { PlacementPlan, RunMode } from "./plan_pb";
 import { file_omnarc_v1_plan } from "./plan_pb";
 import type { Telemetry } from "./telemetry_pb";
 import { file_omnarc_v1_telemetry } from "./telemetry_pb";
@@ -18,7 +18,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file omnarc/v1/cluster_service.proto.
  */
 export const file_omnarc_v1_cluster_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch9vbW5hcmMvdjEvY2x1c3Rlcl9zZXJ2aWNlLnByb3RvEglvbW5hcmMudjEihQIKD0NsdXN0ZXJTbmFwc2hvdBIgCgJpZBgBIAEoCzIULm9tbmFyYy52MS5DbHVzdGVySWQSDAoEbmFtZRgCIAEoCRImCgdkZXZpY2VzGAMgAygLMhUub21uYXJjLnYxLkRldmljZUluZm8SJwoJdGVsZW1ldHJ5GAQgAygLMhQub21uYXJjLnYxLlRlbGVtZXRyeRInCgVwbGFucxgFIAMoCzIYLm9tbmFyYy52MS5QbGFjZW1lbnRQbGFuEiQKCXRoaXNfbm9kZRgGIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQSEgoKY2FuX2ludml0ZRgHIAEoCBIOCgZyZWxheXMYCCADKAkiEwoRR2V0Q2x1c3RlclJlcXVlc3QiQQoSR2V0Q2x1c3RlclJlc3BvbnNlEisKB2NsdXN0ZXIYASABKAsyGi5vbW5hcmMudjEuQ2x1c3RlclNuYXBzaG90IhUKE1dhdGNoQ2x1c3RlclJlcXVlc3Qi4wIKFFdhdGNoQ2x1c3RlclJlc3BvbnNlEi4KCHNuYXBzaG90GAEgASgLMhoub21uYXJjLnYxLkNsdXN0ZXJTbmFwc2hvdEgAEi4KDWRldmljZV9qb2luZWQYAiABKAsyFS5vbW5hcmMudjEuRGV2aWNlSW5mb0gAEigKC2RldmljZV9sZWZ0GAMgASgLMhEub21uYXJjLnYxLk5vZGVJZEgAEikKCXRlbGVtZXRyeRgEIAEoCzIULm9tbmFyYy52MS5UZWxlbWV0cnlIABIwCgxwbGFuX2NoYW5nZWQYBSABKAsyGC5vbW5hcmMudjEuUGxhY2VtZW50UGxhbkgAEi4KDGpvaW5fYXR0ZW1wdBgGIAEoCzIWLm9tbmFyYy52MS5Kb2luQXR0ZW1wdEgAEisKDmRldmljZV9yZW1vdmVkGAcgASgLMhEub21uYXJjLnYxLk5vZGVJZEgAQgcKBWV2ZW50IigKCVNhc1N5bWJvbBINCgVlbW9qaRgBIAEoCRIMCgRuYW1lGAIgASgJIn4KC0pvaW5BdHRlbXB0EiEKBmpvaW5lchgBIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQSJQoGZGV2aWNlGAIgASgLMhUub21uYXJjLnYxLkRldmljZUluZm8SJQoHc3ltYm9scxgDIAMoCzIULm9tbmFyYy52MS5TYXNTeW1ib2wiKgoTQ3JlYXRlVGlja2V0UmVxdWVzdBITCgt0dGxfc2Vjb25kcxgBIAEoDSJkChRDcmVhdGVUaWNrZXRSZXNwb25zZRIoCgZ0aWNrZXQYASABKAsyGC5vbW5hcmMudjEuQ2x1c3RlclRpY2tldBISCgpxcl9wYXlsb2FkGAIgASgJEg4KBnFyX3N2ZxgDIAEoCSJHChFBbnN3ZXJKb2luUmVxdWVzdBIhCgZqb2luZXIYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB21hdGNoZXMYAiABKAgiJAoSQW5zd2VySm9pblJlc3BvbnNlEg4KBndhaXRlZBgBIAEoCCI4ChNSZW1vdmVNZW1iZXJSZXF1ZXN0EiEKBm1lbWJlchgBIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQiFgoUUmVtb3ZlTWVtYmVyUmVzcG9uc2UiNAoUQ3JlYXRlQ2x1c3RlclJlcXVlc3QSDAoEbmFtZRgBIAEoCRIOCgZyZWxheXMYAiADKAkiFwoVQ3JlYXRlQ2x1c3RlclJlc3BvbnNlIjkKEkpvaW5DbHVzdGVyUmVxdWVzdBIOCgZ0aWNrZXQYASABKAkSEwoLZGV2aWNlX25hbWUYAiABKAkiWQoTSm9pbkNsdXN0ZXJSZXNwb25zZRIoCgdzeW1ib2xzGAEgASgLMhUub21uYXJjLnYxLlNhc1N5bWJvbHNIABIQCgZqb2luZWQYAiABKAlIAEIGCgRzdGVwIjMKClNhc1N5bWJvbHMSJQoHc3ltYm9scxgBIAMoCzIULm9tbmFyYy52MS5TYXNTeW1ib2wiTQoUVXBkYXRlQ2x1c3RlclJlcXVlc3QSDAoEbmFtZRgBIAEoCRIRCglhZGRfcmVsYXkYAiABKAkSFAoMcmVtb3ZlX3JlbGF5GAMgASgJIhcKFVVwZGF0ZUNsdXN0ZXJSZXNwb25zZTKTBQoOQ2x1c3RlclNlcnZpY2USSQoKR2V0Q2x1c3RlchIcLm9tbmFyYy52MS5HZXRDbHVzdGVyUmVxdWVzdBodLm9tbmFyYy52MS5HZXRDbHVzdGVyUmVzcG9uc2USUQoMV2F0Y2hDbHVzdGVyEh4ub21uYXJjLnYxLldhdGNoQ2x1c3RlclJlcXVlc3QaHy5vbW5hcmMudjEuV2F0Y2hDbHVzdGVyUmVzcG9uc2UwARJPCgxDcmVhdGVUaWNrZXQSHi5vbW5hcmMudjEuQ3JlYXRlVGlja2V0UmVxdWVzdBofLm9tbmFyYy52MS5DcmVhdGVUaWNrZXRSZXNwb25zZRJJCgpBbnN3ZXJKb2luEhwub21uYXJjLnYxLkFuc3dlckpvaW5SZXF1ZXN0Gh0ub21uYXJjLnYxLkFuc3dlckpvaW5SZXNwb25zZRJPCgxSZW1vdmVNZW1iZXISHi5vbW5hcmMudjEuUmVtb3ZlTWVtYmVyUmVxdWVzdBofLm9tbmFyYy52MS5SZW1vdmVNZW1iZXJSZXNwb25zZRJSCg1VcGRhdGVDbHVzdGVyEh8ub21uYXJjLnYxLlVwZGF0ZUNsdXN0ZXJSZXF1ZXN0GiAub21uYXJjLnYxLlVwZGF0ZUNsdXN0ZXJSZXNwb25zZRJSCg1DcmVhdGVDbHVzdGVyEh8ub21uYXJjLnYxLkNyZWF0ZUNsdXN0ZXJSZXF1ZXN0GiAub21uYXJjLnYxLkNyZWF0ZUNsdXN0ZXJSZXNwb25zZRJOCgtKb2luQ2x1c3RlchIdLm9tbmFyYy52MS5Kb2luQ2x1c3RlclJlcXVlc3QaHi5vbW5hcmMudjEuSm9pbkNsdXN0ZXJSZXNwb25zZTABYgZwcm90bzM", [file_omnarc_v1_device, file_omnarc_v1_pairing, file_omnarc_v1_plan, file_omnarc_v1_telemetry]);
+  fileDesc("Ch9vbW5hcmMvdjEvY2x1c3Rlcl9zZXJ2aWNlLnByb3RvEglvbW5hcmMudjEihQIKD0NsdXN0ZXJTbmFwc2hvdBIgCgJpZBgBIAEoCzIULm9tbmFyYy52MS5DbHVzdGVySWQSDAoEbmFtZRgCIAEoCRImCgdkZXZpY2VzGAMgAygLMhUub21uYXJjLnYxLkRldmljZUluZm8SJwoJdGVsZW1ldHJ5GAQgAygLMhQub21uYXJjLnYxLlRlbGVtZXRyeRInCgVwbGFucxgFIAMoCzIYLm9tbmFyYy52MS5QbGFjZW1lbnRQbGFuEiQKCXRoaXNfbm9kZRgGIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQSEgoKY2FuX2ludml0ZRgHIAEoCBIOCgZyZWxheXMYCCADKAkiEwoRR2V0Q2x1c3RlclJlcXVlc3QiQQoSR2V0Q2x1c3RlclJlc3BvbnNlEisKB2NsdXN0ZXIYASABKAsyGi5vbW5hcmMudjEuQ2x1c3RlclNuYXBzaG90IhUKE1dhdGNoQ2x1c3RlclJlcXVlc3Qi4wIKFFdhdGNoQ2x1c3RlclJlc3BvbnNlEi4KCHNuYXBzaG90GAEgASgLMhoub21uYXJjLnYxLkNsdXN0ZXJTbmFwc2hvdEgAEi4KDWRldmljZV9qb2luZWQYAiABKAsyFS5vbW5hcmMudjEuRGV2aWNlSW5mb0gAEigKC2RldmljZV9sZWZ0GAMgASgLMhEub21uYXJjLnYxLk5vZGVJZEgAEikKCXRlbGVtZXRyeRgEIAEoCzIULm9tbmFyYy52MS5UZWxlbWV0cnlIABIwCgxwbGFuX2NoYW5nZWQYBSABKAsyGC5vbW5hcmMudjEuUGxhY2VtZW50UGxhbkgAEi4KDGpvaW5fYXR0ZW1wdBgGIAEoCzIWLm9tbmFyYy52MS5Kb2luQXR0ZW1wdEgAEisKDmRldmljZV9yZW1vdmVkGAcgASgLMhEub21uYXJjLnYxLk5vZGVJZEgAQgcKBWV2ZW50IigKCVNhc1N5bWJvbBINCgVlbW9qaRgBIAEoCRIMCgRuYW1lGAIgASgJIn4KC0pvaW5BdHRlbXB0EiEKBmpvaW5lchgBIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQSJQoGZGV2aWNlGAIgASgLMhUub21uYXJjLnYxLkRldmljZUluZm8SJQoHc3ltYm9scxgDIAMoCzIULm9tbmFyYy52MS5TYXNTeW1ib2wiKgoTQ3JlYXRlVGlja2V0UmVxdWVzdBITCgt0dGxfc2Vjb25kcxgBIAEoDSJkChRDcmVhdGVUaWNrZXRSZXNwb25zZRIoCgZ0aWNrZXQYASABKAsyGC5vbW5hcmMudjEuQ2x1c3RlclRpY2tldBISCgpxcl9wYXlsb2FkGAIgASgJEg4KBnFyX3N2ZxgDIAEoCSJHChFBbnN3ZXJKb2luUmVxdWVzdBIhCgZqb2luZXIYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB21hdGNoZXMYAiABKAgiJAoSQW5zd2VySm9pblJlc3BvbnNlEg4KBndhaXRlZBgBIAEoCCI4ChNSZW1vdmVNZW1iZXJSZXF1ZXN0EiEKBm1lbWJlchgBIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQiFgoUUmVtb3ZlTWVtYmVyUmVzcG9uc2UiNAoUQ3JlYXRlQ2x1c3RlclJlcXVlc3QSDAoEbmFtZRgBIAEoCRIOCgZyZWxheXMYAiADKAkiFwoVQ3JlYXRlQ2x1c3RlclJlc3BvbnNlIjkKEkpvaW5DbHVzdGVyUmVxdWVzdBIOCgZ0aWNrZXQYASABKAkSEwoLZGV2aWNlX25hbWUYAiABKAkiWQoTSm9pbkNsdXN0ZXJSZXNwb25zZRIoCgdzeW1ib2xzGAEgASgLMhUub21uYXJjLnYxLlNhc1N5bWJvbHNIABIQCgZqb2luZWQYAiABKAlIAEIGCgRzdGVwIjMKClNhc1N5bWJvbHMSJQoHc3ltYm9scxgBIAMoCzIULm9tbmFyYy52MS5TYXNTeW1ib2wiTQoUVXBkYXRlQ2x1c3RlclJlcXVlc3QSDAoEbmFtZRgBIAEoCRIRCglhZGRfcmVsYXkYAiABKAkSFAoMcmVtb3ZlX3JlbGF5GAMgASgJIhcKFVVwZGF0ZUNsdXN0ZXJSZXNwb25zZSI1ChBTZXRCdWRnZXRSZXF1ZXN0EiEKBmJ1ZGdldBgBIAEoCzIRLm9tbmFyYy52MS5CdWRnZXQiEwoRU2V0QnVkZ2V0UmVzcG9uc2UiZAoPUnVuTW9kZWxSZXF1ZXN0Eg0KBW1vZGVsGAEgASgJEiAKBG1vZGUYAiABKA4yEi5vbW5hcmMudjEuUnVuTW9kZRIPCgdjb250ZXh0GAMgASgNEg8KB2RyeV9ydW4YBCABKAgihgEKEFJ1bk1vZGVsUmVzcG9uc2USJgoEcGxhbhgBIAEoCzIYLm9tbmFyYy52MS5QbGFjZW1lbnRQbGFuEioKCGxlZnRfb3V0GAIgAygLMhgub21uYXJjLnYxLkxlZnRPdXREZXZpY2USHgoWZXN0aW1hdGVkX21zX3Blcl90b2tlbhgDIAEoAiJACg1MZWZ0T3V0RGV2aWNlEh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEg4KBnJlYXNvbhgCIAEoCSITChFMaXN0TW9kZWxzUmVxdWVzdCI6ChJMaXN0TW9kZWxzUmVzcG9uc2USJAoGbW9kZWxzGAEgAygLMhQub21uYXJjLnYxLk1vZGVsSW5mbyJkCglNb2RlbEluZm8SDAoEbmFtZRgBIAEoCRIOCgZibGFrZTMYAiABKAkSEgoKZmlsZV9ieXRlcxgDIAEoBBITCgtsYXllcl9jb3VudBgEIAEoDRIQCghjb21wbGV0ZRgFIAEoCCISChBTdG9wTW9kZWxSZXF1ZXN0IhMKEVN0b3BNb2RlbFJlc3BvbnNlImIKCkFza1JlcXVlc3QSDgoGcHJvbXB0GAEgASgJEhIKCm1heF90b2tlbnMYAiABKA0SDQoFcGF0aHMYAyABKA0SEwoLdGVtcGVyYXR1cmUYBCABKAISDAoEc2VlZBgFIAEoBCJKCgtBc2tSZXNwb25zZRIPCgVwaWVjZRgBIAEoCUgAEiIKBGRvbmUYAiABKAsyEi5vbW5hcmMudjEuQXNrRG9uZUgAQgYKBHN0ZXAiewoHQXNrRG9uZRIVCg1wcm9tcHRfdG9rZW5zGAEgASgNEhgKEGdlbmVyYXRlZF90b2tlbnMYAiABKA0SDwoHdHRmdF9tcxgDIAEoAhIPCgd0cG90X21zGAQgASgCEg0KBXBhdGhzGAUgASgNEg4KBmFncmVlZBgGIAEoDTLrBwoOQ2x1c3RlclNlcnZpY2USSQoKR2V0Q2x1c3RlchIcLm9tbmFyYy52MS5HZXRDbHVzdGVyUmVxdWVzdBodLm9tbmFyYy52MS5HZXRDbHVzdGVyUmVzcG9uc2USUQoMV2F0Y2hDbHVzdGVyEh4ub21uYXJjLnYxLldhdGNoQ2x1c3RlclJlcXVlc3QaHy5vbW5hcmMudjEuV2F0Y2hDbHVzdGVyUmVzcG9uc2UwARJPCgxDcmVhdGVUaWNrZXQSHi5vbW5hcmMudjEuQ3JlYXRlVGlja2V0UmVxdWVzdBofLm9tbmFyYy52MS5DcmVhdGVUaWNrZXRSZXNwb25zZRJJCgpBbnN3ZXJKb2luEhwub21uYXJjLnYxLkFuc3dlckpvaW5SZXF1ZXN0Gh0ub21uYXJjLnYxLkFuc3dlckpvaW5SZXNwb25zZRJPCgxSZW1vdmVNZW1iZXISHi5vbW5hcmMudjEuUmVtb3ZlTWVtYmVyUmVxdWVzdBofLm9tbmFyYy52MS5SZW1vdmVNZW1iZXJSZXNwb25zZRJSCg1VcGRhdGVDbHVzdGVyEh8ub21uYXJjLnYxLlVwZGF0ZUNsdXN0ZXJSZXF1ZXN0GiAub21uYXJjLnYxLlVwZGF0ZUNsdXN0ZXJSZXNwb25zZRJSCg1DcmVhdGVDbHVzdGVyEh8ub21uYXJjLnYxLkNyZWF0ZUNsdXN0ZXJSZXF1ZXN0GiAub21uYXJjLnYxLkNyZWF0ZUNsdXN0ZXJSZXNwb25zZRJOCgtKb2luQ2x1c3RlchIdLm9tbmFyYy52MS5Kb2luQ2x1c3RlclJlcXVlc3QaHi5vbW5hcmMudjEuSm9pbkNsdXN0ZXJSZXNwb25zZTABEkYKCVNldEJ1ZGdldBIbLm9tbmFyYy52MS5TZXRCdWRnZXRSZXF1ZXN0Ghwub21uYXJjLnYxLlNldEJ1ZGdldFJlc3BvbnNlEkMKCFJ1bk1vZGVsEhoub21uYXJjLnYxLlJ1bk1vZGVsUmVxdWVzdBobLm9tbmFyYy52MS5SdW5Nb2RlbFJlc3BvbnNlEkYKCVN0b3BNb2RlbBIbLm9tbmFyYy52MS5TdG9wTW9kZWxSZXF1ZXN0Ghwub21uYXJjLnYxLlN0b3BNb2RlbFJlc3BvbnNlEjYKA0FzaxIVLm9tbmFyYy52MS5Bc2tSZXF1ZXN0GhYub21uYXJjLnYxLkFza1Jlc3BvbnNlMAESSQoKTGlzdE1vZGVscxIcLm9tbmFyYy52MS5MaXN0TW9kZWxzUmVxdWVzdBodLm9tbmFyYy52MS5MaXN0TW9kZWxzUmVzcG9uc2ViBnByb3RvMw", [file_omnarc_v1_device, file_omnarc_v1_pairing, file_omnarc_v1_plan, file_omnarc_v1_telemetry]);
 
 /**
  * @generated from message omnarc.v1.ClusterSnapshot
@@ -518,6 +518,349 @@ export const UpdateClusterResponseSchema: GenMessage<UpdateClusterResponse> = /*
   messageDesc(file_omnarc_v1_cluster_service, 19);
 
 /**
+ * @generated from message omnarc.v1.SetBudgetRequest
+ */
+export type SetBudgetRequest = Message<"omnarc.v1.SetBudgetRequest"> & {
+  /**
+   * @generated from field: omnarc.v1.Budget budget = 1;
+   */
+  budget?: Budget | undefined;
+};
+
+/**
+ * Describes the message omnarc.v1.SetBudgetRequest.
+ * Use `create(SetBudgetRequestSchema)` to create a new message.
+ */
+export const SetBudgetRequestSchema: GenMessage<SetBudgetRequest> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 20);
+
+/**
+ * @generated from message omnarc.v1.SetBudgetResponse
+ */
+export type SetBudgetResponse = Message<"omnarc.v1.SetBudgetResponse"> & {
+};
+
+/**
+ * Describes the message omnarc.v1.SetBudgetResponse.
+ * Use `create(SetBudgetResponseSchema)` to create a new message.
+ */
+export const SetBudgetResponseSchema: GenMessage<SetBudgetResponse> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 21);
+
+/**
+ * @generated from message omnarc.v1.RunModelRequest
+ */
+export type RunModelRequest = Message<"omnarc.v1.RunModelRequest"> & {
+  /**
+   * A model in some member's store, by its BLAKE3 hash (hex) or its name; empty: the only one there is.
+   *
+   * @generated from field: string model = 1;
+   */
+  model: string;
+
+  /**
+   * @generated from field: omnarc.v1.RunMode mode = 2;
+   */
+  mode: RunMode;
+
+  /**
+   * Context length the KV cache is planned for; 0: 4096.
+   *
+   * @generated from field: uint32 context = 3;
+   */
+  context: number;
+
+  /**
+   * Only answer "Will it fit?": the plan the model would get, without starting it.
+   *
+   * @generated from field: bool dry_run = 4;
+   */
+  dryRun: boolean;
+};
+
+/**
+ * Describes the message omnarc.v1.RunModelRequest.
+ * Use `create(RunModelRequestSchema)` to create a new message.
+ */
+export const RunModelRequestSchema: GenMessage<RunModelRequest> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 22);
+
+/**
+ * @generated from message omnarc.v1.RunModelResponse
+ */
+export type RunModelResponse = Message<"omnarc.v1.RunModelResponse"> & {
+  /**
+   * @generated from field: omnarc.v1.PlacementPlan plan = 1;
+   */
+  plan?: PlacementPlan | undefined;
+
+  /**
+   * The devices the plan leaves out, and why.
+   *
+   * @generated from field: repeated omnarc.v1.LeftOutDevice left_out = 2;
+   */
+  leftOut: LeftOutDevice[];
+
+  /**
+   * What the plan expects one token to take, in milliseconds.
+   *
+   * @generated from field: float estimated_ms_per_token = 3;
+   */
+  estimatedMsPerToken: number;
+};
+
+/**
+ * Describes the message omnarc.v1.RunModelResponse.
+ * Use `create(RunModelResponseSchema)` to create a new message.
+ */
+export const RunModelResponseSchema: GenMessage<RunModelResponse> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 23);
+
+/**
+ * @generated from message omnarc.v1.LeftOutDevice
+ */
+export type LeftOutDevice = Message<"omnarc.v1.LeftOutDevice"> & {
+  /**
+   * @generated from field: omnarc.v1.NodeId node = 1;
+   */
+  node?: NodeId | undefined;
+
+  /**
+   * "too_small": it offers less than one layer needs; "not_needed": the model runs faster without it.
+   *
+   * @generated from field: string reason = 2;
+   */
+  reason: string;
+};
+
+/**
+ * Describes the message omnarc.v1.LeftOutDevice.
+ * Use `create(LeftOutDeviceSchema)` to create a new message.
+ */
+export const LeftOutDeviceSchema: GenMessage<LeftOutDevice> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 24);
+
+/**
+ * @generated from message omnarc.v1.ListModelsRequest
+ */
+export type ListModelsRequest = Message<"omnarc.v1.ListModelsRequest"> & {
+};
+
+/**
+ * Describes the message omnarc.v1.ListModelsRequest.
+ * Use `create(ListModelsRequestSchema)` to create a new message.
+ */
+export const ListModelsRequestSchema: GenMessage<ListModelsRequest> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 25);
+
+/**
+ * @generated from message omnarc.v1.ListModelsResponse
+ */
+export type ListModelsResponse = Message<"omnarc.v1.ListModelsResponse"> & {
+  /**
+   * @generated from field: repeated omnarc.v1.ModelInfo models = 1;
+   */
+  models: ModelInfo[];
+};
+
+/**
+ * Describes the message omnarc.v1.ListModelsResponse.
+ * Use `create(ListModelsResponseSchema)` to create a new message.
+ */
+export const ListModelsResponseSchema: GenMessage<ListModelsResponse> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 26);
+
+/**
+ * @generated from message omnarc.v1.ModelInfo
+ */
+export type ModelInfo = Message<"omnarc.v1.ModelInfo"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * BLAKE3 hash of the GGUF file, hex.
+   *
+   * @generated from field: string blake3 = 2;
+   */
+  blake3: string;
+
+  /**
+   * @generated from field: uint64 file_bytes = 3;
+   */
+  fileBytes: bigint;
+
+  /**
+   * @generated from field: uint32 layer_count = 4;
+   */
+  layerCount: number;
+
+  /**
+   * Whether every byte of the file is on this device: only then can it start the model.
+   *
+   * @generated from field: bool complete = 5;
+   */
+  complete: boolean;
+};
+
+/**
+ * Describes the message omnarc.v1.ModelInfo.
+ * Use `create(ModelInfoSchema)` to create a new message.
+ */
+export const ModelInfoSchema: GenMessage<ModelInfo> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 27);
+
+/**
+ * @generated from message omnarc.v1.StopModelRequest
+ */
+export type StopModelRequest = Message<"omnarc.v1.StopModelRequest"> & {
+};
+
+/**
+ * Describes the message omnarc.v1.StopModelRequest.
+ * Use `create(StopModelRequestSchema)` to create a new message.
+ */
+export const StopModelRequestSchema: GenMessage<StopModelRequest> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 28);
+
+/**
+ * @generated from message omnarc.v1.StopModelResponse
+ */
+export type StopModelResponse = Message<"omnarc.v1.StopModelResponse"> & {
+};
+
+/**
+ * Describes the message omnarc.v1.StopModelResponse.
+ * Use `create(StopModelResponseSchema)` to create a new message.
+ */
+export const StopModelResponseSchema: GenMessage<StopModelResponse> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 29);
+
+/**
+ * @generated from message omnarc.v1.AskRequest
+ */
+export type AskRequest = Message<"omnarc.v1.AskRequest"> & {
+  /**
+   * @generated from field: string prompt = 1;
+   */
+  prompt: string;
+
+  /**
+   * At most this many tokens; 0: 256.
+   *
+   * @generated from field: uint32 max_tokens = 2;
+   */
+  maxTokens: number;
+
+  /**
+   * Accuracy mode (EN-23): the question is answered this many times, on the model's whole copies where there are
+   * several, and the answer most of them agree on is the one given; 0 or 1: one answer.
+   *
+   * @generated from field: uint32 paths = 3;
+   */
+  paths: number;
+
+  /**
+   * Sampling temperature; 0: greedy. Accuracy mode samples each path, at 0.7 when this is 0.
+   *
+   * @generated from field: float temperature = 4;
+   */
+  temperature: number;
+
+  /**
+   * The sampler's seed, so the paths of accuracy mode differ.
+   *
+   * @generated from field: uint64 seed = 5;
+   */
+  seed: bigint;
+};
+
+/**
+ * Describes the message omnarc.v1.AskRequest.
+ * Use `create(AskRequestSchema)` to create a new message.
+ */
+export const AskRequestSchema: GenMessage<AskRequest> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 30);
+
+/**
+ * @generated from message omnarc.v1.AskResponse
+ */
+export type AskResponse = Message<"omnarc.v1.AskResponse"> & {
+  /**
+   * @generated from oneof omnarc.v1.AskResponse.step
+   */
+  step: {
+    /**
+     * The next piece of the answer.
+     *
+     * @generated from field: string piece = 1;
+     */
+    value: string;
+    case: "piece";
+  } | {
+    /**
+     * @generated from field: omnarc.v1.AskDone done = 2;
+     */
+    value: AskDone;
+    case: "done";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message omnarc.v1.AskResponse.
+ * Use `create(AskResponseSchema)` to create a new message.
+ */
+export const AskResponseSchema: GenMessage<AskResponse> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 31);
+
+/**
+ * @generated from message omnarc.v1.AskDone
+ */
+export type AskDone = Message<"omnarc.v1.AskDone"> & {
+  /**
+   * @generated from field: uint32 prompt_tokens = 1;
+   */
+  promptTokens: number;
+
+  /**
+   * @generated from field: uint32 generated_tokens = 2;
+   */
+  generatedTokens: number;
+
+  /**
+   * Time to the first token and mean time per token after it, in milliseconds.
+   *
+   * @generated from field: float ttft_ms = 3;
+   */
+  ttftMs: number;
+
+  /**
+   * @generated from field: float tpot_ms = 4;
+   */
+  tpotMs: number;
+
+  /**
+   * In accuracy mode: the paths answered, and how many of them gave the answer chosen.
+   *
+   * @generated from field: uint32 paths = 5;
+   */
+  paths: number;
+
+  /**
+   * @generated from field: uint32 agreed = 6;
+   */
+  agreed: number;
+};
+
+/**
+ * Describes the message omnarc.v1.AskDone.
+ * Use `create(AskDoneSchema)` to create a new message.
+ */
+export const AskDoneSchema: GenMessage<AskDone> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 32);
+
+/**
  * The control API every node serves to the panel and to apps (Connect RPC, protocol/CLUSTER.md §5).
  *
  * @generated from service omnarc.v1.ClusterService
@@ -603,6 +946,56 @@ export const ClusterService: GenService<{
     methodKind: "server_streaming";
     input: typeof JoinClusterRequestSchema;
     output: typeof JoinClusterResponseSchema;
+  },
+  /**
+   * What this device offers the cluster from now on (REQUIREMENTS Q1). Only this device's owner can change it.
+   *
+   * @generated from rpc omnarc.v1.ClusterService.SetBudget
+   */
+  setBudget: {
+    methodKind: "unary";
+    input: typeof SetBudgetRequestSchema;
+    output: typeof SetBudgetResponseSchema;
+  },
+  /**
+   * Places a model on the cluster's devices within what each offers, and starts it (NO-41).
+   *
+   * @generated from rpc omnarc.v1.ClusterService.RunModel
+   */
+  runModel: {
+    methodKind: "unary";
+    input: typeof RunModelRequestSchema;
+    output: typeof RunModelResponseSchema;
+  },
+  /**
+   * Stops the model that runs, and frees what it took.
+   *
+   * @generated from rpc omnarc.v1.ClusterService.StopModel
+   */
+  stopModel: {
+    methodKind: "unary";
+    input: typeof StopModelRequestSchema;
+    output: typeof StopModelResponseSchema;
+  },
+  /**
+   * Asks the running model; the answer streams back piece by piece, from whichever device holds the head.
+   *
+   * @generated from rpc omnarc.v1.ClusterService.Ask
+   */
+  ask: {
+    methodKind: "server_streaming";
+    input: typeof AskRequestSchema;
+    output: typeof AskResponseSchema;
+  },
+  /**
+   * The models this device holds, in whole or in part.
+   *
+   * @generated from rpc omnarc.v1.ClusterService.ListModels
+   */
+  listModels: {
+    methodKind: "unary";
+    input: typeof ListModelsRequestSchema;
+    output: typeof ListModelsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_omnarc_v1_cluster_service, 0);

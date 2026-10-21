@@ -2,7 +2,7 @@
   import { ConnectError } from '@connectrpc/connect';
   import { Button, Card, Chip, Status } from '@omnarc/ui';
   import { api, cluster } from '$lib/cluster.svelte';
-  import { deviceName } from '$lib/model';
+  import { deviceName, formatGib, gib } from '$lib/model';
   import { currentTheme, setTheme, type Theme } from '$lib/theme';
 
   let theme = $state<Theme>(currentTheme());
@@ -25,6 +25,57 @@
   $effect(() => {
     name = cluster.view.name;
   });
+
+  // what this device offers the cluster (Q1): the plan never uses more
+  const me = $derived(cluster.view.devices[cluster.view.thisNode]);
+  const totalGib = $derived(me ? gib(me.memoryTotalBytes) : 0);
+  let offerGib = $state(0);
+  let cores = $state(0);
+  let limitHours = $state(false);
+  let from = $state('19:00');
+  let to = $state('08:00');
+  let saved = $state('');
+  let loaded = false;
+  $effect(() => {
+    if (loaded || !me) return;
+    loaded = true;
+    const budget = me.budget;
+    // no budget named yet: half of the memory, as the service offers by default
+    offerGib = budget && budget.memoryBytes > 0n ? gib(budget.memoryBytes) : Math.round(totalGib * 4) / 8;
+    cores = budget?.cpuCores ?? 0;
+    const window = budget?.hours[0];
+    limitHours = !!window;
+    if (window) {
+      from = clock(window.startMinute);
+      to = clock(window.endMinute);
+    }
+  });
+  function clock(minute: number): string {
+    return `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`;
+  }
+  function minutes(time: string): number {
+    const [h, m] = time.split(':').map(Number);
+    return h * 60 + m;
+  }
+  async function saveBudget() {
+    busy = true;
+    failed = '';
+    saved = '';
+    try {
+      await api.setBudget({
+        budget: {
+          memoryBytes: BigInt(Math.round(offerGib * 2 ** 30)),
+          cpuCores: cores,
+          hours: limitHours ? [{ startMinute: minutes(from), endMinute: minutes(to), weekdays: 0 }] : [],
+        },
+      });
+      saved = 'Saved: the cluster plans with it from now on.';
+    } catch (e) {
+      failed = e instanceof ConnectError ? e.rawMessage : String(e);
+    } finally {
+      busy = false;
+    }
+  }
 
   async function update(request: { name?: string; addRelay?: string; removeRelay?: string }) {
     busy = true;
@@ -117,6 +168,50 @@
       {/each}
     </div>
   </Card>
+
+  {#if me}
+    <Card title="What this device offers">
+      <form
+        class="grid gap-4"
+        onsubmit={(event) => {
+          event.preventDefault();
+          void saveBudget();
+        }}
+      >
+        <div class="grid gap-2">
+          <label class="flex items-baseline justify-between text-13 text-text-2" for="offer">
+            Memory <span class="font-mono text-12 text-text-1">{offerGib.toFixed(2)} of {formatGib(me.memoryTotalBytes)}</span>
+          </label>
+          <input id="offer" type="range" min="0.25" max={Math.max(0.25, totalGib)} step="0.25" bind:value={offerGib} />
+        </div>
+        <label class="flex flex-wrap items-center gap-3 text-13 text-text-2">
+          Cores
+          <input
+            class="h-9 w-20 rounded-lg border border-line-2 bg-surface-2 px-2 text-13 text-text-1"
+            type="number"
+            min="0"
+            max={me.cpuCores || 256}
+            bind:value={cores}
+          />
+          <span>0: all {me.cpuCores || ''}</span>
+        </label>
+        <div class="flex flex-wrap items-center gap-3 text-13 text-text-2">
+          <label class="flex items-center gap-2"><input type="checkbox" bind:checked={limitHours} /> Only from</label>
+          <input class="h-9 rounded-lg border border-line-2 bg-surface-2 px-2 text-13 text-text-1" type="time" bind:value={from} disabled={!limitHours} aria-label="From" />
+          to
+          <input class="h-9 rounded-lg border border-line-2 bg-surface-2 px-2 text-13 text-text-1" type="time" bind:value={to} disabled={!limitHours} aria-label="To" />
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <Button type="submit" variant="primary" label="Save" disabled={busy} />
+          {#if saved}<span role="status" class="text-13 text-text-2">{saved}</span>{/if}
+        </div>
+        <p class="m-0 text-12 text-text-3">
+          The cluster never uses more than this. Outside the hours this device offers nothing; a model it holds layers of
+          moves on to the others.
+        </p>
+      </form>
+    </Card>
+  {/if}
 
   <Card title="This device">
     <dl class="m-0 grid gap-3 text-13">

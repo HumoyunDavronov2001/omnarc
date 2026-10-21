@@ -215,7 +215,12 @@ pub fn lan_lookup(id: EndpointId) -> Result<MdnsAddressLookup> {
 /// # Errors
 /// The peer cannot be reached, or it is not the node with this id.
 pub async fn connect(endpoint: &Endpoint, peer: &Peer) -> Result<Connection> {
-    let addr = EndpointAddr::from_parts(peer.id, [TransportAddr::Ip(peer.addr)]);
+    // port 0: no address is known, and the endpoint's own lookup finds the peer (a cluster's members, its relays)
+    let addr = if peer.addr.port() == 0 {
+        EndpointAddr::from(peer.id)
+    } else {
+        EndpointAddr::from_parts(peer.id, [TransportAddr::Ip(peer.addr)])
+    };
     endpoint.connect(addr, TENSOR_ALPN).await.map_err(|e| Error::new(&format!("connecting to {peer}"), e))
 }
 

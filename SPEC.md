@@ -79,8 +79,8 @@ design concept (its section number), or "—".
 | EN-09 | Architectures with windows: Llama, Qwen3 | function | D1 | B1 | — | ✓ |
 | EN-10 | Architectures for the uses: the MoE families (Qwen3.5, DeepSeek-V4, GLM-5, Kimi) and Gemma 4 | function | D4 | B4 | — | ○ |
 | EN-11 | Patches rebased weekly on the newest llama.cpp; sent upstream as pull requests | function | P§4 | B1 | — | ◐ |
-| EN-12 | Continuous pipeline with speculative decoding (PipeSpec, FlowSpec, DiP-SD) | function | D3, Y1 | B4 | — | ○ |
-| EN-13 | Draft sources: MTP heads, EAGLE-3, a small model, n-grams; large draft trees for slow devices | function | D3 | B4 | — | ○ |
+| EN-12 | Continuous pipeline with speculative decoding (PipeSpec, FlowSpec, DiP-SD) | function | D3, Y1 | B4 | — | ◐ |
+| EN-13 | Draft sources: MTP heads, EAGLE-3, a small model, n-grams; large draft trees for slow devices | function | D3 | B4 | — | ◐ |
 | EN-14 | Hot and cold neurons (PowerInfer) | function | D4 | B4 | — | ○ |
 | EN-15 | MoE experts placed by co-activation, predicted and fetched ahead; hot experts copied (EPLB) | function | D4 | B4 | — | ○ |
 | EN-16 | Paged KV cache, radix prefix cache, q8/q4 KV | function | P§4 | B4 | — | ○ |
@@ -90,7 +90,7 @@ design concept (its section number), or "—".
 | EN-20 | Continuous batching | function | D6 | B4 | — | ○ |
 | EN-21 | Prefill and decode on different devices | function | D6 | B4 | — | ○ |
 | EN-22 | Quantization per device from one checkpoint (Q8 on a strong device, Q4 on a weak one) | function | D6, Y5 | B4 | — | ○ |
-| EN-23 | Accuracy mode: parallel paths on whole copies, short summaries between them, one composed answer | function | D8, Y10 | B4 | — | ○ |
+| EN-23 | Accuracy mode: parallel paths on whole copies, short summaries between them, one composed answer | function | D8, Y10 | B4 | — | ◐ |
 | EN-24 | NPU operations behind the accuracy gate (Hexagon, Apple Neural Engine, Intel/AMD NPU) | function | D5, Y3 | B5 | — | ○ |
 | EN-25 | The engine inside the phone apps (in-process, through the Rust core) | function | Q2, Q3 | B5 | — | ○ |
 | EN-26 | The engine in the browser: llama.cpp in WASM with ggml-webgpu | function | Q4 | B5 | — | ○ |
@@ -141,18 +141,18 @@ design concept (its section number), or "—".
 
 | ID | What | Kind | Req | Stage | Design | State |
 |---|---|---|---|---|---|---|
-| NO-40 | Profiler: a 20-second benchmark of compute, memory bandwidth, disk and NPU when a device joins | function | R1 | B3 | — | ○ |
-| NO-41 | Placement with HiGHS (≤ 1 s for 64 devices; larger networks in groups) | function | R1, W6 | B3 | 04 | ○ |
-| NO-42 | Routing every request through the replicas (Parallax) | function | R1 | B3 | — | ○ |
-| NO-43 | Devices join and leave while models run; a precomputed backup plan takes over within 1 s | function | R2, R3 | B3 | — | ○ |
-| NO-51 | A device announces a budget (memory, cores or GPU share, hours) and the placement never exceeds it | function | Q1, Q7 | B3 | — | ○ |
-| NO-52 | A device too small for any window is left out of the plan instead of slowing it down | function | Q7, R6 | B3 | — | ○ |
-| NO-44 | Never slower: a model that fits on one device is not split over a slower link | function | R6, W11 | B3 | — | ○ |
+| NO-40 | Profiler: a 20-second benchmark of compute, memory bandwidth, disk and NPU when a device joins | function | R1 | B3 | — | ◐ |
+| NO-41 | Placement with HiGHS (≤ 1 s for 64 devices; larger networks in groups) | function | R1, W6 | B3 | 04 | ◐ |
+| NO-42 | Routing every request through the replicas (Parallax) | function | R1 | B3 | — | ◐ |
+| NO-43 | Devices join and leave while models run; a precomputed backup plan takes over within 1 s | function | R2, R3 | B3 | — | ◐ |
+| NO-51 | A device announces a budget (memory, cores or GPU share, hours) and the placement never exceeds it | function | Q1, Q7 | B3 | — | ◐ |
+| NO-52 | A device too small for any window is left out of the plan instead of slowing it down | function | Q7, R6 | B3 | — | ✓ |
+| NO-44 | Never slower: a model that fits on one device is not split over a slower link | function | R6, W11 | B3 | — | ✓ |
 | NO-45 | The mode of each request: latency, throughput, capacity, accuracy | function | R4 | B3 | 01 | ○ |
 | NO-46 | Tensor-parallel groups only over links of ≤ 1 ms | function | R5 | B3 | — | ○ |
 | NO-47 | Battery, heat, schedule and idle limits hand work to a replica | function | Q5 | B5 | 03 | ○ |
 | NO-48 | Plan suggestions: where moving layers would make the ring faster | function | R1 | B3 | 01 | ○ |
-| NO-49 | Re-planning and KV copies modeled in TLA+ and checked in TLC | function | P§8 | B3 | — | ○ |
+| NO-49 | Re-planning and KV copies modeled in TLA+ and checked in TLC | function | P§8 | B3 | — | ✓ |
 | NO-50 | 1,000 random drop and join scenarios in a network simulation without a lost answer | function | P§8 | B2 | — | ◐ |
 
 ### 4.5 API
@@ -166,7 +166,7 @@ design concept (its section number), or "—".
 | AP-05 | Agent backend: long repeated instructions kept in the prefix cache, tool calls, structured output, long contexts | function | A4 | B8 | — | ○ |
 | AP-06 | API keys (Biscuit) limited by model, quota and expiry | function | P§7 | B6 | — | ○ |
 | AP-07 | Audio and image endpoints | function | D7 | B7 | — | ○ |
-| AP-08 | Metrics (Prometheus) and traces (OpenTelemetry); nothing is sent anywhere by default | function | A3 | B4 | — | ○ |
+| AP-08 | Metrics (Prometheus) and traces (OpenTelemetry); nothing is sent anywhere by default | function | A3 | B4 | — | ◐ |
 
 ## 5. Panel
 
@@ -186,7 +186,7 @@ nine sections in a rail: Ring, Devices, Models, Chat, Observe, Training, Network
 | PA-09 | Will it fit? and the placement plan | screen | — | B3 | 04 | ○ |
 | PA-10 | Running models and downloads | screen | T5 | B3 | — | ○ |
 | PA-11 | Use from apps and agents | screen | A4 | B8 | — | ○ |
-| PA-12 | Chat | screen | D8 | B4 | — | ○ |
+| PA-12 | Chat | screen | D8 | B4 | — | ◐ |
 | PA-13 | Observe: token path | screen | — | B4 | 05 | ○ |
 | PA-14 | Observe: links and traces | screen | T4 | B4 | 05 | ○ |
 | PA-15 | Training | screen | O1, O2 | B7 | — | ○ |

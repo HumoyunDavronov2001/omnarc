@@ -62,4 +62,6 @@ message Telemetry {
   PowerState power = 7;
   repeated LinkSample links = 8;
   repeated StageLoad stages = 9;
+  // Tokens this device's windows computed since local midnight, for every request it served (its contribution).
+  uint64 tokens_today = 10;
 }

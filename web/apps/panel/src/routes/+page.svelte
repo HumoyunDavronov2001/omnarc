@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { Card, Icon, Meter, Ring, Table, Tooltip, loadLevel, type Column } from '@omnarc/ui';
   import { cluster } from '$lib/cluster.svelte';
-  import { deviceName, formatGib, gib, isOnline, markers, platformIcon, platformName, thermal } from '$lib/model';
+  import { describePart, deviceName, formatGib, gib, isOnline, markers, planPart, platformIcon, platformName, thermal } from '$lib/model';
 
   const view = $derived(cluster.view);
 
@@ -42,16 +42,22 @@
   const totalBytes = $derived(ids.reduce((sum, id) => sum + Number(view.devices[id].memoryTotalBytes), 0));
   const usedBytes = $derived(ids.reduce((sum, id) => sum + Number(view.telemetry[id]?.memoryUsedBytes ?? 0n), 0));
 
-  // until a model runs, an arc's length is the device's share of the cluster's memory
+  // while a model runs, an arc's length is the layers its device computes; until then, its share of the memory
   const arcs = $derived(
     ids.map((id) => {
       const online = isOnline(view, id, cluster.now);
       const load = view.telemetry[id]?.cpuLoad ?? 0;
+      const part = planPart(view.plan, id);
+      const computes = part && part.role !== 'replica';
       return {
         name: deviceName(view, id),
-        layers: Math.max(1, Math.round(gib(view.devices[id].memoryTotalBytes) * 10)),
+        layers: view.plan
+          ? computes
+            ? part.end - part.begin
+            : 1
+          : Math.max(1, Math.round(gib(view.devices[id].memoryTotalBytes) * 10)),
         level: online ? loadLevel(load) : 1,
-        note: `${formatGib(view.devices[id].memoryTotalBytes)} · ${online ? `${Math.round(load * 100)}% CPU` : 'offline'}`,
+        note: `${part ? describePart(part) : formatGib(view.devices[id].memoryTotalBytes)} · ${online ? `${Math.round(load * 100)}% CPU` : 'offline'}`,
         // charging, the battery, the temperature: what an offline device last said no longer holds
         markers: online ? markers(view.telemetry[id]) : [],
       };
@@ -110,7 +116,10 @@
         />
       {/if}
       <p class="m-0 text-center text-13 text-text-3">
-        {#if asTable}
+        {#if view.plan}
+          {view.plan.model?.name || 'A model'} runs: every arc is a device, as long as the layers it computes; its color is
+          its load.
+        {:else if asTable}
           A device's share is its part of the cluster's memory. No model is running yet.
         {:else}
           Every arc is a device, as long as its share of the cluster's memory; its color is its load. No model is running yet.

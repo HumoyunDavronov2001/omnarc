@@ -4,6 +4,7 @@ package omnarc.v1;
 
 import "omnarc/v1/cluster.proto";
 import "omnarc/v1/device.proto";
+import "omnarc/v1/plan.proto";
 import "omnarc/v1/telemetry.proto";
 
 // Everything a member says on the cluster's gossip topic (protocol/CLUSTER.md §3.1).
@@ -17,6 +18,8 @@ message GossipPayload {
     LeaveNotice leave = 3;
     // A device an admin has just admitted, with its token: any member can check the token against the cluster id.
     Member member = 4;
+    // The plan the cluster's computers agreed on, for the members that do not keep the log (phones, browsers).
+    PlacementPlan plan = 5;
   }
 }
 
