@@ -59,7 +59,11 @@ impl Net {
         Self { endpoint, incoming: tokio::sync::Mutex::new(incoming), accepting: None }
     }
 
-    async fn own(config: &Config) -> Result<Self, BoxError> {
+    /// An endpoint of its own for a ring wired by hand, with `config`'s key and address.
+    ///
+    /// # Errors
+    /// The key cannot be read or the address cannot be bound.
+    pub async fn own(config: &Config) -> Result<Self, BoxError> {
         let endpoint = bind(config).await?;
         let (tx, incoming) = mpsc::channel(4);
         let accepting = endpoint.clone();
@@ -499,19 +503,29 @@ async fn connect_next(
     Ok((connection, links))
 }
 
-/// One frame for one of this node's windows.
-struct Inbound {
-    shard: usize,
-    header: FrameHeader,
-    payload: Vec<u8>,
+/// What reaches a node's one queue: a frame of a session, or the end of a session once all its frames are in.
+enum Inbound {
+    Frame {
+        session: u64,
+        shard: usize,
+        header: FrameHeader,
+        payload: Vec<u8>,
+    },
+    /// The previous node closed the session's connection: in good order, or by going away.
+    Closed {
+        session: u64,
+        graceful: bool,
+    },
 }
 
-/// Accepts the previous node's connection and the links it opens, one per window of this node that takes hidden
-/// states, and forwards their frames to `inbox`.
+/// Accepts a previous node's connection as session `session` and the links it opens, one per window of this node
+/// that takes hidden states, and forwards their frames to `inbox`; once the connection is gone and its last frame
+/// is queued, the session's end follows in the same queue.
 async fn accept_prev(
     net: &Net,
     config: &Config,
     node: &Node,
+    session: u64,
     inbox: mpsc::Sender<Inbound>,
 ) -> Result<Connection, BoxError> {
     let connection = loop {
@@ -525,6 +539,20 @@ async fn accept_prev(
     let expected = node.shards.iter().filter(|s| !s.takes_tokens()).count();
     // the confirmations of mirrored copies go back on one stream per connection
     let acks = Arc::new(tokio::sync::Mutex::new(None::<SendStream>));
+    // the last link to run dry reports the session's end, so it comes after every frame of the session
+    let open_links = Arc::new(std::sync::atomic::AtomicUsize::new(expected.max(1)));
+    let end = move |connection: Connection,
+                    inbox: mpsc::Sender<Inbound>,
+                    open_links: Arc<std::sync::atomic::AtomicUsize>| async move {
+        if open_links.fetch_sub(1, std::sync::atomic::Ordering::AcqRel) == 1 {
+            let reason = connection.closed().await;
+            let graceful = matches!(reason, omnarc_network::ConnectionError::ApplicationClosed(ref close) if close.error_code == 0u32.into());
+            let _ = inbox.send(Inbound::Closed { session, graceful }).await;
+        }
+    };
+    if expected == 0 {
+        tokio::spawn(end(connection.clone(), inbox.clone(), Arc::clone(&open_links)));
+    }
     for _ in 0..expected {
         let (begin, mut stream) = omnarc_network::accept_link(&connection).await?.ok_or("the previous node left")?;
         let shard = node
@@ -533,11 +561,12 @@ async fn accept_prev(
             .position(|s| s.layers.start == begin)
             .ok_or_else(|| format!("the previous node feeds layer {begin}, which this node does not hold"))?;
         let inbox = inbox.clone();
-        let (connection, acks) = (connection.clone(), Arc::clone(&acks));
+        let (connection, acks, open_links) = (connection.clone(), Arc::clone(&acks), Arc::clone(&open_links));
         tokio::spawn(async move {
             let mut payload = Vec::new();
             while let Ok(Some(header)) = omnarc_network::read_frame(&mut stream, &mut payload).await {
-                if inbox.send(Inbound { shard, header, payload: std::mem::take(&mut payload) }).await.is_err() {
+                let frame = Inbound::Frame { session, shard, header, payload: std::mem::take(&mut payload) };
+                if inbox.send(frame).await.is_err() {
                     break;
                 }
                 if header.flags.contains(Flags::MIRROR) {
@@ -554,6 +583,7 @@ async fn accept_prev(
                     }
                 }
             }
+            end(connection, inbox, open_links).await;
         });
     }
     Ok(connection)
@@ -577,107 +607,191 @@ pub async fn serve_with(config: Config, network: Net) -> Result<(), BoxError> {
     let config = Arc::new(config);
     let node = {
         let config = Arc::clone(&config);
-        tokio::task::spawn_blocking(move || open_node(&config)).await??
+        Arc::new(tokio::task::spawn_blocking(move || open_node(&config)).await??)
     };
+    let network = Arc::new(network);
     let endpoint = network.endpoint().clone();
-    loop {
-        let (tx, mut inbox) = mpsc::channel(256);
-        let mut prev = accept_prev(&network, &config, &node, tx.clone()).await?;
-        let (mut next, mut links) = if config.mirror_only {
-            (None, HashMap::new())
-        } else {
-            let (connection, links) = connect_next(&endpoint, &config, &node).await?;
-            (Some(connection), links)
-        };
-        let (replica, mut mirrors, mut acks) = connect_replica(&endpoint, &config, &node).await;
-        eprintln!("omnarc: ring session started");
-        let mut requests = HashSet::new();
-        let mut live = !config.mirror_only;
-        loop {
-            tokio::select! {
-                message = inbox.recv() => {
-                    let Some(Inbound { shard, header, payload }) = message else { break };
-                    requests.insert(header.request_id);
-                    let mirrored = header.flags.contains(Flags::MIRROR);
-                    if mirrored && live {
-                        // a copy still on its way when this replica became the live node: the resent step that made
-                        // it live is already in the cache, so running the copy would append that step twice
-                        continue;
+    // every connection is a session, taken whenever it comes; all of them share one queue, so a standby runs the
+    // copies it was sent and the step resent to it in the order they reached it (protocol/tla/Takeover.tla)
+    let (tx, mut inbox) = mpsc::channel(256);
+    let accepting = {
+        let (network, config, node) = (Arc::clone(&network), Arc::clone(&config), Arc::clone(&node));
+        n0_future::task::AbortOnDropHandle::new(tokio::spawn(async move {
+            for session in 1u64.. {
+                match accept_prev(&network, &config, &node, session, tx.clone()).await {
+                    Ok(_) => eprintln!("omnarc: ring session started"),
+                    Err(e) => {
+                        eprintln!("omnarc: no more sessions ({e})");
+                        return;
                     }
-                    if !mirrored {
-                        live = true;
-                        // the replica gets this node's input, not its output: running the same input is what
-                        // keeps its KV cache identical (EN-17)
-                        let mut copy = header;
-                        copy.flags = header.flags.union(Flags::MIRROR);
-                        mirror(&mut mirrors, node.shards[shard].layers.start, &copy, &payload).await;
-                    }
-                    if header.flags.contains(Flags::TOKENS) {
-                        // the replica of the layer-0 window runs the tokens themselves
-                        if header.flags.contains(Flags::DRAFT) {
-                            node.truncate(shard, header.request_id, header.position_start).await;
-                        }
-                        let tokens = payload.as_chunks::<4>().0.iter().map(|b| i32::from_le_bytes(*b)).collect();
-                        node.run_tokens(shard, header.request_id, header.position_start, tokens).await?;
-                        continue;
-                    }
-                    let output = node.run(shard, &header, payload).await?;
-                    if mirrored {
-                        // a replica keeps its cache in step and forwards nothing
-                        continue;
-                    }
-                    let info = node.shards[shard].clone();
-                    let count = u32::from(header.token_count);
-                    let to_logits = info.layers.end == info.model.layer_count;
-                    let mut frame =
-                        node.frame(header.request_id, header.step, header.position_start, count, to_logits)?;
-                    // a speculative step stays one all the way around the ring
-                    if header.flags.contains(Flags::DRAFT) {
-                        frame.flags = frame.flags.union(Flags::DRAFT);
-                    }
-                    // the answer goes on only once the standby holds its copy: otherwise a crash now could leave the
-                    // standby with a hole in its cache (protocol/tla/Takeover.tla)
-                    confirmed(&mut acks, &mut mirrors, header.request_id, header.position_start + count).await;
-                    // a node that was only mirroring is live the moment a frame arrives without MIRROR
-                    if links.is_empty() {
-                        let (connection, fresh) = connect_next(&endpoint, &config, &node).await?;
-                        links = fresh;
-                        next = Some(connection);
-                        live = true;
-                        eprintln!("omnarc: this replica is now the live node for its windows");
-                    }
-                    forward(&endpoint, &config, &node, &mut next, &mut links, info.layers.end, &frame, &output)
-                        .await?;
                 }
-                _ = prev.closed() => {
-                    // a replica whose source left keeps its cache: the node before that source connects next
-                    if !live {
-                        prev = accept_prev(&network, &config, &node, tx.clone()).await?;
-                        continue;
+            }
+        }))
+    };
+    let mut sessions: HashMap<u64, Session> = HashMap::new();
+    // requests this node runs live: a copy of one still on its way is in its cache already
+    let mut live: HashSet<u64> = HashSet::new();
+    while let Some(message) = inbox.recv().await {
+        match message {
+            Inbound::Closed { session, graceful } => {
+                let Some(ended) = sessions.remove(&session) else { continue };
+                // a session that ran its requests, or ended in good order, frees their caches; one whose source
+                // went away keeps them for the node that carries the answer on
+                if ended.live || graceful {
+                    node.drop_requests(&ended.requests).await;
+                    for request in &ended.requests {
+                        live.remove(request);
                     }
-                    break;
+                }
+                ended.close();
+                eprintln!("omnarc: ring session ended");
+            }
+            Inbound::Frame { session, shard, header, payload } => {
+                let state = sessions.entry(session).or_default();
+                let frame = Arrival { shard, header, payload };
+                if let Err(e) = step(&endpoint, &config, &node, &mut live, state, frame).await {
+                    eprintln!("omnarc: session {session} stopped: {e}");
+                    if let Some(failed) = sessions.remove(&session) {
+                        failed.close();
+                    }
                 }
             }
         }
-        node.drop_requests(&requests).await;
-        if let Some(replica) = replica {
+    }
+    drop(accepting);
+    Ok(())
+}
+
+/// One frame for one of a node's windows.
+struct Arrival {
+    shard: usize,
+    header: FrameHeader,
+    payload: Vec<u8>,
+}
+
+/// What a node keeps for one session: where its frames go on to, the standby they are copied to, the requests seen.
+#[derive(Default)]
+struct Session {
+    started: bool,
+    next: Option<Connection>,
+    links: HashMap<u32, SendStream>,
+    replica: Option<Connection>,
+    mirrors: HashMap<u32, SendStream>,
+    acks: Option<Acks>,
+    requests: HashSet<u64>,
+    live: bool,
+}
+
+impl Session {
+    fn close(self) {
+        if let Some(replica) = self.replica {
             replica.close(0u32.into(), b"session over");
         }
-        if let Some(next) = next {
+        if let Some(next) = self.next {
             next.close(0u32.into(), b"session over");
         }
-        eprintln!("omnarc: ring session ended");
     }
+}
+
+// Runs one frame of a session on this node and sends its output on.
+async fn step(
+    endpoint: &Endpoint,
+    config: &Config,
+    node: &Node,
+    live: &mut HashSet<u64>,
+    s: &mut Session,
+    frame: Arrival,
+) -> Result<(), BoxError> {
+    let Arrival { shard, header, payload } = frame;
+    s.requests.insert(header.request_id);
+    let mirrored = header.flags.contains(Flags::MIRROR);
+    if mirrored && live.contains(&header.request_id) {
+        // a copy still on its way when this replica became the live node: the resent step that made it live is
+        // already in the cache, so running the copy would append that step twice
+        return Ok(());
+    }
+    if !s.started {
+        s.started = true;
+        if !mirrored {
+            (s.replica, s.mirrors, s.acks) = connect_replica(endpoint, config, node).await;
+        }
+    }
+    if !mirrored {
+        live.insert(header.request_id);
+        s.live = true;
+        // the replica gets this node's input, not its output: running the same input is what keeps its KV cache
+        // identical (EN-17)
+        let mut copy = header;
+        copy.flags = header.flags.union(Flags::MIRROR);
+        mirror(&mut s.mirrors, node.shards[shard].layers.start, &copy, &payload).await;
+    }
+    if header.flags.contains(Flags::TOKENS) {
+        // the replica of the layer-0 window runs the tokens themselves
+        if header.flags.contains(Flags::DRAFT) {
+            node.truncate(shard, header.request_id, header.position_start).await;
+        }
+        let tokens = payload.as_chunks::<4>().0.iter().map(|b| i32::from_le_bytes(*b)).collect();
+        node.run_tokens(shard, header.request_id, header.position_start, tokens).await?;
+        return Ok(());
+    }
+    let output = node.run(shard, &header, payload).await?;
+    if mirrored {
+        // a replica keeps its cache in step and forwards nothing
+        return Ok(());
+    }
+    let info = node.shards[shard].clone();
+    let count = u32::from(header.token_count);
+    let to_logits = info.layers.end == info.model.layer_count;
+    let mut frame = node.frame(header.request_id, header.step, header.position_start, count, to_logits)?;
+    // a speculative step stays one all the way around the ring
+    if header.flags.contains(Flags::DRAFT) {
+        frame.flags = frame.flags.union(Flags::DRAFT);
+    }
+    // the answer goes on only once the standby holds its copy: otherwise a crash now could leave the standby with a
+    // hole in its cache (protocol/tla/Takeover.tla)
+    confirmed(&mut s.acks, &mut s.mirrors, header.request_id, header.position_start + count).await;
+    if s.links.is_empty() {
+        let (connection, fresh) = connect_next(endpoint, config, node).await?;
+        s.links = fresh;
+        s.next = Some(connection);
+        if config.mirror_only {
+            eprintln!("omnarc: this replica is now the live node for its windows");
+        }
+    }
+    forward(endpoint, config, node, &mut s.next, &mut s.links, info.layers.end, &frame, &output).await
 }
 
 /// The head of a ring: it holds layer 0 and the output head, and answers prompts by sending them around the ring.
 /// It keeps its windows loaded between prompts; each prompt is one session of the ring.
 pub struct Head {
-    node: Node,
-    net: Net,
-    config: Config,
-    // one prompt at a time goes around the ring
-    busy: tokio::sync::Mutex<()>,
+    node: Arc<Node>,
+    net: Arc<Net>,
+    config: Arc<Config>,
+    // where the frames coming back around the ring go: each prompt being answered, by its request
+    routes: Routes,
+    _accepting: n0_future::task::AbortOnDropHandle<()>,
+    _routing: n0_future::task::AbortOnDropHandle<()>,
+}
+
+type Routes = Arc<Mutex<HashMap<u64, mpsc::Sender<Arrival>>>>;
+
+/// Request ids of this process: prompts answered at once each get their own.
+static NEXT_REQUEST: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+
+fn new_request() -> u64 {
+    u64::from(std::process::id()) << 32 | NEXT_REQUEST.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+}
+
+// Takes a prompt's route off the table when its answer ends, however it ends.
+struct Route<'a> {
+    routes: &'a Routes,
+    request: u64,
+}
+
+impl Drop for Route<'_> {
+    fn drop(&mut self) {
+        self.routes.lock().expect("routes").remove(&self.request);
+    }
 }
 
 impl fmt::Debug for Head {
@@ -691,6 +805,9 @@ impl Head {
     ///
     /// # Errors
     /// The engine or the model cannot be opened, or the windows lack layer 0 or the output head.
+    ///
+    /// # Panics
+    /// If a task panicked while it held the table of prompts being answered.
     pub async fn open(config: Config, net: Net) -> Result<Self, BoxError> {
         let config = Arc::new(config);
         let node = {
@@ -703,14 +820,44 @@ impl Head {
         if !node.shards.iter().any(ShardInfo::gives_logits) {
             return Err("the head must hold the output head too (layer N, e.g. N:N+1)".into());
         }
-        let config = Arc::try_unwrap(config).map_err(|_| "the head's configuration is still in use")?;
-        Ok(Self { node, net, config, busy: tokio::sync::Mutex::new(()) })
+        let (node, net) = (Arc::new(node), Arc::new(net));
+        // the ring brings every prompt's frames back on connections of their own; each frame goes to the prompt
+        // its request belongs to, so several prompts go around the ring at once
+        let routes: Routes = Arc::default();
+        let (tx, mut queue) = mpsc::channel(256);
+        let accepting = {
+            let (net, config, node) = (Arc::clone(&net), Arc::clone(&config), Arc::clone(&node));
+            n0_future::task::AbortOnDropHandle::new(tokio::spawn(async move {
+                for session in 1u64.. {
+                    if accept_prev(&net, &config, &node, session, tx.clone()).await.is_err() {
+                        return;
+                    }
+                }
+            }))
+        };
+        let routing = {
+            let routes = Arc::clone(&routes);
+            n0_future::task::AbortOnDropHandle::new(tokio::spawn(async move {
+                while let Some(message) = queue.recv().await {
+                    if let Inbound::Frame { shard, header, payload, .. } = message {
+                        let route = routes.lock().expect("routes").get(&header.request_id).cloned();
+                        if let Some(route) = route {
+                            let _ = route.send(Arrival { shard, header, payload }).await;
+                        }
+                    }
+                }
+            }))
+        };
+        Ok(Self { node, net, config, routes, _accepting: accepting, _routing: routing })
     }
 
     /// Answers `prompt` with at most `max_tokens` tokens, handing every piece of text to `on_piece` as it comes.
     ///
     /// # Errors
     /// The engine fails or the ring breaks.
+    ///
+    /// # Panics
+    /// If a task panicked while it held the table of prompts being answered.
     // one loop, because every step of an answer shares the ring's connections, mirrors and the last frame sent
     #[allow(clippy::too_many_lines)]
     pub async fn ask(
@@ -720,8 +867,7 @@ impl Head {
         params: SamplerParams,
         mut on_piece: impl FnMut(&str),
     ) -> Result<Report, BoxError> {
-        let _busy = self.busy.lock().await;
-        let (node, config, endpoint) = (&self.node, &self.config, self.net.endpoint());
+        let (node, config, endpoint) = (&*self.node, &*self.config, self.net.endpoint());
         let prompt = prompt.to_owned();
         let first =
             node.shards.iter().position(ShardInfo::takes_tokens).ok_or("the head holds no window at layer 0")?;
@@ -732,8 +878,10 @@ impl Head {
         let mut next = Some(connection);
         // the head's own standby is not waited for: nobody takes over the head's sampling
         let (replica, mut mirrors, _) = connect_replica(endpoint, config, node).await;
+        let request = new_request();
         let (tx, mut inbox) = mpsc::channel(256);
-        let mut prevs = vec![accept_prev(&self.net, config, node, tx.clone()).await?];
+        self.routes.lock().expect("routes").insert(request, tx);
+        let _route = Route { routes: &self.routes, request };
         // every step sent whose logits have not come back: the prompt goes out in chunks without waiting, so a
         // device that leaves may take several with it, and each is resent to its standby in order
         let mut inflight: std::collections::VecDeque<(u32, FrameHeader, Vec<u8>)> = std::collections::VecDeque::new();
@@ -741,7 +889,6 @@ impl Head {
         let shard_id = node.shards[first].id;
         let tokens = with_engine(&node.engine, move |engine| engine.tokenize(shard_id, &prompt, true)).await?;
         let sampler = with_engine(&node.engine, move |engine| engine.sampler_open(params)).await?;
-        let request = u64::from(std::process::id()) << 32 | u64::from(rand_u32());
         let prompt_len = u32::try_from(tokens.len())?;
         let start = Instant::now();
 
@@ -782,11 +929,10 @@ impl Head {
                         replay.flags = frame.flags.union(Flags::REPLAY);
                         forward(endpoint, config, node, &mut next, &mut links, *key, &replay, payload).await?;
                     }
-                    prevs.push(accept_prev(&self.net, config, node, tx.clone()).await?);
                     continue;
                 }
             };
-            let Some(Inbound { shard, header, payload }) = message else { break };
+            let Some(Arrival { shard, header, payload }) = message else { break };
             let info = node.shards[shard].clone();
             let count = u32::from(header.token_count);
             let mut copy = header;
@@ -896,7 +1042,7 @@ impl Head {
         let shard_id = info.id;
         let tokens = with_engine(&node.engine, move |engine| engine.tokenize(shard_id, &prompt, true)).await?;
         let sampler = with_engine(&node.engine, move |engine| engine.sampler_open(params)).await?;
-        let request = u64::from(std::process::id()) << 32 | u64::from(rand_u32());
+        let request = new_request();
         let start = Instant::now();
         let (mut generated, mut text, mut times) = (Vec::new(), String::new(), Vec::new());
         let mut position = 0u32;
@@ -1020,11 +1166,6 @@ pub fn draft(context: &[i32], k: usize) -> Vec<i32> {
         }
     }
     Vec::new()
-}
-
-fn rand_u32() -> u32 {
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.subsec_nanos());
-    nanos ^ std::process::id().rotate_left(16)
 }
 
 /// Where this device keeps its node key.

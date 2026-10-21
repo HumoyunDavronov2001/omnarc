@@ -21,7 +21,7 @@ use std::str::FromStr;
 
 pub use iroh::address_lookup::memory::MemoryLookup;
 use iroh::endpoint::presets;
-pub use iroh::endpoint::{Connection, RecvStream, SendStream};
+pub use iroh::endpoint::{Connection, ConnectionError, RecvStream, SendStream};
 pub use iroh::protocol::{self, Router};
 pub use iroh::{Endpoint, EndpointAddr, EndpointId, SecretKey, TransportAddr};
 pub use iroh_mdns_address_lookup::{DiscoveryEvent, MdnsAddressLookup};

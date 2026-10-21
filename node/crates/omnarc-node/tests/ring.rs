@@ -343,3 +343,69 @@ async fn a_replica_takes_over_when_the_device_holding_a_window_leaves() {
     eprintln!("the longest pause between two tokens was {:?}", report.longest_pause);
     let _ = std::fs::remove_dir_all(dir);
 }
+
+/// EN-20: prompts asked at once go around the ring at once, each with its own request; the ring answers each of
+/// them exactly as one device does.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn prompts_asked_at_once_go_around_the_ring_together() {
+    let engine = env_path("OMNARC_ENGINE");
+    let model = env_path("OMNARC_TEST_MODEL");
+    let layers = {
+        let mut probe = Engine::spawn(&engine, 1 << 20).unwrap();
+        let info = probe.model_info(&model).unwrap();
+        probe.quit().unwrap();
+        info.layer_count
+    };
+    let dir = std::env::temp_dir().join(format!("omnarc-ring-together-{}", std::process::id()));
+    let (head_key, worker_key) = (dir.join("head.key"), dir.join("worker.key"));
+    let (head_id, worker_id) = (ring::node_id(&head_key).unwrap(), ring::node_id(&worker_key).unwrap());
+    let (head_addr, worker_addr) = (free_port(), free_port());
+    let config = |windows: Vec<Window>, listen, next, prev, key| Config {
+        model: model.clone(),
+        windows,
+        listen,
+        next,
+        next_replica: None,
+        prev: vec![prev],
+        key,
+        engine: engine.clone(),
+        backend: Backend::Cpu,
+        mirror_only: false,
+        replica: None,
+        max_tokens: 512,
+        chunk: 8,
+        wire: DType::F32,
+        threads: 0,
+        draft: 4,
+        kv: omnarc_engine_host::KvType::F16,
+        prompt: None,
+        generate: GENERATE,
+    };
+    let half = layers / 2;
+    let worker =
+        config(vec![Window(half..layers)], worker_addr, Peer { id: head_id, addr: head_addr }, head_id, worker_key);
+    let head = config(
+        vec![Window(0..half), Window(layers..layers + 1)],
+        head_addr,
+        Peer { id: worker_id, addr: worker_addr },
+        worker_id,
+        head_key,
+    );
+    let worker_task = tokio::spawn(ring::serve(worker));
+    let net = ring::Net::own(&head).await.unwrap();
+    let head = ring::Head::open(head, net).await.unwrap();
+
+    let greedy = SamplerParams::default();
+    let (a, b) = tokio::time::timeout(std::time::Duration::from_secs(120), async {
+        tokio::join!(head.ask(PROMPT, GENERATE, greedy, |_| {}), head.ask(PROMPT, GENERATE, greedy, |_| {}))
+    })
+    .await
+    .expect("both answers within two minutes");
+    let (a, b) = (a.unwrap(), b.unwrap());
+    worker_task.abort();
+
+    let expected = tokio::task::spawn_blocking(move || generate_whole(&engine, &model, layers)).await.unwrap();
+    assert_eq!(a.generated, expected, "the first: {:?}", a.text);
+    assert_eq!(b.generated, expected, "the second: {:?}", b.text);
+    let _ = std::fs::remove_dir_all(dir);
+}

@@ -925,6 +925,8 @@ pub(super) async fn keep_running(shared: Arc<Shared>) {
     let mut since_spread = Duration::ZERO;
     // members that said they are leaving: they need not go quiet first, so their backup takes over at once
     let mut leaving: HashSet<EndpointId> = HashSet::new();
+    // a departure no backup covers is told once per plan, not every second
+    let mut told: Option<(u64, EndpointId)> = None;
     // a device just started has heard nobody yet: nobody has gone quiet before they had time to speak
     let started = std::time::Instant::now();
     let grace = Duration::from_millis(2 * GONE_AFTER_MS.unsigned_abs());
@@ -963,7 +965,10 @@ pub(super) async fn keep_running(shared: Arc<Shared>) {
         let Some(gone) = gone else { continue };
         let backup = plan.backups.iter().find(|b| endpoint_id(&key(b.gone.as_ref())) == Some(gone));
         let Some(mut next) = backup.and_then(|b| b.plan.clone()) else {
-            eprintln!("omnarc: {} left and no backup plan holds the model without it", gone.fmt_short());
+            if told != Some((plan.version, gone)) {
+                told = Some((plan.version, gone));
+                eprintln!("omnarc: {} left and no backup plan holds the model without it", gone.fmt_short());
+            }
             continue;
         };
         next.version = plan.version + 1;

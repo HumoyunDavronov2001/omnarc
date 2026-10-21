@@ -14,7 +14,7 @@ design concept (its section number), or "—".
 <!-- count:begin — written by .github/scripts/spec_count.py from the tables below; do not edit by hand -->
 | Part | Screens | Functions | ✓ done | ◐ partly | ○ not started | Ready |
 |---|---|---|---|---|---|---|
-| Engine | 0 | 30 | 9 | 7 | 14 | 42 % |
+| Engine | 0 | 30 | 9 | 8 | 13 | 43 % |
 | Node agent and API | 0 | 42 | 15 | 15 | 12 | 54 % |
 | Panel | 24 | 7 | 5 | 12 | 14 | 35 % |
 | Desktop app | 4 | 5 | 0 | 0 | 9 | 0 % |
@@ -27,7 +27,7 @@ design concept (its section number), or "—".
 | Islands | 0 | 3 | 0 | 0 | 3 | 0 % |
 | Benchmarks, sites and releases | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Design system and quality across all apps | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **All** | **50** | **143** | **37** | **44** | **112** | **31 %** |
+| **All** | **50** | **143** | **37** | **45** | **111** | **31 %** |
 
 "Ready" counts a partly done item as half. By stage — what each stage has to deliver:
 
@@ -37,7 +37,7 @@ design concept (its section number), or "—".
 | B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
 | B3 | 16 | 9 | 6 | 1 |
-| B4 | 18 | 0 | 9 | 9 |
+| B4 | 18 | 0 | 10 | 8 |
 | B5 | 53 | 0 | 5 | 48 |
 | B6 | 23 | 0 | 0 | 23 |
 | B7 | 9 | 0 | 0 | 9 |
@@ -87,7 +87,7 @@ design concept (its section number), or "—".
 | EN-17 | A replica is kept in step with the device that is answering, so it continues without recomputing: it is sent the same inputs and runs them, and a cache can also be handed over directly | function | R3, Y7 | B3 | — | ✓ |
 | EN-18 | Ring attention: long context across the memory of many devices | function | Y9 | B4 | — | ○ |
 | EN-19 | f8e4m3 activations with a per-token scale | function | T3 | B4 | — | ◐ |
-| EN-20 | Continuous batching | function | D6 | B4 | — | ○ |
+| EN-20 | Continuous batching | function | D6 | B4 | — | ◐ |
 | EN-21 | Prefill and decode on different devices | function | D6 | B4 | — | ○ |
 | EN-22 | Quantization per device from one checkpoint (Q8 on a strong device, Q4 on a weak one) | function | D6, Y5 | B4 | — | ○ |
 | EN-23 | Accuracy mode: parallel paths on whole copies, short summaries between them, one composed answer | function | D8, Y10 | B4 | — | ◐ |
