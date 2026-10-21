@@ -18,7 +18,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file omnarc/v1/cluster_service.proto.
  */
 export const file_omnarc_v1_cluster_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch9vbW5hcmMvdjEvY2x1c3Rlcl9zZXJ2aWNlLnByb3RvEglvbW5hcmMudjEihQIKD0NsdXN0ZXJTbmFwc2hvdBIgCgJpZBgBIAEoCzIULm9tbmFyYy52MS5DbHVzdGVySWQSDAoEbmFtZRgCIAEoCRImCgdkZXZpY2VzGAMgAygLMhUub21uYXJjLnYxLkRldmljZUluZm8SJwoJdGVsZW1ldHJ5GAQgAygLMhQub21uYXJjLnYxLlRlbGVtZXRyeRInCgVwbGFucxgFIAMoCzIYLm9tbmFyYy52MS5QbGFjZW1lbnRQbGFuEiQKCXRoaXNfbm9kZRgGIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQSEgoKY2FuX2ludml0ZRgHIAEoCBIOCgZyZWxheXMYCCADKAkiEwoRR2V0Q2x1c3RlclJlcXVlc3QiQQoSR2V0Q2x1c3RlclJlc3BvbnNlEisKB2NsdXN0ZXIYASABKAsyGi5vbW5hcmMudjEuQ2x1c3RlclNuYXBzaG90IhUKE1dhdGNoQ2x1c3RlclJlcXVlc3Qi4wIKFFdhdGNoQ2x1c3RlclJlc3BvbnNlEi4KCHNuYXBzaG90GAEgASgLMhoub21uYXJjLnYxLkNsdXN0ZXJTbmFwc2hvdEgAEi4KDWRldmljZV9qb2luZWQYAiABKAsyFS5vbW5hcmMudjEuRGV2aWNlSW5mb0gAEigKC2RldmljZV9sZWZ0GAMgASgLMhEub21uYXJjLnYxLk5vZGVJZEgAEikKCXRlbGVtZXRyeRgEIAEoCzIULm9tbmFyYy52MS5UZWxlbWV0cnlIABIwCgxwbGFuX2NoYW5nZWQYBSABKAsyGC5vbW5hcmMudjEuUGxhY2VtZW50UGxhbkgAEi4KDGpvaW5fYXR0ZW1wdBgGIAEoCzIWLm9tbmFyYy52MS5Kb2luQXR0ZW1wdEgAEisKDmRldmljZV9yZW1vdmVkGAcgASgLMhEub21uYXJjLnYxLk5vZGVJZEgAQgcKBWV2ZW50IigKCVNhc1N5bWJvbBINCgVlbW9qaRgBIAEoCRIMCgRuYW1lGAIgASgJIn4KC0pvaW5BdHRlbXB0EiEKBmpvaW5lchgBIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQSJQoGZGV2aWNlGAIgASgLMhUub21uYXJjLnYxLkRldmljZUluZm8SJQoHc3ltYm9scxgDIAMoCzIULm9tbmFyYy52MS5TYXNTeW1ib2wiKgoTQ3JlYXRlVGlja2V0UmVxdWVzdBITCgt0dGxfc2Vjb25kcxgBIAEoDSJkChRDcmVhdGVUaWNrZXRSZXNwb25zZRIoCgZ0aWNrZXQYASABKAsyGC5vbW5hcmMudjEuQ2x1c3RlclRpY2tldBISCgpxcl9wYXlsb2FkGAIgASgJEg4KBnFyX3N2ZxgDIAEoCSJHChFBbnN3ZXJKb2luUmVxdWVzdBIhCgZqb2luZXIYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEg8KB21hdGNoZXMYAiABKAgiJAoSQW5zd2VySm9pblJlc3BvbnNlEg4KBndhaXRlZBgBIAEoCCI4ChNSZW1vdmVNZW1iZXJSZXF1ZXN0EiEKBm1lbWJlchgBIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQiFgoUUmVtb3ZlTWVtYmVyUmVzcG9uc2UiNAoUQ3JlYXRlQ2x1c3RlclJlcXVlc3QSDAoEbmFtZRgBIAEoCRIOCgZyZWxheXMYAiADKAkiFwoVQ3JlYXRlQ2x1c3RlclJlc3BvbnNlIjkKEkpvaW5DbHVzdGVyUmVxdWVzdBIOCgZ0aWNrZXQYASABKAkSEwoLZGV2aWNlX25hbWUYAiABKAkiWQoTSm9pbkNsdXN0ZXJSZXNwb25zZRIoCgdzeW1ib2xzGAEgASgLMhUub21uYXJjLnYxLlNhc1N5bWJvbHNIABIQCgZqb2luZWQYAiABKAlIAEIGCgRzdGVwIjMKClNhc1N5bWJvbHMSJQoHc3ltYm9scxgBIAMoCzIULm9tbmFyYy52MS5TYXNTeW1ib2wiTQoUVXBkYXRlQ2x1c3RlclJlcXVlc3QSDAoEbmFtZRgBIAEoCRIRCglhZGRfcmVsYXkYAiABKAkSFAoMcmVtb3ZlX3JlbGF5GAMgASgJIhcKFVVwZGF0ZUNsdXN0ZXJSZXNwb25zZSI1ChBTZXRCdWRnZXRSZXF1ZXN0EiEKBmJ1ZGdldBgBIAEoCzIRLm9tbmFyYy52MS5CdWRnZXQiEwoRU2V0QnVkZ2V0UmVzcG9uc2UiZAoPUnVuTW9kZWxSZXF1ZXN0Eg0KBW1vZGVsGAEgASgJEiAKBG1vZGUYAiABKA4yEi5vbW5hcmMudjEuUnVuTW9kZRIPCgdjb250ZXh0GAMgASgNEg8KB2RyeV9ydW4YBCABKAgihgEKEFJ1bk1vZGVsUmVzcG9uc2USJgoEcGxhbhgBIAEoCzIYLm9tbmFyYy52MS5QbGFjZW1lbnRQbGFuEioKCGxlZnRfb3V0GAIgAygLMhgub21uYXJjLnYxLkxlZnRPdXREZXZpY2USHgoWZXN0aW1hdGVkX21zX3Blcl90b2tlbhgDIAEoAiJACg1MZWZ0T3V0RGV2aWNlEh8KBG5vZGUYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEg4KBnJlYXNvbhgCIAEoCSITChFMaXN0TW9kZWxzUmVxdWVzdCI6ChJMaXN0TW9kZWxzUmVzcG9uc2USJAoGbW9kZWxzGAEgAygLMhQub21uYXJjLnYxLk1vZGVsSW5mbyJkCglNb2RlbEluZm8SDAoEbmFtZRgBIAEoCRIOCgZibGFrZTMYAiABKAkSEgoKZmlsZV9ieXRlcxgDIAEoBBITCgtsYXllcl9jb3VudBgEIAEoDRIQCghjb21wbGV0ZRgFIAEoCCISChBTdG9wTW9kZWxSZXF1ZXN0IhMKEVN0b3BNb2RlbFJlc3BvbnNlImIKCkFza1JlcXVlc3QSDgoGcHJvbXB0GAEgASgJEhIKCm1heF90b2tlbnMYAiABKA0SDQoFcGF0aHMYAyABKA0SEwoLdGVtcGVyYXR1cmUYBCABKAISDAoEc2VlZBgFIAEoBCJKCgtBc2tSZXNwb25zZRIPCgVwaWVjZRgBIAEoCUgAEiIKBGRvbmUYAiABKAsyEi5vbW5hcmMudjEuQXNrRG9uZUgAQgYKBHN0ZXAiewoHQXNrRG9uZRIVCg1wcm9tcHRfdG9rZW5zGAEgASgNEhgKEGdlbmVyYXRlZF90b2tlbnMYAiABKA0SDwoHdHRmdF9tcxgDIAEoAhIPCgd0cG90X21zGAQgASgCEg0KBXBhdGhzGAUgASgNEg4KBmFncmVlZBgGIAEoDTLrBwoOQ2x1c3RlclNlcnZpY2USSQoKR2V0Q2x1c3RlchIcLm9tbmFyYy52MS5HZXRDbHVzdGVyUmVxdWVzdBodLm9tbmFyYy52MS5HZXRDbHVzdGVyUmVzcG9uc2USUQoMV2F0Y2hDbHVzdGVyEh4ub21uYXJjLnYxLldhdGNoQ2x1c3RlclJlcXVlc3QaHy5vbW5hcmMudjEuV2F0Y2hDbHVzdGVyUmVzcG9uc2UwARJPCgxDcmVhdGVUaWNrZXQSHi5vbW5hcmMudjEuQ3JlYXRlVGlja2V0UmVxdWVzdBofLm9tbmFyYy52MS5DcmVhdGVUaWNrZXRSZXNwb25zZRJJCgpBbnN3ZXJKb2luEhwub21uYXJjLnYxLkFuc3dlckpvaW5SZXF1ZXN0Gh0ub21uYXJjLnYxLkFuc3dlckpvaW5SZXNwb25zZRJPCgxSZW1vdmVNZW1iZXISHi5vbW5hcmMudjEuUmVtb3ZlTWVtYmVyUmVxdWVzdBofLm9tbmFyYy52MS5SZW1vdmVNZW1iZXJSZXNwb25zZRJSCg1VcGRhdGVDbHVzdGVyEh8ub21uYXJjLnYxLlVwZGF0ZUNsdXN0ZXJSZXF1ZXN0GiAub21uYXJjLnYxLlVwZGF0ZUNsdXN0ZXJSZXNwb25zZRJSCg1DcmVhdGVDbHVzdGVyEh8ub21uYXJjLnYxLkNyZWF0ZUNsdXN0ZXJSZXF1ZXN0GiAub21uYXJjLnYxLkNyZWF0ZUNsdXN0ZXJSZXNwb25zZRJOCgtKb2luQ2x1c3RlchIdLm9tbmFyYy52MS5Kb2luQ2x1c3RlclJlcXVlc3QaHi5vbW5hcmMudjEuSm9pbkNsdXN0ZXJSZXNwb25zZTABEkYKCVNldEJ1ZGdldBIbLm9tbmFyYy52MS5TZXRCdWRnZXRSZXF1ZXN0Ghwub21uYXJjLnYxLlNldEJ1ZGdldFJlc3BvbnNlEkMKCFJ1bk1vZGVsEhoub21uYXJjLnYxLlJ1bk1vZGVsUmVxdWVzdBobLm9tbmFyYy52MS5SdW5Nb2RlbFJlc3BvbnNlEkYKCVN0b3BNb2RlbBIbLm9tbmFyYy52MS5TdG9wTW9kZWxSZXF1ZXN0Ghwub21uYXJjLnYxLlN0b3BNb2RlbFJlc3BvbnNlEjYKA0FzaxIVLm9tbmFyYy52MS5Bc2tSZXF1ZXN0GhYub21uYXJjLnYxLkFza1Jlc3BvbnNlMAESSQoKTGlzdE1vZGVscxIcLm9tbmFyYy52MS5MaXN0TW9kZWxzUmVxdWVzdBodLm9tbmFyYy52MS5MaXN0TW9kZWxzUmVzcG9uc2ViBnByb3RvMw", [file_omnarc_v1_device, file_omnarc_v1_pairing, file_omnarc_v1_plan, file_omnarc_v1_telemetry]);
+  fileDesc("Ch9vbW5hcmMvdjEvY2x1c3Rlcl9zZXJ2aWNlLnByb3RvEglvbW5hcmMudjEitAIKD0NsdXN0ZXJTbmFwc2hvdBIgCgJpZBgBIAEoCzIULm9tbmFyYy52MS5DbHVzdGVySWQSDAoEbmFtZRgCIAEoCRImCgdkZXZpY2VzGAMgAygLMhUub21uYXJjLnYxLkRldmljZUluZm8SJwoJdGVsZW1ldHJ5GAQgAygLMhQub21uYXJjLnYxLlRlbGVtZXRyeRInCgVwbGFucxgFIAMoCzIYLm9tbmFyYy52MS5QbGFjZW1lbnRQbGFuEiQKCXRoaXNfbm9kZRgGIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWQSEgoKY2FuX2ludml0ZRgHIAEoCBIOCgZyZWxheXMYCCADKAkSLQoKc3VnZ2VzdGlvbhgJIAEoCzIZLm9tbmFyYy52MS5QbGFuU3VnZ2VzdGlvbiJsCg5QbGFuU3VnZ2VzdGlvbhImCgRwbGFuGAEgASgLMhgub21uYXJjLnYxLlBsYWNlbWVudFBsYW4SFAoMbXNfcGVyX3Rva2VuGAIgASgCEhwKFGN1cnJlbnRfbXNfcGVyX3Rva2VuGAMgASgCIhMKEUdldENsdXN0ZXJSZXF1ZXN0IkEKEkdldENsdXN0ZXJSZXNwb25zZRIrCgdjbHVzdGVyGAEgASgLMhoub21uYXJjLnYxLkNsdXN0ZXJTbmFwc2hvdCIVChNXYXRjaENsdXN0ZXJSZXF1ZXN0IuMCChRXYXRjaENsdXN0ZXJSZXNwb25zZRIuCghzbmFwc2hvdBgBIAEoCzIaLm9tbmFyYy52MS5DbHVzdGVyU25hcHNob3RIABIuCg1kZXZpY2Vfam9pbmVkGAIgASgLMhUub21uYXJjLnYxLkRldmljZUluZm9IABIoCgtkZXZpY2VfbGVmdBgDIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWRIABIpCgl0ZWxlbWV0cnkYBCABKAsyFC5vbW5hcmMudjEuVGVsZW1ldHJ5SAASMAoMcGxhbl9jaGFuZ2VkGAUgASgLMhgub21uYXJjLnYxLlBsYWNlbWVudFBsYW5IABIuCgxqb2luX2F0dGVtcHQYBiABKAsyFi5vbW5hcmMudjEuSm9pbkF0dGVtcHRIABIrCg5kZXZpY2VfcmVtb3ZlZBgHIAEoCzIRLm9tbmFyYy52MS5Ob2RlSWRIAEIHCgVldmVudCIoCglTYXNTeW1ib2wSDQoFZW1vamkYASABKAkSDAoEbmFtZRgCIAEoCSJ+CgtKb2luQXR0ZW1wdBIhCgZqb2luZXIYASABKAsyES5vbW5hcmMudjEuTm9kZUlkEiUKBmRldmljZRgCIAEoCzIVLm9tbmFyYy52MS5EZXZpY2VJbmZvEiUKB3N5bWJvbHMYAyADKAsyFC5vbW5hcmMudjEuU2FzU3ltYm9sIioKE0NyZWF0ZVRpY2tldFJlcXVlc3QSEwoLdHRsX3NlY29uZHMYASABKA0iZAoUQ3JlYXRlVGlja2V0UmVzcG9uc2USKAoGdGlja2V0GAEgASgLMhgub21uYXJjLnYxLkNsdXN0ZXJUaWNrZXQSEgoKcXJfcGF5bG9hZBgCIAEoCRIOCgZxcl9zdmcYAyABKAkiRwoRQW5zd2VySm9pblJlcXVlc3QSIQoGam9pbmVyGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBIPCgdtYXRjaGVzGAIgASgIIiQKEkFuc3dlckpvaW5SZXNwb25zZRIOCgZ3YWl0ZWQYASABKAgiOAoTUmVtb3ZlTWVtYmVyUmVxdWVzdBIhCgZtZW1iZXIYASABKAsyES5vbW5hcmMudjEuTm9kZUlkIhYKFFJlbW92ZU1lbWJlclJlc3BvbnNlIjQKFENyZWF0ZUNsdXN0ZXJSZXF1ZXN0EgwKBG5hbWUYASABKAkSDgoGcmVsYXlzGAIgAygJIhcKFUNyZWF0ZUNsdXN0ZXJSZXNwb25zZSI5ChJKb2luQ2x1c3RlclJlcXVlc3QSDgoGdGlja2V0GAEgASgJEhMKC2RldmljZV9uYW1lGAIgASgJIlkKE0pvaW5DbHVzdGVyUmVzcG9uc2USKAoHc3ltYm9scxgBIAEoCzIVLm9tbmFyYy52MS5TYXNTeW1ib2xzSAASEAoGam9pbmVkGAIgASgJSABCBgoEc3RlcCIzCgpTYXNTeW1ib2xzEiUKB3N5bWJvbHMYASADKAsyFC5vbW5hcmMudjEuU2FzU3ltYm9sIk0KFFVwZGF0ZUNsdXN0ZXJSZXF1ZXN0EgwKBG5hbWUYASABKAkSEQoJYWRkX3JlbGF5GAIgASgJEhQKDHJlbW92ZV9yZWxheRgDIAEoCSIXChVVcGRhdGVDbHVzdGVyUmVzcG9uc2UiNQoQU2V0QnVkZ2V0UmVxdWVzdBIhCgZidWRnZXQYASABKAsyES5vbW5hcmMudjEuQnVkZ2V0IhMKEVNldEJ1ZGdldFJlc3BvbnNlImQKD1J1bk1vZGVsUmVxdWVzdBINCgVtb2RlbBgBIAEoCRIgCgRtb2RlGAIgASgOMhIub21uYXJjLnYxLlJ1bk1vZGUSDwoHY29udGV4dBgDIAEoDRIPCgdkcnlfcnVuGAQgASgIIoYBChBSdW5Nb2RlbFJlc3BvbnNlEiYKBHBsYW4YASABKAsyGC5vbW5hcmMudjEuUGxhY2VtZW50UGxhbhIqCghsZWZ0X291dBgCIAMoCzIYLm9tbmFyYy52MS5MZWZ0T3V0RGV2aWNlEh4KFmVzdGltYXRlZF9tc19wZXJfdG9rZW4YAyABKAIiQAoNTGVmdE91dERldmljZRIfCgRub2RlGAEgASgLMhEub21uYXJjLnYxLk5vZGVJZBIOCgZyZWFzb24YAiABKAkiEwoRTGlzdE1vZGVsc1JlcXVlc3QiOgoSTGlzdE1vZGVsc1Jlc3BvbnNlEiQKBm1vZGVscxgBIAMoCzIULm9tbmFyYy52MS5Nb2RlbEluZm8iZAoJTW9kZWxJbmZvEgwKBG5hbWUYASABKAkSDgoGYmxha2UzGAIgASgJEhIKCmZpbGVfYnl0ZXMYAyABKAQSEwoLbGF5ZXJfY291bnQYBCABKA0SEAoIY29tcGxldGUYBSABKAgiEgoQU3RvcE1vZGVsUmVxdWVzdCITChFTdG9wTW9kZWxSZXNwb25zZSJiCgpBc2tSZXF1ZXN0Eg4KBnByb21wdBgBIAEoCRISCgptYXhfdG9rZW5zGAIgASgNEg0KBXBhdGhzGAMgASgNEhMKC3RlbXBlcmF0dXJlGAQgASgCEgwKBHNlZWQYBSABKAQiSgoLQXNrUmVzcG9uc2USDwoFcGllY2UYASABKAlIABIiCgRkb25lGAIgASgLMhIub21uYXJjLnYxLkFza0RvbmVIAEIGCgRzdGVwInsKB0Fza0RvbmUSFQoNcHJvbXB0X3Rva2VucxgBIAEoDRIYChBnZW5lcmF0ZWRfdG9rZW5zGAIgASgNEg8KB3R0ZnRfbXMYAyABKAISDwoHdHBvdF9tcxgEIAEoAhINCgVwYXRocxgFIAEoDRIOCgZhZ3JlZWQYBiABKA0y6wcKDkNsdXN0ZXJTZXJ2aWNlEkkKCkdldENsdXN0ZXISHC5vbW5hcmMudjEuR2V0Q2x1c3RlclJlcXVlc3QaHS5vbW5hcmMudjEuR2V0Q2x1c3RlclJlc3BvbnNlElEKDFdhdGNoQ2x1c3RlchIeLm9tbmFyYy52MS5XYXRjaENsdXN0ZXJSZXF1ZXN0Gh8ub21uYXJjLnYxLldhdGNoQ2x1c3RlclJlc3BvbnNlMAESTwoMQ3JlYXRlVGlja2V0Eh4ub21uYXJjLnYxLkNyZWF0ZVRpY2tldFJlcXVlc3QaHy5vbW5hcmMudjEuQ3JlYXRlVGlja2V0UmVzcG9uc2USSQoKQW5zd2VySm9pbhIcLm9tbmFyYy52MS5BbnN3ZXJKb2luUmVxdWVzdBodLm9tbmFyYy52MS5BbnN3ZXJKb2luUmVzcG9uc2USTwoMUmVtb3ZlTWVtYmVyEh4ub21uYXJjLnYxLlJlbW92ZU1lbWJlclJlcXVlc3QaHy5vbW5hcmMudjEuUmVtb3ZlTWVtYmVyUmVzcG9uc2USUgoNVXBkYXRlQ2x1c3RlchIfLm9tbmFyYy52MS5VcGRhdGVDbHVzdGVyUmVxdWVzdBogLm9tbmFyYy52MS5VcGRhdGVDbHVzdGVyUmVzcG9uc2USUgoNQ3JlYXRlQ2x1c3RlchIfLm9tbmFyYy52MS5DcmVhdGVDbHVzdGVyUmVxdWVzdBogLm9tbmFyYy52MS5DcmVhdGVDbHVzdGVyUmVzcG9uc2USTgoLSm9pbkNsdXN0ZXISHS5vbW5hcmMudjEuSm9pbkNsdXN0ZXJSZXF1ZXN0Gh4ub21uYXJjLnYxLkpvaW5DbHVzdGVyUmVzcG9uc2UwARJGCglTZXRCdWRnZXQSGy5vbW5hcmMudjEuU2V0QnVkZ2V0UmVxdWVzdBocLm9tbmFyYy52MS5TZXRCdWRnZXRSZXNwb25zZRJDCghSdW5Nb2RlbBIaLm9tbmFyYy52MS5SdW5Nb2RlbFJlcXVlc3QaGy5vbW5hcmMudjEuUnVuTW9kZWxSZXNwb25zZRJGCglTdG9wTW9kZWwSGy5vbW5hcmMudjEuU3RvcE1vZGVsUmVxdWVzdBocLm9tbmFyYy52MS5TdG9wTW9kZWxSZXNwb25zZRI2CgNBc2sSFS5vbW5hcmMudjEuQXNrUmVxdWVzdBoWLm9tbmFyYy52MS5Bc2tSZXNwb25zZTABEkkKCkxpc3RNb2RlbHMSHC5vbW5hcmMudjEuTGlzdE1vZGVsc1JlcXVlc3QaHS5vbW5hcmMudjEuTGlzdE1vZGVsc1Jlc3BvbnNlYgZwcm90bzM", [file_omnarc_v1_device, file_omnarc_v1_pairing, file_omnarc_v1_plan, file_omnarc_v1_telemetry]);
 
 /**
  * @generated from message omnarc.v1.ClusterSnapshot
@@ -69,6 +69,13 @@ export type ClusterSnapshot = Message<"omnarc.v1.ClusterSnapshot"> & {
    * @generated from field: repeated string relays = 8;
    */
   relays: string[];
+
+  /**
+   * A faster plan for the running model than the one it runs, now that the devices or their offers changed (NO-48).
+   *
+   * @generated from field: omnarc.v1.PlanSuggestion suggestion = 9;
+   */
+  suggestion?: PlanSuggestion | undefined;
 };
 
 /**
@@ -77,6 +84,35 @@ export type ClusterSnapshot = Message<"omnarc.v1.ClusterSnapshot"> & {
  */
 export const ClusterSnapshotSchema: GenMessage<ClusterSnapshot> = /*@__PURE__*/
   messageDesc(file_omnarc_v1_cluster_service, 0);
+
+/**
+ * @generated from message omnarc.v1.PlanSuggestion
+ */
+export type PlanSuggestion = Message<"omnarc.v1.PlanSuggestion"> & {
+  /**
+   * @generated from field: omnarc.v1.PlacementPlan plan = 1;
+   */
+  plan?: PlacementPlan | undefined;
+
+  /**
+   * What one token would take with it, and takes with the running plan, in milliseconds.
+   *
+   * @generated from field: float ms_per_token = 2;
+   */
+  msPerToken: number;
+
+  /**
+   * @generated from field: float current_ms_per_token = 3;
+   */
+  currentMsPerToken: number;
+};
+
+/**
+ * Describes the message omnarc.v1.PlanSuggestion.
+ * Use `create(PlanSuggestionSchema)` to create a new message.
+ */
+export const PlanSuggestionSchema: GenMessage<PlanSuggestion> = /*@__PURE__*/
+  messageDesc(file_omnarc_v1_cluster_service, 1);
 
 /**
  * @generated from message omnarc.v1.GetClusterRequest
@@ -89,7 +125,7 @@ export type GetClusterRequest = Message<"omnarc.v1.GetClusterRequest"> & {
  * Use `create(GetClusterRequestSchema)` to create a new message.
  */
 export const GetClusterRequestSchema: GenMessage<GetClusterRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 1);
+  messageDesc(file_omnarc_v1_cluster_service, 2);
 
 /**
  * @generated from message omnarc.v1.GetClusterResponse
@@ -106,7 +142,7 @@ export type GetClusterResponse = Message<"omnarc.v1.GetClusterResponse"> & {
  * Use `create(GetClusterResponseSchema)` to create a new message.
  */
 export const GetClusterResponseSchema: GenMessage<GetClusterResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 2);
+  messageDesc(file_omnarc_v1_cluster_service, 3);
 
 /**
  * @generated from message omnarc.v1.WatchClusterRequest
@@ -119,7 +155,7 @@ export type WatchClusterRequest = Message<"omnarc.v1.WatchClusterRequest"> & {
  * Use `create(WatchClusterRequestSchema)` to create a new message.
  */
 export const WatchClusterRequestSchema: GenMessage<WatchClusterRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 3);
+  messageDesc(file_omnarc_v1_cluster_service, 4);
 
 /**
  * @generated from message omnarc.v1.WatchClusterResponse
@@ -184,7 +220,7 @@ export type WatchClusterResponse = Message<"omnarc.v1.WatchClusterResponse"> & {
  * Use `create(WatchClusterResponseSchema)` to create a new message.
  */
 export const WatchClusterResponseSchema: GenMessage<WatchClusterResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 4);
+  messageDesc(file_omnarc_v1_cluster_service, 5);
 
 /**
  * One of the four symbols both screens show while a device joins (protocol/CLUSTER.md §2.4).
@@ -210,7 +246,7 @@ export type SasSymbol = Message<"omnarc.v1.SasSymbol"> & {
  * Use `create(SasSymbolSchema)` to create a new message.
  */
 export const SasSymbolSchema: GenMessage<SasSymbol> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 5);
+  messageDesc(file_omnarc_v1_cluster_service, 6);
 
 /**
  * @generated from message omnarc.v1.JoinAttempt
@@ -237,7 +273,7 @@ export type JoinAttempt = Message<"omnarc.v1.JoinAttempt"> & {
  * Use `create(JoinAttemptSchema)` to create a new message.
  */
 export const JoinAttemptSchema: GenMessage<JoinAttempt> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 6);
+  messageDesc(file_omnarc_v1_cluster_service, 7);
 
 /**
  * @generated from message omnarc.v1.CreateTicketRequest
@@ -256,7 +292,7 @@ export type CreateTicketRequest = Message<"omnarc.v1.CreateTicketRequest"> & {
  * Use `create(CreateTicketRequestSchema)` to create a new message.
  */
 export const CreateTicketRequestSchema: GenMessage<CreateTicketRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 7);
+  messageDesc(file_omnarc_v1_cluster_service, 8);
 
 /**
  * @generated from message omnarc.v1.CreateTicketResponse
@@ -287,7 +323,7 @@ export type CreateTicketResponse = Message<"omnarc.v1.CreateTicketResponse"> & {
  * Use `create(CreateTicketResponseSchema)` to create a new message.
  */
 export const CreateTicketResponseSchema: GenMessage<CreateTicketResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 8);
+  messageDesc(file_omnarc_v1_cluster_service, 9);
 
 /**
  * @generated from message omnarc.v1.AnswerJoinRequest
@@ -309,7 +345,7 @@ export type AnswerJoinRequest = Message<"omnarc.v1.AnswerJoinRequest"> & {
  * Use `create(AnswerJoinRequestSchema)` to create a new message.
  */
 export const AnswerJoinRequestSchema: GenMessage<AnswerJoinRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 9);
+  messageDesc(file_omnarc_v1_cluster_service, 10);
 
 /**
  * @generated from message omnarc.v1.AnswerJoinResponse
@@ -328,7 +364,7 @@ export type AnswerJoinResponse = Message<"omnarc.v1.AnswerJoinResponse"> & {
  * Use `create(AnswerJoinResponseSchema)` to create a new message.
  */
 export const AnswerJoinResponseSchema: GenMessage<AnswerJoinResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 10);
+  messageDesc(file_omnarc_v1_cluster_service, 11);
 
 /**
  * @generated from message omnarc.v1.RemoveMemberRequest
@@ -345,7 +381,7 @@ export type RemoveMemberRequest = Message<"omnarc.v1.RemoveMemberRequest"> & {
  * Use `create(RemoveMemberRequestSchema)` to create a new message.
  */
 export const RemoveMemberRequestSchema: GenMessage<RemoveMemberRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 11);
+  messageDesc(file_omnarc_v1_cluster_service, 12);
 
 /**
  * @generated from message omnarc.v1.RemoveMemberResponse
@@ -358,7 +394,7 @@ export type RemoveMemberResponse = Message<"omnarc.v1.RemoveMemberResponse"> & {
  * Use `create(RemoveMemberResponseSchema)` to create a new message.
  */
 export const RemoveMemberResponseSchema: GenMessage<RemoveMemberResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 12);
+  messageDesc(file_omnarc_v1_cluster_service, 13);
 
 /**
  * @generated from message omnarc.v1.CreateClusterRequest
@@ -382,7 +418,7 @@ export type CreateClusterRequest = Message<"omnarc.v1.CreateClusterRequest"> & {
  * Use `create(CreateClusterRequestSchema)` to create a new message.
  */
 export const CreateClusterRequestSchema: GenMessage<CreateClusterRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 13);
+  messageDesc(file_omnarc_v1_cluster_service, 14);
 
 /**
  * @generated from message omnarc.v1.CreateClusterResponse
@@ -395,7 +431,7 @@ export type CreateClusterResponse = Message<"omnarc.v1.CreateClusterResponse"> &
  * Use `create(CreateClusterResponseSchema)` to create a new message.
  */
 export const CreateClusterResponseSchema: GenMessage<CreateClusterResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 14);
+  messageDesc(file_omnarc_v1_cluster_service, 15);
 
 /**
  * @generated from message omnarc.v1.JoinClusterRequest
@@ -421,7 +457,7 @@ export type JoinClusterRequest = Message<"omnarc.v1.JoinClusterRequest"> & {
  * Use `create(JoinClusterRequestSchema)` to create a new message.
  */
 export const JoinClusterRequestSchema: GenMessage<JoinClusterRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 15);
+  messageDesc(file_omnarc_v1_cluster_service, 16);
 
 /**
  * @generated from message omnarc.v1.JoinClusterResponse
@@ -452,7 +488,7 @@ export type JoinClusterResponse = Message<"omnarc.v1.JoinClusterResponse"> & {
  * Use `create(JoinClusterResponseSchema)` to create a new message.
  */
 export const JoinClusterResponseSchema: GenMessage<JoinClusterResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 16);
+  messageDesc(file_omnarc_v1_cluster_service, 17);
 
 /**
  * @generated from message omnarc.v1.SasSymbols
@@ -469,7 +505,7 @@ export type SasSymbols = Message<"omnarc.v1.SasSymbols"> & {
  * Use `create(SasSymbolsSchema)` to create a new message.
  */
 export const SasSymbolsSchema: GenMessage<SasSymbols> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 17);
+  messageDesc(file_omnarc_v1_cluster_service, 18);
 
 /**
  * @generated from message omnarc.v1.UpdateClusterRequest
@@ -502,7 +538,7 @@ export type UpdateClusterRequest = Message<"omnarc.v1.UpdateClusterRequest"> & {
  * Use `create(UpdateClusterRequestSchema)` to create a new message.
  */
 export const UpdateClusterRequestSchema: GenMessage<UpdateClusterRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 18);
+  messageDesc(file_omnarc_v1_cluster_service, 19);
 
 /**
  * @generated from message omnarc.v1.UpdateClusterResponse
@@ -515,7 +551,7 @@ export type UpdateClusterResponse = Message<"omnarc.v1.UpdateClusterResponse"> &
  * Use `create(UpdateClusterResponseSchema)` to create a new message.
  */
 export const UpdateClusterResponseSchema: GenMessage<UpdateClusterResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 19);
+  messageDesc(file_omnarc_v1_cluster_service, 20);
 
 /**
  * @generated from message omnarc.v1.SetBudgetRequest
@@ -532,7 +568,7 @@ export type SetBudgetRequest = Message<"omnarc.v1.SetBudgetRequest"> & {
  * Use `create(SetBudgetRequestSchema)` to create a new message.
  */
 export const SetBudgetRequestSchema: GenMessage<SetBudgetRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 20);
+  messageDesc(file_omnarc_v1_cluster_service, 21);
 
 /**
  * @generated from message omnarc.v1.SetBudgetResponse
@@ -545,7 +581,7 @@ export type SetBudgetResponse = Message<"omnarc.v1.SetBudgetResponse"> & {
  * Use `create(SetBudgetResponseSchema)` to create a new message.
  */
 export const SetBudgetResponseSchema: GenMessage<SetBudgetResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 21);
+  messageDesc(file_omnarc_v1_cluster_service, 22);
 
 /**
  * @generated from message omnarc.v1.RunModelRequest
@@ -583,7 +619,7 @@ export type RunModelRequest = Message<"omnarc.v1.RunModelRequest"> & {
  * Use `create(RunModelRequestSchema)` to create a new message.
  */
 export const RunModelRequestSchema: GenMessage<RunModelRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 22);
+  messageDesc(file_omnarc_v1_cluster_service, 23);
 
 /**
  * @generated from message omnarc.v1.RunModelResponse
@@ -614,7 +650,7 @@ export type RunModelResponse = Message<"omnarc.v1.RunModelResponse"> & {
  * Use `create(RunModelResponseSchema)` to create a new message.
  */
 export const RunModelResponseSchema: GenMessage<RunModelResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 23);
+  messageDesc(file_omnarc_v1_cluster_service, 24);
 
 /**
  * @generated from message omnarc.v1.LeftOutDevice
@@ -638,7 +674,7 @@ export type LeftOutDevice = Message<"omnarc.v1.LeftOutDevice"> & {
  * Use `create(LeftOutDeviceSchema)` to create a new message.
  */
 export const LeftOutDeviceSchema: GenMessage<LeftOutDevice> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 24);
+  messageDesc(file_omnarc_v1_cluster_service, 25);
 
 /**
  * @generated from message omnarc.v1.ListModelsRequest
@@ -651,7 +687,7 @@ export type ListModelsRequest = Message<"omnarc.v1.ListModelsRequest"> & {
  * Use `create(ListModelsRequestSchema)` to create a new message.
  */
 export const ListModelsRequestSchema: GenMessage<ListModelsRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 25);
+  messageDesc(file_omnarc_v1_cluster_service, 26);
 
 /**
  * @generated from message omnarc.v1.ListModelsResponse
@@ -668,7 +704,7 @@ export type ListModelsResponse = Message<"omnarc.v1.ListModelsResponse"> & {
  * Use `create(ListModelsResponseSchema)` to create a new message.
  */
 export const ListModelsResponseSchema: GenMessage<ListModelsResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 26);
+  messageDesc(file_omnarc_v1_cluster_service, 27);
 
 /**
  * @generated from message omnarc.v1.ModelInfo
@@ -709,7 +745,7 @@ export type ModelInfo = Message<"omnarc.v1.ModelInfo"> & {
  * Use `create(ModelInfoSchema)` to create a new message.
  */
 export const ModelInfoSchema: GenMessage<ModelInfo> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 27);
+  messageDesc(file_omnarc_v1_cluster_service, 28);
 
 /**
  * @generated from message omnarc.v1.StopModelRequest
@@ -722,7 +758,7 @@ export type StopModelRequest = Message<"omnarc.v1.StopModelRequest"> & {
  * Use `create(StopModelRequestSchema)` to create a new message.
  */
 export const StopModelRequestSchema: GenMessage<StopModelRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 28);
+  messageDesc(file_omnarc_v1_cluster_service, 29);
 
 /**
  * @generated from message omnarc.v1.StopModelResponse
@@ -735,7 +771,7 @@ export type StopModelResponse = Message<"omnarc.v1.StopModelResponse"> & {
  * Use `create(StopModelResponseSchema)` to create a new message.
  */
 export const StopModelResponseSchema: GenMessage<StopModelResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 29);
+  messageDesc(file_omnarc_v1_cluster_service, 30);
 
 /**
  * @generated from message omnarc.v1.AskRequest
@@ -781,7 +817,7 @@ export type AskRequest = Message<"omnarc.v1.AskRequest"> & {
  * Use `create(AskRequestSchema)` to create a new message.
  */
 export const AskRequestSchema: GenMessage<AskRequest> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 30);
+  messageDesc(file_omnarc_v1_cluster_service, 31);
 
 /**
  * @generated from message omnarc.v1.AskResponse
@@ -812,7 +848,7 @@ export type AskResponse = Message<"omnarc.v1.AskResponse"> & {
  * Use `create(AskResponseSchema)` to create a new message.
  */
 export const AskResponseSchema: GenMessage<AskResponse> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 31);
+  messageDesc(file_omnarc_v1_cluster_service, 32);
 
 /**
  * @generated from message omnarc.v1.AskDone
@@ -858,7 +894,7 @@ export type AskDone = Message<"omnarc.v1.AskDone"> & {
  * Use `create(AskDoneSchema)` to create a new message.
  */
 export const AskDoneSchema: GenMessage<AskDone> = /*@__PURE__*/
-  messageDesc(file_omnarc_v1_cluster_service, 32);
+  messageDesc(file_omnarc_v1_cluster_service, 33);
 
 /**
  * The control API every node serves to the panel and to apps (Connect RPC, protocol/CLUSTER.md §5).

@@ -15,8 +15,8 @@ design concept (its section number), or "—".
 | Part | Screens | Functions | ✓ done | ◐ partly | ○ not started | Ready |
 |---|---|---|---|---|---|---|
 | Engine | 0 | 30 | 9 | 5 | 16 | 38 % |
-| Node agent and API | 0 | 42 | 12 | 16 | 14 | 48 % |
-| Panel | 24 | 7 | 3 | 8 | 20 | 23 % |
+| Node agent and API | 0 | 42 | 13 | 17 | 12 | 51 % |
+| Panel | 24 | 7 | 4 | 11 | 16 | 31 % |
 | Desktop app | 4 | 5 | 0 | 0 | 9 | 0 % |
 | Android app | 7 | 8 | 0 | 2 | 13 | 7 % |
 | iOS app | 8 | 6 | 0 | 2 | 12 | 7 % |
@@ -27,7 +27,7 @@ design concept (its section number), or "—".
 | Islands | 0 | 3 | 0 | 0 | 3 | 0 % |
 | Benchmarks, sites and releases | 3 | 9 | 2 | 2 | 8 | 25 % |
 | Design system and quality across all apps | 1 | 13 | 6 | 4 | 4 | 57 % |
-| **All** | **50** | **143** | **32** | **39** | **122** | **27 %** |
+| **All** | **50** | **143** | **34** | **43** | **116** | **29 %** |
 
 "Ready" counts a partly done item as half. By stage — what each stage has to deliver:
 
@@ -36,7 +36,7 @@ design concept (its section number), or "—".
 | B0 | 10 | 9 | 1 | 0 |
 | B1 | 16 | 12 | 2 | 2 |
 | B2 | 28 | 7 | 20 | 1 |
-| B3 | 16 | 4 | 5 | 7 |
+| B3 | 16 | 6 | 9 | 1 |
 | B4 | 18 | 0 | 5 | 13 |
 | B5 | 53 | 0 | 5 | 48 |
 | B6 | 23 | 0 | 0 | 23 |
@@ -148,10 +148,10 @@ design concept (its section number), or "—".
 | NO-51 | A device announces a budget (memory, cores or GPU share, hours) and the placement never exceeds it | function | Q1, Q7 | B3 | — | ◐ |
 | NO-52 | A device too small for any window is left out of the plan instead of slowing it down | function | Q7, R6 | B3 | — | ✓ |
 | NO-44 | Never slower: a model that fits on one device is not split over a slower link | function | R6, W11 | B3 | — | ✓ |
-| NO-45 | The mode of each request: latency, throughput, capacity, accuracy | function | R4 | B3 | 01 | ○ |
+| NO-45 | The mode of each request: latency, throughput, capacity, accuracy | function | R4 | B3 | 01 | ◐ |
 | NO-46 | Tensor-parallel groups only over links of ≤ 1 ms | function | R5 | B3 | — | ○ |
 | NO-47 | Battery, heat, schedule and idle limits hand work to a replica | function | Q5 | B5 | 03 | ○ |
-| NO-48 | Plan suggestions: where moving layers would make the ring faster | function | R1 | B3 | 01 | ○ |
+| NO-48 | Plan suggestions: where moving layers would make the ring faster | function | R1 | B3 | 01 | ✓ |
 | NO-49 | Re-planning and KV copies modeled in TLA+ and checked in TLC | function | P§8 | B3 | — | ✓ |
 | NO-50 | 1,000 random drop and join scenarios in a network simulation without a lost answer | function | P§8 | B2 | — | ◐ |
 
@@ -183,8 +183,8 @@ nine sections in a rail: Ring, Devices, Models, Chat, Observe, Training, Network
 | PA-06 | A device | screen | Q1, Q5 | B2 | — | ◐ |
 | PA-07 | People (the family ring) | screen | K1, Q6 | B6 | — | ○ |
 | PA-08 | Models: catalog | screen | — | B8 | — | ○ |
-| PA-09 | Will it fit? and the placement plan | screen | — | B3 | 04 | ○ |
-| PA-10 | Running models and downloads | screen | T5 | B3 | — | ○ |
+| PA-09 | Will it fit? and the placement plan | screen | — | B3 | 04 | ◐ |
+| PA-10 | Running models and downloads | screen | T5 | B3 | — | ◐ |
 | PA-11 | Use from apps and agents | screen | A4 | B8 | — | ○ |
 | PA-12 | Chat | screen | D8 | B4 | — | ◐ |
 | PA-13 | Observe: token path | screen | — | B4 | 05 | ○ |
@@ -199,8 +199,8 @@ nine sections in a rail: Ring, Devices, Models, Chat, Observe, Training, Network
 | PA-22 | Organization: audit and usage | screen | K2, A3 | B6 | — | ○ |
 | PA-23 | Settings | screen | U9 | B2 | — | ◐ |
 | PA-24 | Command palette (⌘K) | screen | U7 | B8 | 01 | ○ |
-| PA-30 | Notifications: a device left and its replica took over, a device joined, a model is ready, errors | function | P§9 | B3 | — | ○ |
-| PA-31 | Plan suggestion card with Apply and Dismiss | function | R1 | B3 | 01 | ○ |
+| PA-30 | Notifications: a device left and its replica took over, a device joined, a model is ready, errors | function | P§9 | B3 | — | ◐ |
+| PA-31 | Plan suggestion card with Apply and Dismiss | function | R1 | B3 | 01 | ✓ |
 | PA-32 | The ring for everyone: a table view, keyboard focus from arc to arc, a spoken summary | function | U4 | B2 | — | ✓ |
 | PA-33 | Several models as nested rings; arcs grouped beyond 128 devices | function | U1 | B4 | — | ○ |
 | PA-34 | The living ring in the panel: intro, tilt, a new arc when a device joins | function | U11 | B2 | 01 | ✓ |

@@ -66,12 +66,73 @@
   }
 
   const running = $derived(view.plan);
+
+  // a faster plan the cluster found for the running model; a dismissed one stays hidden in this browser
+  let dismissed = $state(readDismissed());
+  function readDismissed(): string {
+    try {
+      return localStorage.getItem('omnarc.suggestion.dismissed') ?? '';
+    } catch {
+      return '';
+    }
+  }
+  const suggestion = $derived(view.suggestion);
+  const suggestionKey = $derived(
+    suggestion?.plan
+      ? suggestion.plan.stages.map((s) => `${hex(s.node)}:${s.layerBegin}-${s.layerEnd}`).join(',')
+      : '',
+  );
+  function dismiss() {
+    dismissed = suggestionKey;
+    try {
+      localStorage.setItem('omnarc.suggestion.dismissed', suggestionKey);
+    } catch {
+      // a private window keeps no setting: the card is hidden for this visit
+    }
+  }
+  async function apply() {
+    const plan = running;
+    if (!plan?.model) return;
+    busy = 'apply';
+    failed = '';
+    try {
+      const hash = Array.from(plan.model.blake3, (b) => b.toString(16).padStart(2, '0')).join('');
+      await api.runModel({ model: hash, context: plan.context, mode: plan.mode });
+    } catch (e) {
+      failed = message(e);
+    } finally {
+      busy = '';
+    }
+  }
   const path = $derived(ringPath(view));
 </script>
 
 <svelte:head><title>Models · {view.name || 'Omnarc'}</title></svelte:head>
 
 <div class="grid max-w-[880px] gap-5">
+  {#if running && suggestion?.plan && suggestionKey !== dismissed}
+    <Card title="A faster plan">
+      <div class="grid gap-3">
+        <p class="m-0 text-14 text-text-1">
+          The devices or what they offer changed: {suggestion.plan.stages.length === 1
+            ? 'one device can hold the whole model'
+            : `${suggestion.plan.stages.length} devices would share it`}, {speed(suggestion.msPerToken)} instead of
+          {speed(suggestion.currentMsPerToken).replace('about ', '')}.
+        </p>
+        <ul class="m-0 grid list-none gap-1 p-0 text-13 text-text-2">
+          {#each suggestion.plan.stages as stage, i (i)}
+            <li>{deviceName(view, hex(stage.node))}: layers {stage.layerBegin}–{stage.layerEnd - 1}{i === 0 ? ', answers' : ''}</li>
+          {/each}
+        </ul>
+        <div class="flex flex-wrap gap-2">
+          <Button variant="primary" label="Apply" disabled={!!busy} onclick={apply} />
+          <Button variant="ghost" label="Dismiss" onclick={dismiss} />
+        </div>
+        <p class="m-0 text-12 text-text-3">Applying moves the layers between the devices; an answer being generated stops.</p>
+      </div>
+    </Card>
+  {/if}
+
   {#if running}
     <Card title="Running now">
       <div class="grid gap-4">

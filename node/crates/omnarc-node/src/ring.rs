@@ -161,6 +161,8 @@ pub struct Report {
     pub ttft: Duration,
     /// Mean time per output token after the first.
     pub tpot: Option<Duration>,
+    /// The longest wait between two tokens: what a device leaving costs the answer (NO-43).
+    pub longest_pause: Duration,
 }
 
 /// The engine is synchronous; calls run on blocking threads.
@@ -829,7 +831,8 @@ impl Head {
             let decode = times[times.len() - 1].saturating_sub(times[0]);
             decode / u32::try_from(times.len() - 1).unwrap_or(u32::MAX)
         });
-        Ok(Report { prompt_tokens: tokens.len(), generated, text, ttft, tpot })
+        let longest_pause = times.windows(2).map(|w| w[1].saturating_sub(w[0])).max().unwrap_or_default();
+        Ok(Report { prompt_tokens: tokens.len(), generated, text, ttft, tpot, longest_pause })
     }
 }
 
@@ -888,7 +891,8 @@ impl Head {
             let decode = times[times.len() - 1].saturating_sub(times[0]);
             decode / u32::try_from(times.len() - 1).unwrap_or(u32::MAX)
         });
-        Ok(Report { prompt_tokens: tokens.len(), generated, text, ttft, tpot })
+        let longest_pause = times.windows(2).map(|w| w[1].saturating_sub(w[0])).max().unwrap_or_default();
+        Ok(Report { prompt_tokens: tokens.len(), generated, text, ttft, tpot, longest_pause })
     }
 }
 

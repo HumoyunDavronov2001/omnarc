@@ -1,7 +1,7 @@
 // The cluster as the panel keeps it, and the pure functions that change and describe it.
 
 import type { RingMarker } from '@omnarc/ui';
-import type { ClusterSnapshot, JoinAttempt, WatchClusterResponse } from './gen/omnarc/v1/cluster_service_pb';
+import type { ClusterSnapshot, JoinAttempt, PlanSuggestion, WatchClusterResponse } from './gen/omnarc/v1/cluster_service_pb';
 import type { PlacementPlan } from './gen/omnarc/v1/plan_pb';
 import { Backend, Platform, type DeviceInfo, type NodeId } from './gen/omnarc/v1/device_pb';
 import { LinkKind, ThermalState, type LinkSample, type PowerState, type Telemetry } from './gen/omnarc/v1/telemetry_pb';
@@ -29,6 +29,8 @@ export interface ClusterView {
   joinAttempt: JoinAttempt | null;
   /** The model the cluster runs and where; null while none runs. */
   plan: PlacementPlan | null;
+  /** A faster plan for it, offered by the device that started it (NO-48). */
+  suggestion: PlanSuggestion | null;
 }
 
 export function emptyView(): ClusterView {
@@ -44,6 +46,7 @@ export function emptyView(): ClusterView {
     seen: {},
     joinAttempt: null,
     plan: null,
+    suggestion: null,
   };
 }
 
@@ -64,6 +67,7 @@ export function fromSnapshot(snapshot: ClusterSnapshot, now: number): ClusterVie
   view.canInvite = snapshot.canInvite;
   view.relays = [...snapshot.relays];
   view.plan = snapshot.plans.find((plan) => plan.stages.length > 0) ?? null;
+  view.suggestion = snapshot.suggestion ?? null;
   for (const device of snapshot.devices) view.devices[hex(device.id)] = device;
   for (const telemetry of snapshot.telemetry) {
     const id = hex(telemetry.node);

@@ -128,6 +128,8 @@ struct Shared {
     tensors: Mutex<Option<tokio::sync::mpsc::Sender<Connection>>>,
     // this device's windows in the plan, for its telemetry
     stages: Mutex<Vec<v1::StageLoad>>,
+    // a faster plan for the running model, on the device that started it
+    suggestion: Mutex<Option<v1::PlanSuggestion>>,
 }
 
 // What the service keeps doing while it runs.
@@ -152,6 +154,8 @@ fn spawn_tasks(
         tasks.push(tokio::spawn(steward(Arc::clone(shared))));
         #[cfg(feature = "coordinator")]
         tasks.push(tokio::spawn(run::keep_running(Arc::clone(shared))));
+        #[cfg(feature = "coordinator")]
+        tasks.push(tokio::spawn(run::suggest(Arc::clone(shared))));
     }
     tasks
 }
@@ -292,6 +296,7 @@ impl Service {
             running: tokio::sync::Mutex::default(),
             tensors: Mutex::default(),
             stages: Mutex::default(),
+            suggestion: Mutex::default(),
         });
         joins.0.set(Arc::clone(&shared)).expect("set once");
         tensors.0.set(Arc::clone(&shared)).expect("set once");
@@ -531,6 +536,7 @@ impl omnarc_api::Cluster for ApiView {
             plans: shared.plan.borrow().clone().filter(|p| !p.stages.is_empty()).into_iter().collect(),
             this_node: Some(node_id(shared.key.public())),
             can_invite: shared.cluster_key.is_some(),
+            suggestion: shared.suggestion.lock().expect("suggestion").clone(),
             relays: relay::parse_all(&shared.store.relays().unwrap_or_default())
                 .unwrap_or_default()
                 .iter()

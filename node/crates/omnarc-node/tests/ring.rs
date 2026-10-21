@@ -308,5 +308,8 @@ async fn a_replica_takes_over_when_the_device_holding_a_window_leaves() {
     let expected = tokio::task::spawn_blocking(move || generate_whole(&engine, &model, layers)).await.unwrap();
     assert_eq!(report.generated, expected, "after the takeover: {:?}", report.text);
     assert_eq!(report.generated.len(), GENERATE as usize, "the answer finished");
+    // NO-43: the standby took over within a second, not after a restart
+    assert!(report.longest_pause <= std::time::Duration::from_secs(1), "the answer paused {:?}", report.longest_pause);
+    eprintln!("the longest pause between two tokens was {:?}", report.longest_pause);
     let _ = std::fs::remove_dir_all(dir);
 }

@@ -742,6 +742,8 @@ fn to_plan(
         source: Some(node_id(source)),
         context,
         backups: Vec::new(),
+        #[allow(clippy::cast_possible_truncation)]
+        estimated_ms_per_token: (placement.seconds_per_token * 1e3) as f32,
     }
 }
 
@@ -811,6 +813,63 @@ async fn pick(shared: &Shared, name: &str) -> Result<Model, BoxError> {
     }
 }
 
+/// How often the device that started the model looks for a faster plan for it.
+#[cfg(feature = "coordinator")]
+const SUGGEST_EVERY: Duration = Duration::from_secs(15);
+
+/// A plan is suggested only when it is clearly faster: by a tenth at least.
+#[cfg(feature = "coordinator")]
+const SUGGEST_GAIN: f32 = 0.9;
+
+/// On the device that started the running model: solves its placement again now and then, and when the devices or
+/// their offers changed enough that another plan is clearly faster, offers it to the owner (NO-48). Nothing moves
+/// until the owner applies it.
+#[cfg(feature = "coordinator")]
+pub(super) async fn suggest(shared: Arc<Shared>) {
+    let mut ticks = tokio::time::interval(SUGGEST_EVERY);
+    loop {
+        ticks.tick().await;
+        let suggestion = better_plan(&shared).await;
+        let changed = {
+            let mut current = shared.suggestion.lock().expect("suggestion");
+            let changed = *current != suggestion;
+            *current = suggestion;
+            changed
+        };
+        if changed {
+            let _ = shared.events.send(super::Event::ClusterChanged);
+        }
+    }
+}
+
+#[cfg(feature = "coordinator")]
+async fn better_plan(shared: &Shared) -> Option<v1::PlanSuggestion> {
+    let plan = shared.plan.borrow().clone().filter(|p| !p.stages.is_empty())?;
+    if endpoint_id(&key(plan.source.as_ref())) != Some(shared.key.public()) || plan.estimated_ms_per_token <= 0.0 {
+        return None;
+    }
+    let hash = Hash::from_bytes(<[u8; 32]>::try_from(plan.model.as_ref()?.blake3.as_slice()).ok()?).to_hex();
+    let model = shared.models.model(&hash).await.ok()?;
+    let shape = shape(&model, plan.context);
+    let placement = omnarc_scheduler::place(&shape, &offers(shared, &shape)).ok()?;
+    #[allow(clippy::cast_possible_truncation)]
+    let ms = (placement.seconds_per_token * 1e3) as f32;
+    let candidate = to_plan(0, &model, plan.context, plan.mode, shared.key.public(), &placement);
+    let same = |a: &[v1::Stage], b: &[v1::Stage]| {
+        a.len() == b.len()
+            && a.iter()
+                .zip(b)
+                .all(|(x, y)| x.node == y.node && x.layer_begin == y.layer_begin && x.layer_end == y.layer_end)
+    };
+    (ms < plan.estimated_ms_per_token * SUGGEST_GAIN && !same(&candidate.stages, &plan.stages)).then_some({
+        v1::PlanSuggestion {
+            plan: Some(candidate),
+            ms_per_token: ms,
+            current_ms_per_token: plan.estimated_ms_per_token,
+        }
+    })
+}
+
 /// Stops the model: a plan without stages.
 #[cfg(feature = "coordinator")]
 pub(super) async fn stop_model(shared: &Arc<Shared>) -> Result<(), BoxError> {
@@ -828,6 +887,9 @@ pub(super) async fn keep_running(shared: Arc<Shared>) {
     let Some(consensus) = shared.consensus.clone() else { return };
     let mut ticks = tokio::time::interval(Duration::from_secs(1));
     let mut since_spread = Duration::ZERO;
+    // a device just started has heard nobody yet: nobody has left before they had time to speak
+    let started = std::time::Instant::now();
+    let grace = Duration::from_millis(2 * GONE_AFTER_MS.unsigned_abs());
     loop {
         ticks.tick().await;
         since_spread += Duration::from_secs(1);
@@ -838,6 +900,9 @@ pub(super) async fn keep_running(shared: Arc<Shared>) {
         if since_spread >= SPREAD_EVERY {
             since_spread = Duration::ZERO;
             super::spread_plan(&shared, &plan).await;
+        }
+        if started.elapsed() < grace {
+            continue;
         }
         let now = crate::pairing::now_unix_ms();
         let quiet = |id: EndpointId| {

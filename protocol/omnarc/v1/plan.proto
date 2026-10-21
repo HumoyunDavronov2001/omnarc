@@ -56,6 +56,8 @@ message PlacementPlan {
   uint32 context = 7;
   // The plan for each stage's device leaving, solved with this one, so a departure is answered at once (NO-43).
   repeated BackupPlan backups = 8;
+  // What the placement expected one token to take, in milliseconds, when it chose this plan.
+  float estimated_ms_per_token = 9;
 }
 
 message BackupPlan {

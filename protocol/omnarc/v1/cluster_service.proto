@@ -50,6 +50,15 @@ message ClusterSnapshot {
   bool can_invite = 7;
   // The cluster's relays (protocol/CLUSTER.md §3.5), without their tokens.
   repeated string relays = 8;
+  // A faster plan for the running model than the one it runs, now that the devices or their offers changed (NO-48).
+  PlanSuggestion suggestion = 9;
+}
+
+message PlanSuggestion {
+  PlacementPlan plan = 1;
+  // What one token would take with it, and takes with the running plan, in milliseconds.
+  float ms_per_token = 2;
+  float current_ms_per_token = 3;
 }
 
 message GetClusterRequest {}
