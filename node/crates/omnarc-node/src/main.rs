@@ -378,7 +378,7 @@ fn describe() -> DeviceInfo {
     // cores, not the threads the processor runs on them
     let cores = System::physical_core_count().unwrap_or_else(|| sys.cpus().len());
     DeviceInfo {
-        name: System::host_name().unwrap_or_default(),
+        name: device_name(),
         platform: platform() as i32,
         os_version: System::long_os_version().unwrap_or_default(),
         cpu_model,
@@ -393,6 +393,24 @@ fn describe() -> DeviceInfo {
 /// The GPUs the engine at `engine` can run layers on, as the engine itself names them: a device says it computes
 /// with what Omnarc can use, not with every graphics card it has. None without an engine, or when the engine does
 /// not answer within ten seconds (a GPU driver can hang; the service starts all the same).
+// The name a device shows in its cluster. Android calls every phone `localhost`, so a phone is named by its model,
+// as its owner knows it.
+fn device_name() -> String {
+    let host = System::host_name().unwrap_or_default();
+    if cfg!(target_os = "android") || host == "localhost" {
+        let model = std::process::Command::new("getprop")
+            .arg("ro.product.model")
+            .output()
+            .ok()
+            .map(|out| String::from_utf8_lossy(&out.stdout).trim().to_owned())
+            .filter(|model| !model.is_empty());
+        if let Some(model) = model {
+            return model;
+        }
+    }
+    host
+}
+
 fn accelerators(engine: &Path) -> Vec<omnarc_protocol::v1::Accelerator> {
     if !engine.is_file() {
         return Vec::new();
