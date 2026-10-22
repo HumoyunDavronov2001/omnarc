@@ -546,6 +546,46 @@ section.s{padding:clamp(96px,10vw,150px) 0}
 /* askbox kbd hint (Cursor) */
 .askbox{position:relative}
 .ask-hint{position:absolute;right:76px;bottom:8px;font-family:var(--font-mono);font-size:10px;color:color-mix(in srgb,var(--ink-fg) 52%,transparent);pointer-events:none}
+
+/* ═══ 6 · Terminal: ikki qurilma, bitta halqa — haqiqiy buyruqlar ═══ */
+.term-duo{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.term{background:var(--ink-2);border:1px solid var(--ink-line);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 70px -34px rgba(0,0,0,.55);min-width:0}
+.term-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--ink-line);background:color-mix(in srgb,var(--ink-3) 55%,transparent)}
+.term-dots{display:inline-flex;gap:5px;flex:none}
+.term-dots i{width:9px;height:9px;border-radius:50%;background:#31493c}
+.term-dots i:nth-child(1){background:#c4553a}.term-dots i:nth-child(2){background:#c99a2e}.term-dots i:nth-child(3){background:#17b565}
+.term-title{font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.term-body{margin:0;padding:16px 18px 18px;font-family:var(--font-mono);font-size:12.5px;line-height:1.8;color:var(--ink-fg);min-height:380px;overflow:auto;white-space:pre-wrap;overflow-wrap:break-word;flex:1}
+.term-body::-webkit-scrollbar{width:8px}
+.tl-p{color:var(--gold);user-select:none}
+.tl-c{color:#eaf4ee}
+.tl-o{color:var(--ink-muted)}
+.tl-ok{color:var(--bright)}
+.tl-tok{color:var(--beam);animation:tk .5s var(--ease)}
+.term-cur{display:inline-block;width:8px;height:1.02em;vertical-align:-2px;margin-left:1px;background:var(--bright);animation:blink 1s steps(2) infinite}
+.term-hop{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:9px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-muted);background:color-mix(in srgb,var(--ink) 88%,transparent);border:1px solid var(--ink-line);border-radius:99px;padding:7px 14px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);white-space:nowrap}
+.term-hop i{width:6px;height:6px;border-radius:50%;background:var(--bright);box-shadow:0 0 10px var(--bright);animation:pulse 2.4s infinite;flex:none}
+.term-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+.term-foot .btn-ghost{color:var(--fg);border-color:color-mix(in srgb,var(--fg) 22%,transparent);background:transparent}
+.term-foot .btn-ghost:hover{background:var(--wash)}
+.term-hint{font-size:13px;color:var(--subtle);margin:0}
+@media (max-width:900px){
+  .term-duo{grid-template-columns:1fr}
+  .term-hop{top:auto;bottom:-7px}
+  .term-body{min-height:230px}
+}
+
+/* ═══ 7 · CTA halqasi — yoylar asta oqadi ═══ */
+.cta-ring g{transform-box:view-box;transform-origin:50% 50%;animation:ringSpin90 80s linear infinite}
+.cta-ring circle{transform-box:view-box;transform-origin:50% 50%;animation:ringSpin 30s linear infinite}
+.cta-ring circle:nth-of-type(2){animation-duration:19s;animation-direction:reverse}
+.cta-ring circle:nth-of-type(4){animation-duration:44s}
+@keyframes ringSpin90{from{transform:rotate(-90deg)}to{transform:rotate(270deg)}}
+@keyframes ringSpin{to{transform:rotate(1turn)}}
+
+/* ═══ 8 · mayda sayqal: tanlash rangi, FAQ ochilishi ═══ */
+::selection{background:color-mix(in srgb,var(--brand) 30%,transparent)}
+.faq details[open] p{animation:rise var(--d2) var(--ease)}
 </style>
 </head>
 <body>
@@ -561,6 +601,7 @@ section.s{padding:clamp(96px,10vw,150px) 0}
       <a href="#node" data-i="nav.node">Inside a node</a>
       <a href="#math" data-i="nav.math">The math</a>
       <a href="#roadmap" data-i="nav.road">Roadmap</a>
+      <a href="#try" data-i="nav.try">Try it</a>
       <a href="#faq" data-i="nav.faq">FAQ</a>
     </nav>
     <div class="nav-r">
@@ -884,10 +925,36 @@ section.s{padding:clamp(96px,10vw,150px) 0}
   </div>
 </section>
 
+<!-- TRY -->
+<section class="s soft" id="try">
+  <div class="wrap">
+    <div class="s-head rv">
+      <p class="kicker"><b>07</b><span data-i="nav.try">Try it tonight</span></p>
+      <h2 data-i="try.h">Two devices, one ring, wired by hand.</h2>
+      <p data-i="try.p">The commands are real and the wiring is by hand — that is stage B1. Watch the PC and the laptop close one ring, then stream an answer together.</p>
+    </div>
+    <div class="term-duo rv d1" id="termDuo">
+      <div class="term">
+        <div class="term-bar"><span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="term-title" data-i="try.t1">pc — the head · layers 0:34 + the output head</span></div>
+        <pre class="term-body" id="termA"></pre>
+      </div>
+      <div class="term">
+        <div class="term-bar"><span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="term-title" data-i="try.t2">laptop — layers 34:80</span></div>
+        <pre class="term-body" id="termB"></pre>
+      </div>
+      <div class="term-hop" aria-hidden="true"><i></i><span data-i="try.hop">16 KB · QUIC · per hop</span><i></i></div>
+    </div>
+    <div class="term-foot rv d2">
+      <button type="button" class="btn btn-ghost btn-sm" id="termReplay" data-i="try.replay">Replay</button>
+      <p class="term-hint" data-i="try.hint">Typing is simulated; the commands and the output format are real — the README has the walkthrough.</p>
+    </div>
+  </div>
+</section>
+
 <!-- FAQ -->
 <section class="s soft" id="faq">
   <div class="wrap">
-    <div class="s-head rv"><p class="kicker"><b>07</b><span data-i="faq.k">questions</span></p>
+    <div class="s-head rv"><p class="kicker"><b>08</b><span data-i="faq.k">questions</span></p>
       <h2 data-i="faq.h">Questions</h2></div>
     <div class="faq">
       <details class="rv"><summary>Is Omnarc ready to use?</summary><p>Not yet; it is pre-alpha. Stage B0 is complete and B1 is in progress: devices can already run one model together as a ring wired by hand. Discovery, QR pairing and planning arrive in B2 and B3.</p></details>
@@ -1008,6 +1075,82 @@ function pointCloud(n){
   g.setAttribute('size',new THREE.BufferAttribute(new Float32Array(n),1));
   g.setAttribute('alpha',new THREE.BufferAttribute(new Float32Array(n),1));
   const p=new THREE.Points(g,glowShader());p.frustumCulled=false;return p;
+}
+/* living ring — every arc is a river of particles (design/living-ring.js, carried over to three):
+   core, dust and filament particles flow along each device's arc over a soft band of glow, the spot a token
+   is passing through lights up warm, and on first sight the particles swirl in from a cloud */
+function livingArcs(R,arcs,o){
+  const TAU=Math.PI*2,MAXA=8,N=arcs.length;
+  let seed=20261012;const rand=()=>((seed=(seed*16807)%2147483647)/2147483647);
+  const gauss=()=>Math.sqrt(-2*Math.log(rand()+1e-9))*Math.cos(TAU*rand());
+  const span=arcs.map(a=>a.a1-a.a0),total=span.reduce((s,x)=>s+x,0);
+  const cnt=span.map(s=>Math.round(o.count*s/total)),gcnt=span.map(s=>Math.max(8,Math.round(o.glow*s/total)));
+  const NP=cnt.concat(gcnt).reduce((s,x)=>s+x,0);
+  const pos=new Float32Array(NP*3),meta=new Float32Array(NP*4),arcI=new Float32Array(NP),cloud=new Float32Array(NP*3);
+  let j=0;
+  const put=(k,u,r,y,size,kind)=>{const az=rand()*TAU,pol=Math.acos(2*rand()-1),cr=1.7+rand()*1.1;
+    pos.set([u,r,y],j*3);meta.set([size,rand()*TAU,Math.min(.88,.08+k*.11+rand()*.3),kind],j*4);arcI[j]=k;
+    cloud.set([cr*Math.sin(pol)*Math.cos(az),cr*Math.cos(pol)*.6,cr*Math.sin(pol)*Math.sin(az)],j*3);j++;};
+  cnt.forEach((m,k)=>{for(let i=0;i<m;i++){const r=rand(),kind=r<.16?1:r<.32?2:0,s=kind===1?.055:kind===2?.003:.019;   // dust, filament, core
+    put(k,rand(),gauss()*s,gauss()*s,kind===1?.8+rand()*.8:kind===2?1+rand()*.5:1.2+rand()*1.3,kind);}});
+  gcnt.forEach((m,k)=>{for(let i=0;i<m;i++)put(k,(i+.5)/m,0,0,.11,3);});                                           // glow band
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('aMeta',new THREE.BufferAttribute(meta,4));
+  g.setAttribute('aArc',new THREE.BufferAttribute(arcI,1));g.setAttribute('aCloud',new THREE.BufferAttribute(cloud,3));
+  const slot=f=>Array.from({length:MAXA},(_,k)=>f(arcs[Math.min(k,N-1)],Math.min(k,N-1)));
+  const C0=new THREE.Color(0x0b7a75),C1=new THREE.Color(0x9ff6ef),tint=o.tint??.3;   // the ring's teal, tinted toward each device
+  const U={uTime:{value:0},uIntro:{value:0},uAlpha:{value:o.alpha??1},uR:{value:R},uPR:{value:Math.min(devicePixelRatio||1,1.75)},uDist:{value:20},uRefPx:{value:300},uHover:{value:-1},
+    uArcs:{value:slot(a=>new THREE.Vector2(a.a0,a.a1))},uFlow:{value:slot((a,k)=>o.flow?o.flow[k]:.03)},uBoost:{value:new Array(MAXA).fill(0)},
+    uC0:{value:slot(a=>C0.clone().lerp(new THREE.Color(a.color),tint))},uC1:{value:slot(a=>C1.clone().lerp(new THREE.Color(a.color),tint*.45))},
+    uHot:{value:new THREE.Color(0xf3c868)},uTok:{value:Array.from({length:MAXA},()=>new THREE.Vector4())},uTokN:{value:0}};
+  const mat=new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+    vertexShader:`attribute vec4 aMeta;attribute float aArc;attribute vec3 aCloud;
+      uniform float uTime;uniform float uIntro;uniform float uAlpha;uniform float uR;uniform float uPR;uniform float uDist;uniform float uRefPx;uniform float uHover;
+      uniform vec2 uArcs[8];uniform float uFlow[8];uniform float uBoost[8];uniform vec3 uC0[8];uniform vec3 uC1[8];uniform vec3 uHot;
+      uniform vec4 uTok[8];uniform int uTokN;
+      varying vec3 vC;varying float vA;varying float vHard;
+      void main(){
+        int k=int(aArc+.5);vec2 arc=uArcs[k];float span=arc.y-arc.x;
+        float u=fract(position.x+uTime*uFlow[k]),ang=arc.x+span*u;
+        float ends=smoothstep(0.,.045,min(u,1.-u)*span);
+        float rr=uR*(1.+position.y);
+        vec3 ring=vec3(cos(ang)*rr,position.z*uR,sin(ang)*rr);
+        float e=clamp((uIntro*1.5-aMeta.z)/.6,0.,1.);e=e*e*(3.-2.*e);
+        float sw=(1.-e)*1.7,cs=cos(sw),sn=sin(sw);
+        vec3 c=vec3(aCloud.x*cs-aCloud.z*sn,aCloud.y,aCloud.x*sn+aCloud.z*cs)*uR;
+        vec4 mv=modelViewMatrix*vec4(mix(c,ring,e),1.);
+        gl_Position=projectionMatrix*mv;
+        /* where an arc runs toward the camera its particles pile up on screen: dim them by as much */
+        vec3 tv=(modelViewMatrix*vec4(-sin(ang),0.,cos(ang),0.)).xyz;
+        float fore=clamp(length(tv.xy)/max(length(tv),1e-4),.2,1.);
+        float g=0.;
+        for(int i=0;i<8;i++){if(i>=uTokN)break;float d=mod(abs(ang-uTok[i].x),6.2831853);d=min(d,6.2831853-d);g+=uTok[i].y*(exp(-d*d/.006)+.22*exp(-d*d/.06));}
+        g*=e;
+        int kind=int(aMeta.w+.5);
+        float tw=kind==3?1.:.78+.22*sin(uTime*(1.1+aMeta.y*.35)+aMeta.y*7.);
+        float base=kind==0?.4:kind==1?.15:kind==2?.62:.055;
+        float resp=kind==0?.5:kind==1?.3:kind==2?.65:.08;
+        float hov=abs(float(k)-uHover)<.5?(kind==3?.05:.3):0.;
+        float b=base*tw+g*resp+hov+uBoost[k]*(kind==3?.05:.3);
+        vC=mix(uC0[k],uC1[k],clamp(kind==3?.2:b*1.1,0.,1.));
+        vC=mix(vC,uHot,clamp(g*.55,0.,.7)*(kind==3?.3:1.));
+        vA=clamp(b+(1.-e)*.25,0.,1.)*mix(.6,1.,e)*mix(1.,ends*fore,e)*uAlpha;
+        vHard=kind==2?.35:0.;
+        float sz=kind==3?aMeta.x*uRefPx:aMeta.x*(1.+.45*g);
+        gl_PointSize=min(sz*uPR*uDist/max(-mv.z,.1),160.);
+      }`,
+    fragmentShader:`varying vec3 vC;varying float vA;varying float vHard;
+      void main(){vec2 d=gl_PointCoord*2.-1.;float r2=dot(d,d);if(r2>1.)discard;
+        float a=mix(exp(-r2*3.2),1.-smoothstep(.55,1.,r2),vHard)*vA;if(a<.004)discard;gl_FragColor=vec4(vC,a);}`});
+  const points=new THREE.Points(g,mat);points.frustumCulled=false;
+  return {points,
+    /* toks: flat [angle, strength, …]; boost: per-arc extra light (load, pulse); hover: arc index or -1 */
+    set(t,intro,toks,boost,hover){U.uTime.value=t;U.uIntro.value=intro;
+      let n=0;for(let i=0;i+1<toks.length&&n<MAXA;i+=2)U.uTok.value[n++].set(((toks[i]%TAU)+TAU)%TAU,toks[i+1],0,0);U.uTokN.value=n;
+      if(boost)for(let k=0;k<N;k++)U.uBoost.value[k]=boost[k];U.uHover.value=hover;},
+    /* dist: camera distance at which sizes are true pixels; pxPerUnit: H / (2·tan(fov/2)).
+       A smaller ring on screen packs the same particles tighter, so each gets fainter (the living ring keeps ~9.5 per pixel of arc) */
+    scale(dist,pxPerUnit){const ref=R*pxPerUnit/dist;U.uDist.value=dist;U.uRefPx.value=ref;U.uAlpha.value=(o.alpha??1)*Math.min(1,60*ref/o.count);}};
 }
 function studioEnv(renderer){
   const s=new THREE.Scene();s.background=new THREE.Color(0x0b0f0d);
@@ -1232,18 +1375,12 @@ function hero(){
   ];
   const GAP=.07,TOTAL=DEVS.reduce((s,d)=>s+d.layers,0),SPAN=Math.PI*2-GAP*DEVS.length;
   let a=-Math.PI/2+.4,lay=0;
-  class Arc extends THREE.Curve{constructor(r,a0,a1){super();this.r=r;this.a0=a0;this.a1=a1;}getPoint(t,o=new THREE.Vector3()){const x=this.a0+(this.a1-this.a0)*t;return o.set(Math.cos(x)*this.r,0,Math.sin(x)*this.r);}}
   DEVS.forEach(d=>{d.a0=a;d.a1=a+SPAN*d.layers/TOTAL;d.mid=(d.a0+d.a1)/2;d.l0=lay;d.l1=lay+d.layers;lay+=d.layers;a=d.a1+GAP;});
   DEVS.forEach(d=>{d.frac=(d.a1-d.a0)/(Math.PI*2);d.flash=0;});
   const TAU=Math.PI*2,OMEGA=2.42,AVGFR=1/7,lapT=[];
-  /* arcs */
-  DEVS.forEach(d=>{
-    const mat=new THREE.MeshBasicMaterial({color:d.color,toneMapped:false});d.base=new THREE.Color(d.color);
-    const m=new THREE.Mesh(new THREE.TubeGeometry(new Arc(R,d.a0,d.a1),Math.max(12,d.layers*3),.075,10,false),mat);
-    world.add(m);d.arcMat=mat;d.arcGeo=m.geometry;d.caps=[];
-    /* caps */
-    [d.a0,d.a1].forEach(x=>{const s=new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),mat);s.position.set(Math.cos(x)*R,0,Math.sin(x)*R);world.add(s);d.caps.push(s);});
-  });
+  /* arcs — each device's share is a river of particles; a token lights the spot it passes */
+  const vw=innerWidth,live=livingArcs(R,DEVS,{count:vw>960?24000:vw>600?18000:12000,glow:vw>960?2200:vw>600?1700:1200,flow:DEVS.map(d=>.03*d.speed),alpha:.85});
+  world.add(live.points);const boost=DEVS.map(()=>0),toks=[];
   /* layer ticks */
   {const pts=[];DEVS.forEach(d=>{for(let i=0;i<=d.layers;i++){const x=lerp(d.a0,d.a1,i/d.layers),big=i===0||i===d.layers,r1=R+.2,r2=R+(big?.52:.32);pts.push(Math.cos(x)*r1,0,Math.sin(x)*r1,Math.cos(x)*r2,0,Math.sin(x)*r2);}});
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
@@ -1333,7 +1470,7 @@ function hero(){
     else if(W>600){world.position.set(0,-3,0);camBase.set(0,10,25);cam.fov=38;}
     else{world.position.set(0,-6.4,0);camBase.set(0,7.6,25);cam.fov=40;}
     crect=null;
-    cam.updateProjectionMatrix();}
+    cam.updateProjectionMatrix();live.scale(camBase.distanceTo(world.position),H/(2*Math.tan(cam.fov*Math.PI/360)));}
   new ResizeObserver(resize).observe(canvas);resize();
   const v=new THREE.Vector3();let T=0,hudT=0;
   const tokEl=$('#hudTok'),flightEl=$('#hudFlight');
@@ -1344,13 +1481,12 @@ function hero(){
     cam.position.set(camBase.x+st.mx*.8,camBase.y+st.pitch*8-st.my*.4,camBase.z);
     cam.lookAt(0,world.position.y+.5,0);
     const it=reduceMotion?1:clamp((performance.now()-t0Intro-300)/2200,0,1);
-    if(it<1||!DEVS.grown){DEVS.forEach((d,i)=>{const p=clamp(it*DEVS.length*.9-i*.8,0,1),cnt=d.arcGeo.index.count;d.arcGeo.setDrawRange(0,Math.floor(p*cnt/6)*6);d.caps[0].visible=p>0;d.caps[1].visible=p>=1;});if(it>=1)DEVS.grown=true;}
     /* loads */
     DEVS.forEach((d,i)=>{d.load=.45+.3*Math.sin(T*.7+i*1.9)+.15*noise1(T*.6+i*10);d.pulse=Math.max(0,d.pulse-dt*2.2);
       d.group.position.y=-.9+d.pulse*.16;
       d.flash=Math.max(0,d.flash-dt*2.4);
       if(d.lkMat){d.lkMat.opacity=.24+.76*d.flash;d.lkMat.color.copy(d.colBase).multiplyScalar(.5+1.1*d.flash);}
-      d.arcMat.color.copy(d.base).multiplyScalar(.5+d.load*.45+d.pulse*.6);d.pedMat.opacity=.35+d.pulse*.65;});
+      boost[i]=(d.load-.5)*.5+d.pulse*.8;d.pedMat.opacity=.35+d.pulse*.65;});
     /* comets */
     const P=comets.geometry.attributes.position.array,Cc=comets.geometry.attributes.aColor.array,S=comets.geometry.attributes.size.array,A=comets.geometry.attributes.alpha.array;
     let fl=0;
@@ -1360,7 +1496,7 @@ function hero(){
       /* bosqich-vaqt modeli: token har qurilmaning ulushiga proporsional vaqt o'tkazadi */
       const dNow=colAt(c.a);
       c.a+=dt*(c.w||OMEGA)*(AVGFR/dNow.frac);
-      c.trav+=c.a-prev;const d=colAt(c.a);
+      c.trav+=c.a-prev;
       const rel=x=>((x-DEVS[0].a0)%TAU+TAU)%TAU,r0=rel(prev),r1=rel(c.a);
       for(const dd of DEVS){
         const bp=((dd.a0-DEVS[0].a0)%TAU+TAU)%TAU;
@@ -1371,16 +1507,18 @@ function hero(){
       c.hist.unshift(c.a);if(c.hist.length>TR)c.hist.length=TR;
       while(c.hist.length<TR)c.hist.push(c.hist[c.hist.length-1]);
       const done=!c.amb&&c.trav>=Math.PI*2,fade=done?0:1;if(done)c.on=false;
-      const col=new THREE.Color(d.color);
       for(let j=0;j<TR;j++){const k=ci*TR+j,x=c.hist[j],f=1-j/TR;
         P[k*3]=Math.cos(x)*R;P[k*3+1]=.2+Math.sin(T*3+ci)*.02;P[k*3+2]=Math.sin(x)*R;
-        const w=j===0?.7:0;Cc[k*3]=lerp(col.r,1,w);Cc[k*3+1]=lerp(col.g,1,w);Cc[k*3+2]=lerp(col.b,1,w);
+        /* tokens are gold comets, as in the living ring */
+        const w=j===0?.8:.15*f;Cc[k*3]=lerp(.89,1,w);Cc[k*3+1]=lerp(.69,.97,w);Cc[k*3+2]=lerp(.24,.88,w);
         S[k]=(j===0?(c.big?7:4.2):(c.big?3.2:2.2)*f+.3);A[k]=fade*(j===0?1:.85*f*f);}
     });
     const hC=C.find(c=>c.on);
     if(hC){tokenLight.position.set(Math.cos(hC.a)*R,.5,Math.sin(hC.a)*R);tokenLight.color.set(colAt(hC.a).color);}
     flightEl.textContent=fl;
     ['position','aColor','size','alpha'].forEach(n=>comets.geometry.attributes[n].needsUpdate=true);
+    toks.length=0;C.forEach(c=>{if(c.on)toks.push(c.a,c.big?1.2:1);});
+    const hi=selDev||hoverDev;live.set(T,it,toks,boost,hi?DEVS.indexOf(hi):-1);
     dust.rotation.y+=dt*.01;
     leds.forEach(l=>l.m.material.color.setHex(noise1(T*3+l.ph)>.35?l.base:0x0a2016));
     fans.forEach(f=>f.rotation.x+=dt*14);
@@ -1396,6 +1534,7 @@ function hero(){
       card.style.left=((v.x+1)/2*W)+'px';card.style.top=((1-v.y)/2*H)+'px';card.style.opacity=v.z<1?1:0;}
     hudT+=dt;if(hudT>.5){hudT=0;crect=null;if(!api.streaming){while(lapT.length&&lapT[0]<T-2.6)lapT.shift();tokNow=lapT.length/2.6*7.2;tokEl.textContent=tokNow.toFixed(1)+' tok/s';window.__ringTok=tokNow;heroScreens.forEach(r=>r.redraw());
       labels.forEach(o=>o.ld.textContent='load '+Math.round(o.d.load*100)+'%');cardRefresh();}
+    }
   }
   const L=loop(host,frame);if(reduceMotion){frame(0,0);L.once();}
   api.redraw=()=>reduceMotion&&L.once();
@@ -1706,7 +1845,8 @@ en:{"nav.story":"How it works","nav.lab":"Partition lab","nav.node":"Inside a no
 "use.a.h":"Agents on your own model","use.a.p":"OpenClaw, OpenCode and other agents run on a frontier-class open model spread across your own computers — no per-token bill, no rate limit. One computer can only stream such a model from disk; a cluster keeps all of it in memory.",
 "use.b.h":"The family ring","use.b.p":"A family or a team shares one assistant that speaks their language; a weak phone joins by voice and computes nothing.",
 "use.c.h":"Accuracy mode","use.c.p":"Several devices answer the same question and check each other; the answer shows how many agreed — a single device’s mistake is caught before you read it.",
-"cmp.k":"the comparison","road.k":"the plan","faq.k":"questions","s5.h":"Proof, not opinion.","s5.p":"Four arcs answer in parallel; their hidden states vote, and every public-network answer carries a TOPLOC proof that your ring produced it. Disagreement is a feature: you see the split instead of a confident mistake."},
+"cmp.k":"the comparison","road.k":"the plan","faq.k":"questions","s5.h":"Proof, not opinion.","s5.p":"Four arcs answer in parallel; their hidden states vote, and every public-network answer carries a TOPLOC proof that your ring produced it. Disagreement is a feature: you see the split instead of a confident mistake.",
+"nav.try":"Try it tonight","try.h":"Two devices, one ring, wired by hand.","try.p":"The commands are real and the wiring is by hand — that is stage B1. Watch the PC and the laptop close one ring, then stream an answer together.","try.replay":"Replay","try.hint":"Typing is simulated; the commands and the output format are real — the README has the walkthrough.","try.t1":"pc — the head · layers 0:34 + the output head","try.t2":"laptop — layers 34:80","try.hop":"16 KB · QUIC · per hop","try.haiku":"seventy minds, one thought —\nthe ring closes softly,\na lamp in each hand"},
 uz:{"nav.story":"Qanday ishlaydi","nav.lab":"Bo‘lish laboratoriyasi","nav.node":"Node ichida","nav.math":"Matematika","nav.road":"Yo‘l xaritasi","nav.faq":"Savollar","nav.start":"Boshlash",
 "hero.status":"pre-alfa, B1 bosqichi davom etmoqda","hero.h1a":"Har bir qurilma — bitta yoy.","hero.h1b":"Birgalikda — bitta aql.","hero.ph":"Halqadan so‘rang…",
 "chip.ring":"Halqa bitta modelni qanday ishlatadi?","chip.phone":"Eski telefonim rostdan yordam beradimi?","chip.privacy":"So‘rovim uyimdan chiqib ketadimi?",
@@ -1738,7 +1878,8 @@ uz:{"nav.story":"Qanday ishlaydi","nav.lab":"Bo‘lish laboratoriyasi","nav.node
 "use.a.h":"O‘z modellingizdagi agentlar","use.a.p":"OpenClaw, OpenCode va boshqa agentlar frontier-class ochiq model ustida ishlaydi — model sizning kompyuterlaringizga bo‘lingan: tokenga pul yo‘q, limit yo‘q. Bitta kompyuter bunday modelni diskdan faqat oqizadi; klaster esa hammasini xotirada ushlab turadi.",
 "use.b.h":"Oilaviy halqa","use.b.p":"Oilalar va jamoalar o‘z tilida gaplashadigan bitta yordamchini bo‘lishadi; kuchsiz telefon ovoz bilan qo‘shiladi va hech narsa hisoblamaydi.",
 "use.c.h":"Aniqlik rejimi","use.c.p":"Bir nechta qurilma bir savolga parallel javob beradi va bir-birini tekshiradi; javob nechta rozi bo‘lganini ko‘rsatadi — bitta qurilmaning xatosi siz o‘qishdan oldin ushlanadi.",
-"cmp.k":"taqqoslash","road.k":"reja","faq.k":"savollar","s5.h":"Fikr emas — isbot.","s5.p":"To‘rt yoy parallel javob beradi; yashirin holatlari ovoz beradi va ommaviy tarmoqdagi har bir javob TOPLOC isbotini olib yuradi — uni aynan sizning halqangiz yaratganini tasdiqlaydi. Kelishmovchilik xususiyat: ishonchli xato o‘rniga bo‘linishni ko‘rasiz."},
+"cmp.k":"taqqoslash","road.k":"reja","faq.k":"savollar","s5.h":"Fikr emas — isbot.","s5.p":"To‘rt yoy parallel javob beradi; yashirin holatlari ovoz beradi va ommaviy tarmoqdagi har bir javob TOPLOC isbotini olib yuradi — uni aynan sizning halqangiz yaratganini tasdiqlaydi. Kelishmovchilik xususiyat: ishonchli xato o‘rniga bo‘linishni ko‘rasiz.",
+"nav.try":"Bugun sinab ko‘ring","try.h":"Ikki qurilma, bitta halqa — qo‘lda ulangan.","try.p":"Buyruqlar haqiqiy, ulanish qo‘lda — bu B1 bosqichi. PC va noutbuk bitta halqani qanday yopishi va javobni birgalikda oqizishi shu yerda.","try.replay":"Qayta ijro","try.hint":"Yozish simulyatsiya; buyruqlar va chiqish formati haqiqiy — to‘liq yo‘l xaritasi README’da.","try.t1":"pc — bosh qurilma · 0:34 qatlamlar + chiqish boshi","try.t2":"noutbuk — 34:80 qatlamlar","try.hop":"16 KB · QUIC · har o‘tishda","try.haiku":"yetmish aql, bitta fikr —\nhalqa yumshoq yopiladi,\nhar qo‘lda bitta chiroq"},
 ru:{"nav.story":"Как это работает","nav.lab":"Лаборатория разбиения","nav.node":"Внутри узла","nav.math":"Математика","nav.road":"Дорожная карта","nav.faq":"Вопросы","nav.start":"Начать",
 "hero.status":"пре-альфа, идёт этап B1","hero.h1a":"Каждое устройство — дуга.","hero.h1b":"Вместе — один разум.","hero.ph":"Спросите кольцо…",
 "chip.ring":"Как кольцо запускает одну модель?","chip.phone":"Мой старый телефон правда поможет?","chip.privacy":"Покидает ли мой запрос дом?",
@@ -1770,7 +1911,8 @@ ru:{"nav.story":"Как это работает","nav.lab":"Лаборатори
 "use.a.h":"Агенты на своей модели","use.a.p":"OpenClaw, OpenCode и другие агенты работают на opensource-модели переднего уровня, распределённой по вашим машинам — без платы за токены и лимитов. Один компьютер может лишь стримить такую модель с диска; кластер держит её целиком в памяти.",
 "use.b.h":"Семейное кольцо","use.b.p":"Семья или команда делят одного ассистента, говорящего на их языке; слабый телефон подключается голосом и ничего не считает.",
 "use.c.h":"Режим точности","use.c.p":"Несколько устройств отвечают на один вопрос параллельно и проверяют друг друга; в ответе видно, сколько их сошлось — ошибка одного устройства ловится раньше, чем вы её прочтёте.",
-"cmp.k":"сравнение","road.k":"план","faq.k":"вопросы","s5.h":"Доказательство, а не мнение.","s5.p":"Четыре дуги отвечают параллельно; их скрытые состояния голосуют, и каждый ответ в публичной сети несёт доказательство TOPLOC, что его создало ваше кольцо. Расхождение — это функция: вы видите раскол вместо уверенной ошибки."}
+"cmp.k":"сравнение","road.k":"план","faq.k":"вопросы","s5.h":"Доказательство, а не мнение.","s5.p":"Четыре дуги отвечают параллельно; их скрытые состояния голосуют, и каждый ответ в публичной сети несёт доказательство TOPLOC, что его создало ваше кольцо. Расхождение — это функция: вы видите раскол вместо уверенной ошибки.",
+"nav.try":"Попробуйте сегодня","try.h":"Два устройства, одно кольцо — соединённые вручную.","try.p":"Команды настоящие, соединение вручную — это этап B1. Посмотрите, как ПК и ноутбук замыкают одно кольцо и вместе стримят ответ.","try.replay":"Повторить","try.hint":"Набор симулирован; команды и формат вывода настоящие — полный путь в README.","try.t1":"пк — голова · слои 0:34 + выходная голова","try.t2":"ноутбук — слои 34:80","try.hop":"16 КБ · QUIC · за переход","try.haiku":"семьдесят умов, одна мысль —\nкольцо тихо замыкается,\nлампа в каждой руке"}
 };
 const ANS={
 en:{ring:"A model is a stack of layers. Omnarc measures each device and gives it a window of layers in proportion to its memory bandwidth: the server here holds 24, the phone holds 4. When you ask something, the server embeds your words and runs its window, then sends a 16 KB hidden state to the next device. Each one adds its layers and passes it on. When the state comes back around, the server turns it into the next token, and the trip starts again.",
@@ -1856,14 +1998,13 @@ function story(){
   const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(6,12,8);scene.add(key);
   const COLS=[0x1be480,0x2fc983,0x9fbf3a,0x1a8f8f,0x2b5f9e,0x5b8fd0,0xc99a2e],SH=[24,20,15,10,5,4,3];
   /* 1. ring */
-  let storyGrid=null;
+  let storyGrid=null,live=null;
   const ring=new THREE.Group();scene.add(ring);const R=6;
-  {let a=0;const gap=.06,span=Math.PI*2-gap*7;
-   class Arc extends THREE.Curve{constructor(a0,a1){super();this.a0=a0;this.a1=a1;}getPoint(t,o=new THREE.Vector3()){const x=this.a0+(this.a1-this.a0)*t;return o.set(Math.cos(x)*R,0,Math.sin(x)*R);}}
+  {let a=0;const gap=.06,span=Math.PI*2-gap*7,sArcs=[];
    const IDS=['server','pc','nas','laptop','tablet','phone','browser'];
    SH.forEach((n,i)=>{
      const a1=a+span*n/81;
-     ring.add(new THREE.Mesh(new THREE.TubeGeometry(new Arc(a,a1),n*3,.09,8,false),new THREE.MeshBasicMaterial({color:COLS[i],toneMapped:false})));
+     sArcs.push({a0:a,a1,color:COLS[i]});
      const mid=(a+a1)/2,x0=Math.cos(mid)*(R+1.6),z0=Math.sin(mid)*(R+1.6);
      const mk=makeDevice(IDS[i],COLS[i],{leds:sLed,fans:sFan,floaters:sFloat});
      mk.position.set(x0,-.4,z0);mk.scale.setScalar(.62);
@@ -1872,6 +2013,7 @@ function story(){
      const halo=new THREE.Mesh(new THREE.TorusGeometry(.66,.014,6,48),new THREE.MeshBasicMaterial({color:COLS[i],toneMapped:false,transparent:true,opacity:.7}));
      halo.rotation.x=Math.PI/2;halo.position.set(x0,-.39,z0);ring.add(halo);
      a=a1+gap;});
+   live=livingArcs(R,sArcs,{count:innerWidth>700?20000:11000,glow:innerWidth>700?1900:1100,flow:SH.map((n,i)=>.03*(1-i*.09))});ring.add(live.points);
    const g=new THREE.PolarGridHelper(13,24,8,96,0x1c3a2b,0x112419);g.position.y=-.42;g.material.transparent=true;g.material.opacity=.5;ring.add(g);storyGrid=g;}
   const rc=pointCloud(4*24);ring.add(rc);const rcA=[0,1.6,3.2,4.7];
   /* 2. layer stack */
@@ -1933,7 +2075,7 @@ function story(){
   const cp=new THREE.Vector3(),cl=new THREE.Vector3(),mp={x:0,y:0};
   canvas.parentElement.addEventListener('pointermove',e=>{mp.x=e.clientX/innerWidth*2-1;mp.y=e.clientY/innerHeight*2-1;});
   function camAt(p){let i=0;while(i<KEYS.length-2&&p>KEYS[i+1].p)i++;const a=KEYS[i],b=KEYS[i+1],f=ease(clamp((p-a.p)/(b.p-a.p),0,1));cp.lerpVectors(a.pos,b.pos,f);cl.lerpVectors(a.look,b.look,f);}
-  let W=1,H=1;function resize(){W=canvas.clientWidth;H=canvas.clientHeight;renderer.setSize(W,H,false);cam.aspect=W/H;cam.fov=W<700?52:40;cam.updateProjectionMatrix();}
+  let W=1,H=1;function resize(){W=canvas.clientWidth;H=canvas.clientHeight;renderer.setSize(W,H,false);cam.aspect=W/H;cam.fov=W<700?52:40;cam.updateProjectionMatrix();live.scale(23.3,H/(2*Math.tan(cam.fov*Math.PI/360)));}
   new ResizeObserver(resize).observe(canvas);resize();
   let T=0,sp=0;
   function frame(dt){
@@ -1942,8 +2084,9 @@ function story(){
     cam.position.set(cp.x+mp.x*.8,cp.y-mp.y*.5,cp.z);cam.lookAt(cl);
     /* ring comets */
     {const P=rc.geometry.attributes.position.array,C=rc.geometry.attributes.aColor.array,S=rc.geometry.attributes.size.array,A=rc.geometry.attributes.alpha.array;
-     rcA.forEach((a0,c)=>{const a=a0+T*.8;for(let j=0;j<24;j++){const k=c*24+j,x=a-j*.03,f=1-j/24;P[k*3]=Math.cos(x)*R;P[k*3+1]=.22;P[k*3+2]=Math.sin(x)*R;C[k*3]=.5+.5*(j===0);C[k*3+1]=1;C[k*3+2]=.7+.3*(j===0);S[k]=j?2.6*f+.3:5;A[k]=j?f*f*.85:1;}});
+     rcA.forEach((a0,c)=>{const a=a0+T*.8;for(let j=0;j<24;j++){const k=c*24+j,x=a-j*.03,f=1-j/24;P[k*3]=Math.cos(x)*R;P[k*3+1]=.22;P[k*3+2]=Math.sin(x)*R;const w=j?.15*f:.8;C[k*3]=lerp(.89,1,w);C[k*3+1]=lerp(.69,.97,w);C[k*3+2]=lerp(.24,.88,w);S[k]=j?2.6*f+.3:5;A[k]=j?f*f*.85:1;}});
      ['position','aColor','size','alpha'].forEach(n=>rc.geometry.attributes[n].needsUpdate=true);}
+    live.set(T,reduceMotion?1:clamp(T/2.6,0,1),rcA.flatMap(a0=>[a0+T*.8,1]),null,-1);
     ring.rotation.y=T*.05;
     /* token climbs the stack in .26–.52, loops locally otherwise */
     const lp=clamp((sp-.26)/.24,0,1),ty=-.6+lp*(NL*.8+.4)+(sp<.26?0:0);
@@ -2048,6 +2191,85 @@ function measure(LAB){
   setInterval(()=>{const t=window.__ringTok;if(t&&hud.classList.contains('on'))b.textContent=t.toFixed(1)+' tok/s';},700);
 })();
 
+/* ───────── try it: ikki qurilma bitta halqani yopadi ───────── */
+function tryit(){
+  const A=$('#termA'),B=$('#termB'),duo=$('#termDuo'),btn=$('#termReplay');if(!A||!B)return;
+  let run=0,started=false;
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const cur=document.createElement('span');cur.className='term-cur';
+  const scroll=el=>{el.scrollTop=el.scrollHeight;};
+  function mk(el,cls,txt){const d=document.createElement('div');const s=document.createElement('span');s.className=cls;s.textContent=txt;d.appendChild(s);el.appendChild(d);scroll(el);return s;}
+  async function typeCmd(el,txt,my){
+    const d=document.createElement('div');
+    const p=document.createElement('span');p.className='tl-p';p.textContent='$ ';
+    const c=document.createElement('span');c.className='tl-c';
+    d.appendChild(p);d.appendChild(c);d.appendChild(cur);el.appendChild(d);scroll(el);
+    for(const ch of txt){
+      if(my!==run)return false;
+      c.textContent+=ch;scroll(el);
+      if(!reduceMotion)await sleep(ch==='\n'||ch==='\\'?80:11+Math.random()*16);
+    }
+    d.removeChild(cur);scroll(el);
+    return true;
+  }
+  async function streamTok(el,my){
+    const d=document.createElement('div');d.appendChild(cur);el.appendChild(d);scroll(el);
+    for(const w of t('try.haiku').split(/(\s+)/)){
+      if(my!==run)return false;
+      if(w.trim()){const s=document.createElement('span');s.className='tl-tok';s.textContent=w;d.insertBefore(s,cur);}
+      else d.insertBefore(document.createTextNode(w),cur);
+      scroll(el);
+      if(!reduceMotion)await sleep(140+Math.random()*150);
+    }
+    d.removeChild(cur);scroll(el);
+    return true;
+  }
+  function scriptA(){return[
+    {c:'git clone https://github.com/HumoyunDavronov2001/omnarc.git',d:380,o:'Cloning into \'omnarc\'... done.'},
+    {c:'cd omnarc',d:220},
+    {c:'cargo build -r -p omnarc-node',d:860,o:'   Compiling omnarc-node v0.1.0\n    Finished `release` profile [optimized]'},
+    {c:'omnarc-node ring --model llama-3.3-70b.Q4_K_M.gguf \\\n      --layers 0:34 --next 7f3a@192.168.1.12:7700 --prev 7f3a \\\n      --prompt "Write a haiku about many small things becoming one." --generate 24',d:560},
+    {ok:'omnarc: layers 0:34 loaded on cuda',d:340},
+    {ok:'omnarc: node b1e2 listening on 0.0.0.0:7700',d:260},
+    {ok:'omnarc: ring session started',d:480},
+    {tok:1,d:130},
+    {o:'omnarc: 9 prompt tokens, 24 generated; first token after 341 ms',d:240},
+    {o:'omnarc: 118.8 ms per output token (8.4 tokens/s)',d:0}
+  ];}
+  function scriptB(){return[
+    {c:'git clone https://github.com/HumoyunDavronov2001/omnarc.git',d:380,o:'Cloning into \'omnarc\'... done.'},
+    {c:'cd omnarc',d:220},
+    {c:'cargo build -r -p omnarc-node',d:860,o:'   Compiling omnarc-node v0.1.0\n    Finished `release` profile [optimized]'},
+    {c:'omnarc-node ring --model llama-3.3-70b.Q4_K_M.gguf \\\n      --layers 34:80 --next b1e2@192.168.1.10:7700 --prev b1e2',d:560},
+    {ok:'omnarc: layers 34:80 loaded on vulkan',d:340},
+    {ok:'omnarc: node 7f3a listening on 0.0.0.0:7700',d:260},
+    {ok:'omnarc: ring session started',d:520},
+    {st:'holding layers 34:80 · stage 46 ms · kv 3.9 GiB',d:560},
+    {st:'holding layers 34:80 · stage 51 ms · kv 4.1 GiB',d:760},
+    {st:'holding layers 34:80 · stage 44 ms · kv 4.1 GiB',d:0}
+  ];}
+  async function play(){
+    const my=++run;
+    A.textContent='';B.textContent='';
+    const steps=async(el,script)=>{
+      let stEl=null;
+      for(const s of script){
+        if(my!==run)return;
+        if(s.d&&s.d>0)await sleep(reduceMotion?0:s.d);
+        if(my!==run)return;
+        if(s.c!=null){if(!await typeCmd(el,s.c,my))return;if(s.o)mk(el,'tl-o',s.o);}
+        else if(s.o!=null)mk(el,'tl-o',s.o);
+        else if(s.ok!=null)mk(el,'tl-ok',s.ok);
+        else if(s.st!=null){stEl?stEl.textContent=s.st:stEl=mk(el,'tl-o',s.st);scroll(el);}
+        else if(s.tok!=null){if(!await streamTok(el,my))return;}
+      }
+    };
+    await Promise.all([steps(A,scriptA()),steps(B,scriptB())]);
+  }
+  if(duo)whenVisible(duo,v=>{if(v&&!started){started=true;play();}});
+  if(btn)btn.addEventListener('click',()=>{started=true;play();});
+}
+
 /* ───────── boot ───────── */
 let HERO={spawn(){}};
 try{HERO=hero()||HERO;}catch(e){console.error(e);$('#top').classList.add('no3d');}
@@ -2056,6 +2278,7 @@ try{node();}catch(e){console.error(e);}
 math();
 try{story();}catch(e){console.error(e);$('#story').classList.add('no3d');}
 chat(HERO);measure(LAB);
+try{tryit();}catch(e){console.error(e);}
 fetch('https://api.github.com/repos/HumoyunDavronov2001/omnarc').then(r=>r.ok?r.json():null).then(d=>{
   const n=d&&d.stargazers_count;
   if(typeof n==='number'&&n>0){const el=$('#ghStars');if(el){el.hidden=false;el.textContent=n>=1000?(n/1000).toFixed(1)+'k':n;}}
