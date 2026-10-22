@@ -165,7 +165,7 @@ const char *backend_name(om_backend backend) {
 }
 
 om_shard *open_shard(const std::string &model, uint32_t begin, uint32_t end, om_backend backend, uint32_t ctx) {
-    const om_shard_params params = {model.c_str(), begin, end, backend, ctx, OM_KV_F16};
+    const om_shard_params params = {model.c_str(), begin, end, backend, ctx, OM_KV_F16, 0, 0};
     om_shard *shard = nullptr;
     const om_status status = om_shard_open(&params, &shard);
     if (status != OM_OK) {

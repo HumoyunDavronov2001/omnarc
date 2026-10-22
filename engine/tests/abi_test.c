@@ -43,7 +43,7 @@ int main(void) {
     CHECK(om_shard_open(NULL, NULL) == OM_ERR_INVALID_ARGUMENT);
     CHECK(strlen(om_last_error()) > 0);
 
-    om_shard_params params = {"no-such-model.gguf", 10, 10, OM_BACKEND_AUTO, 4096, OM_KV_F16};
+    om_shard_params params = {"no-such-model.gguf", 10, 10, OM_BACKEND_AUTO, 4096, OM_KV_F16, 0, 0};
     CHECK(om_shard_open(&params, &shard) == OM_ERR_INVALID_ARGUMENT); /* empty layer range */
     params.layer_end = 24;
     params.max_tokens = 0;
