@@ -624,7 +624,7 @@ section.s{padding:clamp(96px,10vw,150px) 0}
 <main>
 <!-- HERO -->
 <section class="hero" id="top">
-  <canvas id="hero3d" aria-label="Seven devices hold the experts of one model; each burst of light is a token waking the eight experts it chose"></canvas>
+  <canvas id="hero3d" aria-label="Seven devices hold the experts of one model; gold lights are tokens travelling the ring"></canvas>
   <div class="xy" aria-hidden="true"><div class="xy-glow"></div><div class="xy-grid"></div></div>
   <div class="hero-chips" aria-hidden="true">
     <span class="hchip"><i></i><b>8</b> of 256 experts a token</span>
@@ -656,7 +656,7 @@ section.s{padding:clamp(96px,10vw,150px) 0}
           <button type="button" class="chip" data-k="phone" data-i="chip.phone">Can my old phone really help?</button>
           <button type="button" class="chip" data-k="privacy" data-i="chip.privacy">Does my prompt leave my house?</button>
         </div>
-        <p class="sim-note" data-i="hero.sim">Answers here are simulated; each burst of light is a token waking the 8 experts it chose.</p>
+        <p class="sim-note" data-i="hero.sim">Answers here are simulated; the gold light is a token travelling the ring, and each finished token sends out a wave.</p>
       </div>
     </div>
   </div>
@@ -665,7 +665,7 @@ section.s{padding:clamp(96px,10vw,150px) 0}
       <div><span data-i="hud.devs">devices</span><b>7</b></div>
       <div><span data-i="hud.experts">experts</span><b>256</b></div>
       <div><span data-i="hud.per">per token</span><b>8</b></div>
-      <div><span data-i="hud.flight">calls in flight</span><b id="hudFlight">0</b></div>
+      <div><span data-i="hud.flight">tokens in flight</span><b id="hudFlight">7</b></div>
     </div>
     <div class="clone">
       <code id="cloneCmd">git clone https://github.com/HumoyunDavronov2001/omnarc.git</code>
@@ -1093,7 +1093,7 @@ function livingArcs(R,arcs,o){
   const U={uTime:{value:0},uIntro:{value:0},uAlpha:{value:o.alpha??1},uR:{value:R},uPR:{value:Math.min(devicePixelRatio||1,1.75)},uDist:{value:20},uRefPx:{value:300},uHover:{value:-1},
     uArcs:{value:slot(a=>new THREE.Vector2(a.a0,a.a1))},uFlow:{value:slot((a,k)=>o.flow?o.flow[k]:.03)},uBoost:{value:new Array(MAXA).fill(0)},
     uC0:{value:slot(a=>C0.clone().lerp(new THREE.Color(a.color),tint))},uC1:{value:slot(a=>C1.clone().lerp(new THREE.Color(a.color),tint*.45))},
-    uHot:{value:new THREE.Color(0xdffff9)},uTok:{value:Array.from({length:MAXA},()=>new THREE.Vector4())},uTokN:{value:0}};
+    uHot:{value:new THREE.Color(0xf3c868)},uTok:{value:Array.from({length:MAXA},()=>new THREE.Vector4())},uTokN:{value:0}};
   const mat=new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
     vertexShader:`attribute vec4 aMeta;attribute float aArc;attribute vec3 aCloud;
       uniform float uTime;uniform float uIntro;uniform float uAlpha;uniform float uR;uniform float uPR;uniform float uDist;uniform float uRefPx;uniform float uHover;
@@ -1143,90 +1143,77 @@ function livingArcs(R,arcs,o){
        A smaller ring on screen packs the same particles tighter, so each gets fainter (the living ring keeps ~9.5 per pixel of arc) */
     scale(dist,pxPerUnit){const ref=R*pxPerUnit/dist;U.uDist.value=dist;U.uRefPx.value=ref;U.uAlpha.value=(o.alpha??1)*Math.min(1,60*ref/o.count);}};
 }
-/* the core in the middle of the ring: servers that keep attention, the router, the shared experts and the hottest experts.
-   Rings of light above them are the core's layers; the orb flashes for every call answered right there */
-function coreCluster(reg,scale){
-  const g=new THREE.Group(),k=scale||1;
-  const ped=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.62,.12,56),M.bezel);ped.position.y=.06;ped.receiveShadow=true;g.add(ped);
-  const rim=new THREE.Mesh(new THREE.TorusGeometry(1.56,.016,6,96),new THREE.MeshBasicMaterial({color:0x1be480,transparent:true,opacity:.65}));
-  rim.rotation.x=Math.PI/2;rim.position.y=.125;g.add(rim);
-  for(let i=0;i<3;i++){const a=i/3*Math.PI*2+Math.PI/2,sv=makeDevice('server',0x1be480,reg);sv.scale.setScalar(.6);
-    sv.position.set(Math.cos(a)*.74,.12,Math.sin(a)*.74);sv.rotation.y=Math.PI/2-a;g.add(sv);}
-  const layers=[];
-  for(let i=0;i<6;i++){const l=new THREE.Mesh(new THREE.TorusGeometry(.95-i*.07,.012,6,72),new THREE.MeshBasicMaterial({color:0x7dffd8,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}));
-    l.rotation.x=Math.PI/2;l.position.y=1.32+i*.13;g.add(l);layers.push(l);}
-  const orb=new THREE.Sprite(new THREE.SpriteMaterial({map:radialTex('rgba(225,255,250,1)','rgba(27,228,128,0)'),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));
-  orb.position.y=2.2;orb.scale.set(1.1,1.1,1);g.add(orb);
-  g.scale.setScalar(k);
-  return {group:g,top:new THREE.Vector3(0,2.2*k,0),
-    pulse(f,t){orb.scale.setScalar(1.05+.5*f+.06*Math.sin(t*5));orb.material.opacity=Math.min(1,.55+.45*f);
-      layers.forEach((l,i)=>{l.material.opacity=.18+.22*Math.max(0,Math.sin(t*3.2-i*.8))+.3*f;});}};
-}
-/* a token's expert calls as lightning. A call that leaves the core is a bolt of particles from the core to the arc that holds
-   the expert: jagged, branching, re-forming three times in its third of a second, throwing sparks where it strikes.
-   A call answered on the core itself only flashes the core (S0: the hottest quarter of experts took two thirds of the calls) */
-function lightning(R,arcs,o){
-  const K=o.k||8,MAXB=K*2,NC=110,NG=14,NS=14,PER=NC+NG+NS,LIFE=.34,SPARK=.5,GLOW=.8,hot=o.hot??.6,from=o.from;
-  const pts=pointCloud(MAXB*PER),ga=pts.geometry.attributes;
-  /* the bolt's filament: one bright line through the jagged path and its branches */
-  const LS=64,lg=new THREE.BufferGeometry(),LP=new Float32Array(MAXB*LS*6),LC=new Float32Array(MAXB*LS*6);
-  lg.setAttribute('position',new THREE.BufferAttribute(LP,3));lg.setAttribute('color',new THREE.BufferAttribute(LC,3));
-  const lines=new THREE.LineSegments(lg,new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,   // alpha follows brightness: a fading bolt never draws dark on the transparent canvas
-    vertexShader:'attribute vec3 color;varying vec3 vC;void main(){vC=color;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'varying vec3 vC;void main(){float a=max(vC.r,max(vC.g,vC.b));if(a<.01)discard;gl_FragColor=vec4(vC/a,a);}'}));
-  lines.frustumCulled=false;const obj=new THREE.Group();obj.add(pts,lines);
-  const span=arcs.map(d=>d.a1-d.a0),tot=span.reduce((s,x)=>s+x,0),bolts=[],toks=[];
-  let flash=0;
-  const rnd=()=>Math.random()-.5;
-  const pickArc=()=>{let r=Math.random()*tot,i=0;while(i<arcs.length-1&&r>span[i]){r-=span[i];i++;}return arcs[i];};
-  const jag=(A,B,levels,rough)=>{let p=[A.clone(),B.clone()];
-    for(let l=0,amp=A.distanceTo(B)*rough;l<levels;l++,amp*=.55){const q=[p[0]];
-      for(let i=1;i<p.length;i++){const m=p[i-1].clone().add(p[i]).multiplyScalar(.5);m.x+=rnd()*amp;m.y+=rnd()*amp*.8;m.z+=rnd()*amp;q.push(m,p[i]);}
-      p=q;}
+/* the living ring's tokens, dial and waves (design/living-ring.js, carried over to three): gold comets with a tail and
+   a halo, as many in flight as there are devices. A token spends time on each arc in proportion to its share over its
+   device's speed and crosses the gaps between arcs — the network hops — quickly; faint sparks ahead of it are draft
+   tokens; every token that finishes a lap sends a wave out of the output point, the gap before the first arc */
+function ringTokens(R,arcs){
+  const n=arcs.length,TAU=Math.PI*2,TAIL=28,WAVE=160,HOP=.075,LAP=3.9,MAXP=n*(TAIL+4)+n+4*WAVE;
+  const DIAL=new THREE.Color(0x7d9384),T0=new THREE.Color(0xe2b13c),T1=new THREE.Color(0xfff6e0);
+  const VS=`attribute vec3 aColor;attribute float aSize;attribute float aAlpha;attribute float aHard;
+    uniform float uPR;uniform float uDist;uniform float uScale;uniform float uFade;
+    varying vec3 vC;varying float vA;varying float vH;
+    void main(){vC=aColor;vA=aAlpha*uFade;vH=aHard;vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;
+      gl_PointSize=min(aSize*uScale*uPR*uDist/max(-mv.z,.1),200.);}`;
+  const FS=`varying vec3 vC;varying float vA;varying float vH;
+    void main(){vec2 d=gl_PointCoord*2.-1.;float r2=dot(d,d);if(r2>1.)discard;
+      float a=mix(exp(-r2*3.2),1.-smoothstep(.55,1.,r2),vH)*vA;if(a<.003)discard;gl_FragColor=vec4(vC,a);}`;
+  const mats=[];
+  const layer=N=>{const g=new THREE.BufferGeometry();
+    [['position',3],['aColor',3],['aSize',1],['aAlpha',1],['aHard',1]].forEach(([k,w])=>g.setAttribute(k,new THREE.BufferAttribute(new Float32Array(N*w),w)));
+    const mt=new THREE.ShaderMaterial({uniforms:{uPR:{value:Math.min(devicePixelRatio||1,1.75)},uDist:{value:20},uScale:{value:1},uFade:{value:1}},
+      vertexShader:VS,fragmentShader:FS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+    mats.push(mt);const p=new THREE.Points(g,mt);p.frustumCulled=false;return p;};
+  const fixed=(list)=>{const p=layer(list.length),A=p.geometry.attributes;
+    list.forEach(([a,r,size,alpha],i)=>{A.position.setXYZ(i,Math.cos(a)*R*r,0,Math.sin(a)*R*r);A.aColor.setXYZ(i,DIAL.r,DIAL.g,DIAL.b);A.aSize.setX(i,size);A.aAlpha.setX(i,alpha);A.aHard.setX(i,1);});
     return p;};
-  /* n points spread evenly along a polyline, written into out from index at */
-  const along=(poly,n,out,at)=>{const L=[0];for(let i=1;i<poly.length;i++)L.push(L[i-1]+poly[i].distanceTo(poly[i-1]));const T=L[L.length-1]||1;
-    for(let k=0,i=1;k<n;k++){const d=T*k/Math.max(1,n-1);while(i<poly.length-1&&L[i]<d)i++;out[at+k]=poly[i-1].clone().lerp(poly[i],clamp((d-L[i-1])/((L[i]-L[i-1])||1),0,1));}};
-  function shape(bo){   /* a new jagged path with up to two short branches, sampled once per flicker */
-    const p=jag(from,bo.B,5,.16),br=[];
-    for(let b=0;b<2;b++)if(Math.random()<.7){const i0=4+Math.floor(Math.random()*(p.length-12)),st=p[i0];
-      const end=st.clone().add(p[i0+3].clone().sub(st).multiplyScalar(2+Math.random()*3)).add(new THREE.Vector3(rnd()*.9,rnd()*.5,rnd()*.9));
-      br.push(jag(st,end,3,.25));}
-    const nMain=br.length?Math.round(NC*.72):NC,nBr=br.length?Math.floor((NC-nMain)/br.length):0,pts2=new Array(NC);
-    along(p,nMain,pts2,0);br.forEach((q,j)=>along(q,nBr,pts2,nMain+j*nBr));
-    bo.pts=pts2;bo.nMain=nMain;bo.polys=[p,...br];bo.gain=.65+.35*Math.random();}
+  /* the dial, and the inner ring that turns slowly */
+  const dl=[];for(let i=0;i<180;i++){const a=i/180*TAU,major=i%5===0;dl.push([a,1.17,major?1.7:1.15,major?.55:.3]);if(major)dl.push([a,1.21,1.4,.4]);}
+  const dial=fixed(dl),inner=fixed(Array.from({length:96},(_,i)=>[i/96*TAU,.72,1.2,.22]));
+  const dyn=layer(MAXP),A=dyn.geometry.attributes,obj=new THREE.Group();obj.add(dial,inner,dyn);
+  /* stage times: a lap takes about 3.9 s, as in the living ring */
+  const span=arcs.map(d=>d.a1-d.a0),spd=arcs.map(d=>d.speed||1);
+  const K=(LAP-n*HOP)/span.reduce((s,x,k)=>s+x/spd[k],0),stage=span.map((x,k)=>K*x/spd[k]),T=stage.reduce((s,x)=>s+x,0)+n*HOP;
+  const nextA=k=>k===n-1?arcs[0].a0+TAU:arcs[k+1].a0;
+  const angleAt=tau=>{tau=((tau%T)+T)%T;
+    for(let k=0;k<n;k++){if(tau<stage[k])return [arcs[k].a0+span[k]*tau/stage[k],k];tau-=stage[k];
+      if(tau<HOP)return [arcs[k].a1+(nextA(k)-arcs[k].a1)*tau/HOP,-1];tau-=HOP;}
+    return [arcs[0].a0,0];};
+  const hash=x=>{const v=Math.sin(x*12.9898)*43758.5453;return v-Math.floor(v);};
+  const phase=Array.from({length:n},(_,i)=>i/n),onArc=Array(n).fill(null),waves=[],toks=[];
+  let m=0;
+  const put=(a,r,size,alpha,mix,hard,dialCol)=>{const i=m++;A.position.setXYZ(i,Math.cos(a)*R*r,0,Math.sin(a)*R*r);
+    if(dialCol)A.aColor.setXYZ(i,DIAL.r,DIAL.g,DIAL.b);else A.aColor.setXYZ(i,lerp(T0.r,T1.r,mix),lerp(T0.g,T1.g,mix),lerp(T0.b,T1.b,mix));
+    A.aSize.setX(i,size);A.aAlpha.setX(i,alpha);A.aHard.setX(i,hard);};
   return {points:obj,
-    fire(t,big){for(let i=0;i<K;i++){
-        if(Math.random()<hot){flash=Math.min(1.6,flash+.35);continue;}
-        const d=pickArc(),a=d.a0+(.06+.88*Math.random())*(d.a1-d.a0);
-        bolts.push({t0:t+i*.022+Math.random()*.02,a,d,big:!!big,B:new THREE.Vector3(Math.cos(a)*R,0,Math.sin(a)*R),flick:-1,struck:false,
-          sp:Array.from({length:NS},()=>new THREE.Vector3(rnd()*2.2,Math.random()*1.6+.3,rnd()*2.2))});}
-      while(bolts.length>MAXB)bolts.shift();},
-    /* returns {toks:[angle, strength, …] newest first, flash, flying} */
-    update(t,dt,onStrike){
-      const P=ga.position.array,C=ga.aColor.array,S=ga.size.array,A=ga.alpha.array;toks.length=0;flash=Math.max(0,flash-dt*3.2);let flying=0;
-      for(let b=0;b<MAXB;b++){const o0=b*PER,bo=bolts[b],age=bo?t-bo.t0:-1;
-        const l0=b*LS*6;LC.fill(0,l0,l0+LS*6);
-        if(!bo||age<0||age>SPARK){for(let k=0;k<PER;k++)A[o0+k]=0;continue;}
-        if(!bo.struck){bo.struck=true;onStrike&&onStrike(bo);}
-        const fl=Math.min(2,Math.floor(age/(LIFE/3)));if(fl!==bo.flick){bo.flick=fl;shape(bo);}
-        const on=age<LIFE?Math.pow(1-age/LIFE,1.3)*bo.gain:0;if(on)flying++;
-        if(on){let n=0;bo.polys.forEach((q,j)=>{const c=on*(j?.55:1)*(bo.big?1.2:1);
-          for(let i=1;i<q.length&&n<LS;i++,n++){const o=l0+n*6;
-            LP[o]=q[i-1].x;LP[o+1]=q[i-1].y;LP[o+2]=q[i-1].z;LP[o+3]=q[i].x;LP[o+4]=q[i].y;LP[o+5]=q[i].z;
-            LC[o]=LC[o+3]=.8*c;LC[o+1]=LC[o+4]=c;LC[o+2]=LC[o+5]=.97*c;}});}
-        for(let k=0;k<NC;k++){const i=o0+k,v=bo.pts[k];if(!v||!on){A[i]=0;continue;}
-          P[i*3]=v.x+rnd()*.03;P[i*3+1]=v.y+rnd()*.03;P[i*3+2]=v.z+rnd()*.03;
-          const br=k>=bo.nMain;C[i*3]=.78;C[i*3+1]=1;C[i*3+2]=.98;S[i]=(br?.24:.36)*(bo.big?1.25:1);A[i]=on*(br?.55:1)*(.75+.25*Math.random());}
-        for(let k=0;k<NG;k++){const i=o0+NC+k,v=bo.pts[Math.floor(k/(NG-1)*(bo.nMain-1))];   // a soft glow along the main path
-          if(!v||!on){A[i]=0;continue;}P[i*3]=v.x;P[i*3+1]=v.y;P[i*3+2]=v.z;C[i*3]=.15;C[i*3+1]=.85;C[i*3+2]=.75;S[i]=1.6;A[i]=on*.16;}
-        for(let k=0;k<NS;k++){const i=o0+NC+NG+k,u=age/SPARK,w=bo.sp[k];   // discharge sparks where it strikes
-          P[i*3]=bo.B.x+w.x*age*(1-u*.5);P[i*3+1]=Math.max(0,w.y*age-2.2*age*age);P[i*3+2]=bo.B.z+w.z*age*(1-u*.5);
-          C[i*3]=.7;C[i*3+1]=1;C[i*3+2]=.95;S[i]=.32*(1-u)+.08;A[i]=Math.pow(1-u,1.6);}}
-      for(let b=bolts.length-1;b>=0;b--){const age=t-bolts[b].t0;if(age>=0&&age<GLOW)toks.push(bolts[b].a,(bolts[b].big?1.2:1)*(1-age/GLOW));}
-      while(bolts.length&&t-bolts[0].t0>Math.max(SPARK,GLOW)+.2)bolts.shift();
-      ['position','aColor','size','alpha'].forEach(n=>ga[n].needsUpdate=true);lg.attributes.position.needsUpdate=lg.attributes.color.needsUpdate=true;
-      return {toks,flash,flying};}};
+    wave(t){waves.push(t);},
+    /* sizes are the living ring's pixels for a ring of 250 px */
+    scale(dist,refPx){mats.forEach(mt=>{mt.uniforms.uDist.value=dist;mt.uniforms.uScale.value=refPx/250;});},
+    /* moves the tokens; onEnter(k) when a token enters arc k. Returns {toks:[angle, strength, …], head} */
+    update(t,dt,intro,speed,onEnter){
+      m=0;toks.length=0;const on=clamp((intro-.82)/.18,0,1);
+      mats[0].uniforms.uFade.value=mats[1].uniforms.uFade.value=intro;inner.rotation.y=t*.05;
+      for(let k=0;k<n-1;k++)put((arcs[k].a1+arcs[k+1].a0)/2,1,3.2,.5*intro,0,.8,true);   // network hops
+      put((arcs[n-1].a1+arcs[0].a0+TAU)/2,1,4.6,.8*intro,.2,.8,false);                    // the output point
+      const order=phase.map((f,i)=>[f,i]).sort((a,b)=>a[0]-b[0]);                          // tokens settle into even spacing
+      order.forEach(([f,i],r)=>{const goal=(order[0][0]+r/n)%1;let df=goal-f;df-=Math.round(df);phase[i]=(phase[i]+df*dt*.6+1)%1;});
+      let head=null;
+      for(let i=0;i<n;i++){
+        const before=phase[i];phase[i]=(phase[i]+dt*speed/T)%1;if(phase[i]<before&&on>.5)waves.push(t);
+        const tau=phase[i]*T,[a,k]=angleAt(tau),cycle=Math.floor(t/T+i*.37);
+        if(k!==onArc[i]){if(k>=0&&onArc[i]!==null&&onEnter)onEnter(k);onArc[i]=k;}
+        if(head===null)head=a;toks.push(a,on);
+        put(a,1,30,.2*on,0,0);                                                                  // halo
+        for(let q=0;q<TAIL;q++){const p=q/TAIL;put(angleAt(tau-q*.012*T)[0],1,1+7*Math.pow(1-p,.8),.62*Math.pow(1-p,1.6)*on,.25,.3);}   // tail
+        put(a,1,9.5,on,.85,.35);                                                                // head
+        for(let g=0;g<2;g++){const tg=tau+(g+1)*.026*T,f=(tg%T)/T;                              // draft tokens; rejected ones fade
+          const kept=hash(cycle*7+i*3+g)<.28&&f>.76?Math.max(0,1-(f-.76)/.12):1;put(angleAt(tg)[0],1,4.2,.5*kept*on,.6,.2);}}
+      while(waves.length&&t-waves[0]>1.3)waves.shift();
+      waves.slice(-4).forEach(t0=>{const p=(t-t0)/1.3,e=1-Math.pow(1-p,3);                    // output waves
+        for(let q=0;q<WAVE;q++)put(q/WAVE*TAU,1+.42*e,1.5,.42*Math.pow(1-p,2),.3,0);});
+      dyn.geometry.setDrawRange(0,m);
+      Object.values(A).forEach(b=>b.needsUpdate=true);
+      return {toks,head};}};
 }
 function studioEnv(renderer){
   const s=new THREE.Scene();s.background=new THREE.Color(0x0b0f0d);
@@ -1438,10 +1425,9 @@ function hero(){
   const fill=new THREE.DirectionalLight(0x7fd6ff,.35);fill.position.set(-8,3,-4);scene.add(fill);
   const core=new THREE.PointLight(0x1be480,2.4,16,1.6);core.position.set(0,1.4,0);scene.add(core);
   const world=new THREE.Group();scene.add(world);
-  let innerMat=null;
   const R=6.0;
   const DEVS=[
-    {id:'server',label:'home server',ex:72,speed:1.00,color:0x1be480},
+    {id:'server',label:'server',ex:72,speed:1.00,color:0x1be480},
     {id:'pc',label:'pc',ex:56,speed:.88,color:0x2fc983},
     {id:'nas',label:'nas',ex:40,speed:.52,color:0x9fbf3a},
     {id:'laptop',label:'laptop',ex:32,speed:.56,color:0x1a8f8f},
@@ -1457,11 +1443,6 @@ function hero(){
   /* arcs — each device's share is a river of particles; a token lights the spot it passes */
   const vw=innerWidth,live=livingArcs(R,DEVS,{count:vw>960?24000:vw>600?18000:12000,glow:vw>960?2200:vw>600?1700:1200,flow:DEVS.map(d=>.03*d.speed),alpha:.85});
   world.add(live.points);const boost=DEVS.map(()=>0);
-  /* expert ticks, one per four */
-  {const pts=[];DEVS.forEach(d=>{for(let i=0;i<=d.ex;i+=4){const x=lerp(d.a0,d.a1,i/d.ex),big=i===0||i===d.ex,r1=R+.2,r2=R+(big?.52:.32);pts.push(Math.cos(x)*r1,0,Math.sin(x)*r1,Math.cos(x)*r2,0,Math.sin(x)*r2);}});
-    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
-    var tickMat=new THREE.LineBasicMaterial({color:0x4d7a62,transparent:true,opacity:.55});world.add(new THREE.LineSegments(g,tickMat));}
-  {const inner=new THREE.Mesh(new THREE.TorusGeometry(R-.55,.008,6,256),new THREE.MeshBasicMaterial({color:0x2a5a42,transparent:true,opacity:.6}));inner.rotation.x=Math.PI/2;world.add(inner);innerMat=inner.material;}
   /* floor */
   const grid=new THREE.PolarGridHelper(11,28,9,128,0x1c3a2b,0x112419);grid.position.y=-.95;grid.material.transparent=true;grid.material.opacity=.55;world.add(grid);
   const glow=new THREE.Mesh(new THREE.PlaneGeometry(16,16),new THREE.MeshBasicMaterial({map:radialTex('rgba(27,228,128,.28)','rgba(27,228,128,0)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
@@ -1513,12 +1494,9 @@ function hero(){
   addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(e.target&&e.target.closest&&e.target.closest('form,textarea,input'))return;selDev=null;cardUpdate();});
 
   leds.forEach(l=>l.base=l.m.material.color.getHex());
-  /* the core in the middle: servers that keep attention, the router, the shared and the hottest experts */
-  const coreC=coreCluster({leds,fans,floaters},1);coreC.group.position.y=-.9;world.add(coreC.group);
-  /* tokens: each wakes 8 experts; a call that leaves the core strikes its arc as lightning */
-  const zap=lightning(R,DEVS,{k:8,hot:.6,from:new THREE.Vector3(0,-.9+coreC.top.y,0)});world.add(zap.points);
-  let nextBurst=0;
-  api.spawn=(o={})=>zap.fire(T,!!o.big);
+  /* tokens, dial and waves of the living ring; each streamed word sends a wave */
+  const rt=ringTokens(R,DEVS);world.add(rt.points);
+  api.spawn=()=>rt.wave(T);
   /* dust */
   const ND=650,dust=pointCloud(ND);world.add(dust);
   {const p=dust.geometry.attributes.position.array,c=dust.geometry.attributes.aColor.array,s=dust.geometry.attributes.size.array,al=dust.geometry.attributes.alpha.array;
@@ -1535,7 +1513,7 @@ function hero(){
   const shFloor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.ShadowMaterial({opacity:.42}));
   shFloor.rotation.x=-Math.PI/2;shFloor.position.y=-.945;shFloor.receiveShadow=true;world.add(shFloor);
   /* a light follows the latest strike */
-  const tokenLight=new THREE.PointLight(0xaaffd2,2.2,8,2);tokenLight.position.set(0,.5,0);world.add(tokenLight);
+  const tokenLight=new THREE.PointLight(0xffd98a,2.2,8,2);tokenLight.position.set(0,.5,0);world.add(tokenLight);
   const st={yaw:0,pitch:0,mx:0,my:0,dragging:false,moved:0};
   dragYaw(canvas,st,()=>reduceMotion&&L.once());
   const t0Intro=performance.now();let W=1,H=1,camBase=new THREE.Vector3(),crect=null;const center=$('#heroCenter');
@@ -1544,10 +1522,11 @@ function hero(){
     else if(W>600){world.position.set(0,-3,0);camBase.set(0,10,25);cam.fov=38;}
     else{world.position.set(0,-6.4,0);camBase.set(0,7.6,25);cam.fov=40;}
     crect=null;
-    cam.updateProjectionMatrix();live.scale(camBase.distanceTo(world.position),H/(2*Math.tan(cam.fov*Math.PI/360)));}
+    cam.updateProjectionMatrix();
+    {const ppu=H/(2*Math.tan(cam.fov*Math.PI/360)),dist=camBase.distanceTo(world.position);live.scale(dist,ppu);rt.scale(dist,R*ppu/dist);}}
   new ResizeObserver(resize).observe(canvas);resize();
   const v=new THREE.Vector3();let T=0,hudT=0;
-  const flightEl=$('#hudFlight');
+  $('#hudFlight').textContent=DEVS.length;
   function frame(dt,t){
     T+=dt;
     if(!st.dragging&&!reduceMotion)st.yaw+=dt*.05;
@@ -1561,13 +1540,10 @@ function hero(){
       d.flash=Math.max(0,d.flash-dt*2.4);
       if(d.lkMat){d.lkMat.opacity=.24+.76*d.flash;d.lkMat.color.copy(d.colBase).multiplyScalar(.5+1.1*d.flash);}
       boost[i]=(d.load-.5)*.5+d.pulse*.8;d.pedMat.opacity=.35+d.pulse*.65;});
-    /* tokens: a burst of 8 expert calls; lightning where a call leaves the core, a flash where it stays */
-    if(!reduceMotion&&!api.streaming&&T>=nextBurst){zap.fire(T);nextBurst=T+.62;}
-    const zk=zap.update(T,dt,e=>{e.d.pulse=Math.max(e.d.pulse,e.big?1:.75);e.d.flash=1;
-      tokenLight.position.set(Math.cos(e.a)*R,.5,Math.sin(e.a)*R);tokenLight.color.setHex(0xc8fff6);});
-    coreC.pulse(zk.flash,T);
-    flightEl.textContent=zk.flying;
-    const hi=selDev||hoverDev;live.set(T,it,zk.toks,boost,hi?DEVS.indexOf(hi):-1);
+    /* tokens travel the ring as in the living ring; a streamed answer speeds them up */
+    const rk=rt.update(T,dt,it,api.streaming?1.6:1,k=>{const d=DEVS[k];d.pulse=Math.max(d.pulse,.8);d.flash=1;});
+    if(rk.head!==null)tokenLight.position.set(Math.cos(rk.head)*R,.5,Math.sin(rk.head)*R);
+    const hi=selDev||hoverDev;live.set(T,it,rk.toks,boost,hi?DEVS.indexOf(hi):-1);
     dust.rotation.y+=dt*.01;
     leds.forEach(l=>l.m.material.color.setHex(noise1(T*3+l.ph)>.35?l.base:0x0a2016));
     fans.forEach(f=>f.rotation.x+=dt*14);
@@ -1859,8 +1835,8 @@ const T={
 en:{"nav.story":"How it works","nav.lab":"Pool lab","nav.node":"The core","nav.math":"The math","nav.road":"Roadmap","nav.faq":"FAQ","nav.start":"Get started","nav.try":"Try it",
 "hero.status":"pre-alpha · stage S0: measuring","hero.h1a":"Every device is an arc.","hero.h1b":"Together, one mind.","hero.ph":"Ask the pool anything…",
 "chip.ring":"How do my devices share one model?","chip.phone":"Can my old phone really help?","chip.privacy":"Does my prompt leave my house?",
-"hero.sim":"Answers here are simulated; each burst of light is a token waking the 8 experts it chose.","sim":"simulated",
-"hud.devs":"devices","hud.experts":"experts","hud.per":"per token","hud.flight":"calls in flight","hud.core":"core","copy":"Copy","copied":"Copied",
+"hero.sim":"Answers here are simulated; the gold light is a token travelling the ring, and each finished token sends out a wave.","sim":"simulated",
+"hud.devs":"devices","hud.experts":"experts","hud.per":"per token","hud.flight":"tokens in flight","hud.core":"core","copy":"Copy","copied":"Copied",
 "s1.h":"Hundreds of experts, one model.","s1.p":"A mixture-of-experts model is a crowd of small specialists. Each arc is one device’s share of them, sized by the memory its owner lends.",
 "s2.h":"The core stays on the server.","s2.p":"Attention, the router, the shared experts and the conversation’s memory live where memory is widest. At every layer the router picks 8 of 256 experts for the token.",
 "s3.h":"Only the chosen experts wake.","s3.p":"A few kilobytes of hidden state go to the devices that hold them and come back. The most-called experts stay on the server: in S0’s traces the hottest quarter took two thirds of the calls.",
@@ -1904,8 +1880,8 @@ en:{"nav.story":"How it works","nav.lab":"Pool lab","nav.node":"The core","nav.m
 uz:{"nav.story":"Qanday ishlaydi","nav.lab":"Hovuz laboratoriyasi","nav.node":"Yadro","nav.math":"Matematika","nav.road":"Yo‘l xaritasi","nav.faq":"Savollar","nav.start":"Boshlash","nav.try":"Sinab ko‘ring",
 "hero.status":"pre-alfa · S0 bosqichi: o‘lchov","hero.h1a":"Har bir qurilma — bitta yoy.","hero.h1b":"Birgalikda — bitta aql.","hero.ph":"Hovuzdan so‘rang…",
 "chip.ring":"Qurilmalarim bitta modelni qanday bo‘lishadi?","chip.phone":"Eski telefonim rostdan yordam beradimi?","chip.privacy":"So‘rovim uyimdan chiqib ketadimi?",
-"hero.sim":"Bu yerdagi javoblar simulyatsiya; har bir nur chaqnashi — o‘zi tanlagan 8 ta ekspertni uyg‘otayotgan token.","sim":"simulyatsiya",
-"hud.devs":"qurilmalar","hud.experts":"ekspertlar","hud.per":"har tokenda","hud.flight":"yo‘ldagi chaqiruvlar","hud.core":"yadro","copy":"Nusxa","copied":"Nusxalandi",
+"hero.sim":"Bu yerdagi javoblar simulyatsiya; tilla nur — halqa bo‘ylab yurayotgan token, tayyor bo‘lgan har bir token to‘lqin chiqaradi.","sim":"simulyatsiya",
+"hud.devs":"qurilmalar","hud.experts":"ekspertlar","hud.per":"har tokenda","hud.flight":"yo‘ldagi tokenlar","hud.core":"yadro","copy":"Nusxa","copied":"Nusxalandi",
 "s1.h":"Yuzlab ekspert, bitta model.","s1.p":"Mixture-of-experts modeli — kichik mutaxassislar to‘dasi. Har bir yoy — ulardan bitta qurilmaga tushgan ulush; kattaligi egasi ajratgan xotiraga qarab belgilanadi.",
 "s2.h":"Yadro serverda qoladi.","s2.p":"Attention, yo‘naltirgich (router), umumiy ekspertlar va suhbat xotirasi xotira eng keng joyda turadi. Har bir qatlamda yo‘naltirgich token uchun 256 ekspertdan 8 tasini tanlaydi.",
 "s3.h":"Faqat tanlangan ekspertlar uyg‘onadi.","s3.p":"Bir necha kilobayt yashirin holat ularni ushlab turgan qurilmalarga borib qaytadi. Eng ko‘p chaqiriladigan ekspertlar serverda qoladi: S0 izlarida eng issiq chorak chaqiruvlarning uchdan ikkisini oldi.",
@@ -1949,8 +1925,8 @@ uz:{"nav.story":"Qanday ishlaydi","nav.lab":"Hovuz laboratoriyasi","nav.node":"Y
 ru:{"nav.story":"Как это работает","nav.lab":"Лаборатория пула","nav.node":"Ядро","nav.math":"Математика","nav.road":"Дорожная карта","nav.faq":"Вопросы","nav.start":"Начать","nav.try":"Попробуйте",
 "hero.status":"пре-альфа · этап S0: измерения","hero.h1a":"Каждое устройство — дуга.","hero.h1b":"Вместе — один разум.","hero.ph":"Спросите пул…",
 "chip.ring":"Как мои устройства делят одну модель?","chip.phone":"Мой старый телефон правда поможет?","chip.privacy":"Покидает ли мой запрос дом?",
-"hero.sim":"Ответы здесь смоделированы; каждая вспышка — токен, будящий 8 выбранных им экспертов.","sim":"симуляция",
-"hud.devs":"устройства","hud.experts":"эксперты","hud.per":"на токен","hud.flight":"вызовов в пути","hud.core":"ядро","copy":"Копировать","copied":"Скопировано",
+"hero.sim":"Ответы здесь смоделированы; золотой свет — токен, идущий по кольцу, а каждый готовый токен пускает волну.","sim":"симуляция",
+"hud.devs":"устройства","hud.experts":"эксперты","hud.per":"на токен","hud.flight":"токенов в пути","hud.core":"ядро","copy":"Копировать","copied":"Скопировано",
 "s1.h":"Сотни экспертов, одна модель.","s1.p":"Модель mixture-of-experts — это толпа небольших специалистов. Каждая дуга — доля одного устройства, её размер зависит от памяти, которую выделил владелец.",
 "s2.h":"Ядро остаётся на сервере.","s2.p":"Attention, маршрутизатор (router), общие эксперты и память диалога живут там, где память шире всего. На каждом слое маршрутизатор выбирает для токена 8 из 256 экспертов.",
 "s3.h":"Просыпаются только выбранные эксперты.","s3.p":"Несколько килобайт скрытого состояния уходят к устройствам, где лежат эти эксперты, и возвращаются. Самые востребованные эксперты остаются на сервере: в трассах S0 самая горячая четверть взяла две трети вызовов.",
@@ -1996,15 +1972,15 @@ const ANS={
 en:{ring:"A mixture-of-experts model is a crowd of small specialists. Your server keeps the core: attention, the router, the shared experts and the conversation’s memory. The experts are spread over every device you have, each holding as many as its owner lends memory for. For every token, at every layer, the router picks 8 of the 256 experts, and only a few kilobytes of hidden state travel to the devices that hold them and back. The experts called most stay on the server, so most steps never touch the network.",
 phone:"Yes. Every device joins the pool and takes a part it can carry: a few experts, a cache, a copy. In S0 a 32-bit phone with 1.4 GB free held the experts of eight layers over Wi-Fi; each step cost about 28 ms, and the answer was the same text the server writes alone. A phone in its owner’s hand runs slower, so the pool measures it live and keeps copies elsewhere.",
 privacy:"Your words reach only your pool’s server — a machine you own or run. Expert devices receive hidden states for the layers they hold, never your text. The links run inside an encrypted tunnel, and Omnarc sends no telemetry.",
-trace:n=>`Your prompt is about ${n} tokens. The server read it whole and keeps the conversation’s memory. For every word streaming here, 8 of 256 experts woke at each layer — the bursts of light on the ring. Most were hot experts on the server itself; the rest were a few kilobytes away on your other devices.\n\nThis answer is simulated. The Try it section below shows a real run from S0.`},
+trace:n=>`Your prompt is about ${n} tokens. The server read it whole and keeps the conversation’s memory. For every word streaming here, 8 of 256 experts woke at each layer; most were hot experts on the server itself, the rest a few kilobytes away on your other devices. Every finished word sends a wave around the ring.\n\nThis answer is simulated. The Try it section below shows a real run from S0.`},
 uz:{ring:"Mixture-of-experts modeli — kichik mutaxassislar to‘dasi. Serveringiz yadroni ushlaydi: attention, yo‘naltirgich, umumiy ekspertlar va suhbat xotirasi. Ekspertlar bor qurilmalaringizning hammasiga tarqalgan — har biri egasi qancha xotira ajratsa, shuncha ekspertni ushlaydi. Har bir token uchun har bir qatlamda yo‘naltirgich 256 ekspertdan 8 tasini tanlaydi va faqat bir necha kilobayt yashirin holat ularni ushlab turgan qurilmalarga borib qaytadi. Eng ko‘p chaqiriladigan ekspertlar serverda qoladi, shuning uchun qadamlarning ko‘pi tarmoqqa umuman chiqmaydi.",
 phone:"Ha. Har bir qurilma hovuzga qo‘shiladi va ko‘tara oladigan qismni oladi: bir necha ekspert, kesh yoki nusxa. S0 da 1,4 GB bo‘sh xotirali 32 bitli telefon Wi-Fi orqali sakkiz qatlam ekspertlarini ushladi; har bir qadam taxminan 28 ms turdi, javob esa server yolg‘iz yozgan matn bilan bir xil chiqdi. Egasi qo‘lidagi telefon sekinroq ishlaydi, shuning uchun hovuz uni jonli o‘lchaydi va boshqa joyda nusxa saqlaydi.",
 privacy:"So‘zlaringiz faqat hovuzingiz serveriga yetadi — o‘zingizniki yoki o‘zingiz boshqaradigan mashina. Ekspert qurilmalari faqat o‘zlaridagi qatlamlar uchun yashirin holatlarni oladi, matningizni hech qachon ko‘rmaydi. Aloqalar shifrlangan tunnel ichida yuradi, Omnarc hech qanday telemetriya yubormaydi.",
-trace:n=>`So‘rovingiz taxminan ${n} tokendan iborat. Server uni butunligicha o‘qidi va suhbat xotirasini saqlaydi. Bu yerda chiqayotgan har bir so‘z uchun har bir qatlamda 256 ekspertdan 8 tasi uyg‘ondi — halqadagi nur chaqnashlari shular. Ularning ko‘pi serverning o‘zidagi issiq ekspertlar edi; qolganlari boshqa qurilmalaringizda, bir necha kilobayt narida.\n\nBu javob simulyatsiya. Pastdagi «Sinab ko‘ring» bo‘limida S0 dagi haqiqiy ishga tushirish bor.`},
+trace:n=>`So‘rovingiz taxminan ${n} tokendan iborat. Server uni butunligicha o‘qidi va suhbat xotirasini saqlaydi. Bu yerda chiqayotgan har bir so‘z uchun har bir qatlamda 256 ekspertdan 8 tasi uyg‘ondi; ularning ko‘pi serverning o‘zidagi issiq ekspertlar edi, qolganlari boshqa qurilmalaringizda, bir necha kilobayt narida. Tayyor bo‘lgan har bir so‘z halqa bo‘ylab to‘lqin chiqaradi.\n\nBu javob simulyatsiya. Pastdagi «Sinab ko‘ring» bo‘limida S0 dagi haqiqiy ishga tushirish bor.`},
 ru:{ring:"Модель mixture-of-experts — это толпа небольших специалистов. Ваш сервер держит ядро: attention, маршрутизатор, общие эксперты и память диалога. Эксперты распределены по всем вашим устройствам — каждое держит столько, на сколько владелец выделил памяти. Для каждого токена на каждом слое маршрутизатор выбирает 8 из 256 экспертов, и лишь несколько килобайт скрытого состояния уходят к устройствам, где они лежат, и обратно. Самые востребованные эксперты остаются на сервере, поэтому большинство шагов вообще не выходит в сеть.",
 phone:"Да. Каждое устройство входит в пул и берёт посильную часть: несколько экспертов, кэш, копию. В S0 32-битный телефон с 1,4 ГБ свободной памяти держал экспертов восьми слоёв по Wi-Fi; каждый шаг стоил около 28 мс, а ответ совпал с текстом, который пишет один сервер. Телефон в руках владельца работает медленнее, поэтому пул измеряет его на лету и держит копии в другом месте.",
 privacy:"Ваши слова доходят только до сервера вашего пула — машины, которая принадлежит вам или которой вы управляете. Устройства с экспертами получают лишь скрытые состояния своих слоёв и никогда не видят текст. Связь идёт внутри зашифрованного туннеля, Omnarc не отправляет телеметрию.",
-trace:n=>`Ваш запрос — примерно ${n} токенов. Сервер прочитал его целиком и хранит память диалога. Для каждого слова, которое здесь появляется, на каждом слое просыпались 8 из 256 экспертов — это вспышки на кольце. Большинство были горячими экспертами на самом сервере, остальные — в нескольких килобайтах, на других ваших устройствах.\n\nЭтот ответ смоделирован. Настоящий запуск из S0 — ниже, в разделе «Попробуйте».`}
+trace:n=>`Ваш запрос — примерно ${n} токенов. Сервер прочитал его целиком и хранит память диалога. Для каждого слова, которое здесь появляется, на каждом слое просыпались 8 из 256 экспертов; большинство — горячие эксперты на самом сервере, остальные — в нескольких килобайтах, на других ваших устройствах. Каждое готовое слово пускает волну по кольцу.\n\nЭтот ответ смоделирован. Настоящий запуск из S0 — ниже, в разделе «Попробуйте».`}
 };
 let LANG='en';
 const t=k=>(T[LANG]&&T[LANG][k])||T.en[k]||k;
@@ -2074,7 +2050,7 @@ function story(){
   const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(6,12,8);scene.add(key);
   const COLS=[0x1be480,0x2fc983,0x9fbf3a,0x1a8f8f,0x2b5f9e,0x5b8fd0,0xc99a2e],SH=[24,20,15,10,5,4,3];
   /* 1. ring */
-  let storyGrid=null,live=null,zap=null,coreC=null;
+  let storyGrid=null,live=null,rt=null;
   const ring=new THREE.Group();scene.add(ring);const R=6;
   {let a=0;const gap=.06,span=Math.PI*2-gap*7,sArcs=[];
    const IDS=['server','pc','nas','laptop','tablet','phone','browser'];
@@ -2090,10 +2066,8 @@ function story(){
      halo.rotation.x=Math.PI/2;halo.position.set(x0,-.39,z0);ring.add(halo);
      a=a1+gap;});
    live=livingArcs(R,sArcs,{count:innerWidth>700?20000:11000,glow:innerWidth>700?1900:1100,flow:SH.map((n,i)=>.03*(1-i*.09))});ring.add(live.points);
-   coreC=coreCluster({leds:sLed,fans:sFan,floaters:sFloat},.85);coreC.group.position.y=-.42;ring.add(coreC.group);
-   zap=lightning(R,sArcs,{k:8,hot:.6,from:new THREE.Vector3(0,-.42+coreC.top.y,0)});ring.add(zap.points);
+   rt=ringTokens(R,sArcs.map((d,i)=>Object.assign(d,{speed:1-i*.09})));ring.add(rt.points);
    const g=new THREE.PolarGridHelper(13,24,8,96,0x1c3a2b,0x112419);g.position.y=-.42;g.material.transparent=true;g.material.opacity=.5;ring.add(g);storyGrid=g;}
-  let nextBurst=0;
   /* 2. layer stack */
   const stack=new THREE.Group();stack.position.set(0,0,-44);scene.add(stack);
   const NL=10,plates=[];
@@ -2153,7 +2127,7 @@ function story(){
   const cp=new THREE.Vector3(),cl=new THREE.Vector3(),mp={x:0,y:0};
   canvas.parentElement.addEventListener('pointermove',e=>{mp.x=e.clientX/innerWidth*2-1;mp.y=e.clientY/innerHeight*2-1;});
   function camAt(p){let i=0;while(i<KEYS.length-2&&p>KEYS[i+1].p)i++;const a=KEYS[i],b=KEYS[i+1],f=ease(clamp((p-a.p)/(b.p-a.p),0,1));cp.lerpVectors(a.pos,b.pos,f);cl.lerpVectors(a.look,b.look,f);}
-  let W=1,H=1;function resize(){W=canvas.clientWidth;H=canvas.clientHeight;renderer.setSize(W,H,false);cam.aspect=W/H;cam.fov=W<700?52:40;cam.updateProjectionMatrix();live.scale(23.3,H/(2*Math.tan(cam.fov*Math.PI/360)));}
+  let W=1,H=1;function resize(){W=canvas.clientWidth;H=canvas.clientHeight;renderer.setSize(W,H,false);cam.aspect=W/H;cam.fov=W<700?52:40;cam.updateProjectionMatrix();{const ppu=H/(2*Math.tan(cam.fov*Math.PI/360));live.scale(23.3,ppu);rt.scale(23.3,R*ppu/23.3);}}
   new ResizeObserver(resize).observe(canvas);resize();
   let T=0,sp=0;
   function frame(dt){
@@ -2161,9 +2135,7 @@ function story(){
     setStage(target);camAt(sp);
     cam.position.set(cp.x+mp.x*.8,cp.y-mp.y*.5,cp.z);cam.lookAt(cl);
     /* tokens: each wakes 8 experts on the ring */
-    if(!reduceMotion&&T>=nextBurst){zap.fire(T);nextBurst=T+.7;}
-    const zk=zap.update(T,dt);coreC.pulse(zk.flash,T);
-    live.set(T,reduceMotion?1:clamp(T/2.6,0,1),zk.toks,null,-1);
+    {const intro=reduceMotion?1:clamp(T/2.6,0,1);live.set(T,intro,rt.update(T,dt,intro,1).toks,null,-1);}
     ring.rotation.y=T*.05;
     /* token climbs the stack in .26–.52, loops locally otherwise */
     const lp=clamp((sp-.26)/.24,0,1),ty=-.6+lp*(NL*.8+.4)+(sp<.26?0:0);
