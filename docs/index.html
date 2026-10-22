@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Omnarc — every device is an arc. Together, one mind.</title>
-<meta name="description" content="Omnarc turns computers, phones, servers and browsers into one AI cluster — from the devices in one home to idle devices around the world. Open source, Apache 2.0.">
+<meta name="description" content="Omnarc pools every device you own — old phones, laptops, desktops and servers — to run one large mixture-of-experts model, private and offline. Open source, Apache 2.0.">
 <meta property="og:title" content="Omnarc — every device is an arc. Together, one mind.">
-<meta property="og:description" content="Computers, phones, servers and browsers as one AI cluster. Open source, Apache 2.0.">
+<meta property="og:description" content="Every device you own, pooled to run one large mixture-of-experts model. Open source, Apache 2.0.">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://humoyundavronov2001.github.io/omnarc/">
 <meta property="og:url" content="https://humoyundavronov2001.github.io/omnarc/">
@@ -14,14 +14,14 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/HumoyunDavronov2001/omnarc/main/design/assets/home-screen-dark.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Omnarc — every device is an arc. Together, one mind.">
-<meta name="twitter:description" content="Computers, phones, servers and browsers as one AI cluster. Open source, Apache 2.0.">
+<meta name="twitter:description" content="Every device you own, pooled to run one large mixture-of-experts model. Open source, Apache 2.0.">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/HumoyunDavronov2001/omnarc/main/design/assets/home-screen-dark.png">
 <meta name="theme-color" content="#f7f6f1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#08120e" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23118d4f' stroke-width='2.6' stroke-linecap='round' stroke-dasharray='38 18.5' transform='rotate(-90 12 12)'/%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23c99a2e' stroke-width='2.6' stroke-linecap='round' stroke-dasharray='9 47.5' transform='rotate(150 12 12)'/%3E%3Ccircle cx='19' cy='7.5' r='2.4' fill='%231be480'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..800&family=JetBrains+Mono:wght@400..600&display=swap" rel="stylesheet">
 <style>
 :root{
   color-scheme:light;
@@ -34,9 +34,9 @@
   --ink-hi:#0f2a1e;--ink:#07110d;--ink-2:#0c1a14;--ink-3:#12241b;--ink-g2:#10261b;
   --ink-line:rgba(215,232,221,.10);
   --ink-fg:#d7e8dd;--ink-muted:#7d9384;--ink-dim:#4d6457;--beam:#9be9bf;
-  --font-sans:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --font-display:"Bricolage Grotesque","Geist",system-ui,sans-serif;
-  --font-mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-display:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --nav-bg:rgba(255,255,255,.9);--nav-line:rgba(22,33,27,.10);--nav-fg:#16211b;--nav-muted:#5b6459;--nav-hover:rgba(22,33,27,.07);
   --r-sm:8px;--r:14px;--r-lg:22px;
   --wrap:1200px;
@@ -141,7 +141,7 @@ button,input,select{font:inherit;color:inherit}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--bright);box-shadow:0 0 0 0 rgba(27,228,128,.6);animation:pulse 2.4s infinite}
 @keyframes pulse{70%{box-shadow:0 0 0 7px rgba(27,228,128,0)}100%{box-shadow:0 0 0 0 rgba(27,228,128,0)}}
 .hero h1{font-family:var(--font-display);font-weight:650;font-size:clamp(36px,5.6vw,74px);line-height:.98;letter-spacing:-.035em;margin:20px 0 0;text-wrap:balance}
-.hero h1 .l2{display:block;font-weight:300;font-stretch:78%;font-variation-settings:"wdth" 78;letter-spacing:-.02em;color:color-mix(in srgb,var(--brand) 38%,var(--ink-fg))}
+.hero h1 .l2{display:block;font-weight:300;letter-spacing:-.03em;color:color-mix(in srgb,var(--brand) 38%,var(--ink-fg))}
 .ask{width:100%;margin-top:30px;text-align:left}
 .answer{display:none;margin-bottom:12px;background:color-mix(in srgb,var(--ink) 86%,transparent);border:1px solid var(--ink-line);border-radius:20px;padding:16px 20px 18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);max-height:min(46vh,420px);overflow-y:auto;animation:rise var(--d2) var(--ease)}
 .answer.on{display:block}
@@ -255,7 +255,7 @@ section.s.soft{background:var(--bg-soft)}
 .dev .nm{font-weight:600;font-size:14.5px;line-height:1.25}
 .dev .sp{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
 .dev .sw{width:10px;height:10px;border-radius:3px}
-.formula{margin-top:18px;padding:16px 18px;border-radius:12px;background:var(--bg-soft);border:1px dashed var(--border-strong);font-family:"Bricolage Grotesque",Georgia,serif;font-size:17px;line-height:1.9;overflow-x:auto}
+.formula{margin-top:18px;padding:16px 18px;border-radius:12px;background:var(--bg-soft);border:1px dashed var(--border-strong);font-family:var(--font-display);font-size:17px;line-height:1.9;overflow-x:auto}
 .formula var{font-style:italic}
 .formula .c{font-family:var(--font-sans);font-size:13.5px;color:var(--muted);line-height:1.5;margin:0 0 6px}
 .result{background:var(--ink);color:var(--ink-fg);border-color:transparent}
@@ -317,7 +317,7 @@ section.s.soft{background:var(--bg-soft)}
 .mcard .top{padding:20px 20px 0}
 .mcard h3{font-family:var(--font-display);font-size:21px;letter-spacing:-.01em;margin:0 0 6px;line-height:1.2}
 .mcard p{color:var(--muted);font-size:14.5px;margin:0 0 12px}
-.eq{font-family:"Bricolage Grotesque",Georgia,serif;font-size:18px;padding:12px 14px;border-radius:10px;background:var(--bg-soft);overflow-x:auto;white-space:nowrap}
+.eq{font-family:var(--font-display);font-size:18px;padding:12px 14px;border-radius:10px;background:var(--bg-soft);overflow-x:auto;white-space:nowrap}
 .eq var{font-style:italic}
 .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.9em;margin:0 .15em}
 .frac > span:first-child{border-bottom:1px solid currentColor;padding:0 .2em}
@@ -597,8 +597,8 @@ section.s{padding:clamp(96px,10vw,150px) 0}
     </a>
     <nav class="nav-links" aria-label="Sections">
       <a href="#story" data-i="nav.story">How it works</a>
-      <a href="#lab" data-i="nav.lab">Partition lab</a>
-      <a href="#node" data-i="nav.node">Inside a node</a>
+      <a href="#lab" data-i="nav.lab">Pool lab</a>
+      <a href="#node" data-i="nav.node">The core</a>
       <a href="#math" data-i="nav.math">The math</a>
       <a href="#roadmap" data-i="nav.road">Roadmap</a>
       <a href="#try" data-i="nav.try">Try it</a>
@@ -624,18 +624,18 @@ section.s{padding:clamp(96px,10vw,150px) 0}
 <main>
 <!-- HERO -->
 <section class="hero" id="top">
-  <canvas id="hero3d" aria-label="A ring of seven devices running one model; light trails are tokens moving between them"></canvas>
+  <canvas id="hero3d" aria-label="Seven devices hold the experts of one model; each burst of light is a token waking the eight experts it chose"></canvas>
   <div class="xy" aria-hidden="true"><div class="xy-glow"></div><div class="xy-grid"></div></div>
   <div class="hero-chips" aria-hidden="true">
-    <span class="hchip"><i></i><b>80</b> layers · ring of 7</span>
-    <span class="hchip"><i></i>QUIC hop · <b>0.3 ms</b></span>
-    <span class="hchip"><i></i><b>16 KB</b> per token hop</span>
-    <span class="hchip"><i></i>TOPLOC proof ✓</span>
+    <span class="hchip"><i></i><b>8</b> of 256 experts a token</span>
+    <span class="hchip"><i></i>Wi-Fi step · <b>28 ms</b></span>
+    <span class="hchip"><i></i>hottest <b>25 %</b> · 67 % of calls</span>
+    <span class="hchip"><i></i>every device joins ✓</span>
   </div>
   <div class="hero-labels" id="heroLabels" aria-hidden="true"></div>
   <div class="hero-in">
     <div class="hero-center" id="heroCenter">
-      <span class="status intro i1"><span class="dot"></span><span data-i="hero.status">pre-alpha, stage B1 in progress</span></span>
+      <span class="status intro i1"><span class="dot"></span><span data-i="hero.status">pre-alpha · stage S0: measuring</span></span>
       <h1 class="intro i2"><span data-i="hero.h1a">Every device is an arc.</span> <span class="l2" data-i="hero.h1b">Together, one mind.</span></h1>
       <div class="ask intro i3">
         <div class="answer" id="answer" aria-live="polite">
@@ -644,28 +644,28 @@ section.s{padding:clamp(96px,10vw,150px) 0}
           <div class="a-txt" id="aTxt"></div>
         </div>
         <form class="askbox" id="askForm" autocomplete="off">
-          <label class="sr" for="askIn" data-i="hero.ph">Ask the ring anything…</label>
-          <textarea id="askIn" rows="1" data-ip="hero.ph" placeholder="Ask the ring anything…"></textarea>
+          <label class="sr" for="askIn" data-i="hero.ph">Ask the pool anything…</label>
+          <textarea id="askIn" rows="1" data-ip="hero.ph" placeholder="Ask the pool anything…"></textarea>
           <button class="send" id="askSend" type="submit" aria-label="Send" disabled>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
           </button>
           <span class="ask-hint" aria-hidden="true">⏎</span>
         </form>
         <div class="chips" id="chips">
-          <button type="button" class="chip" data-k="ring" data-i="chip.ring">How does a ring run one model?</button>
+          <button type="button" class="chip" data-k="ring" data-i="chip.ring">How do my devices share one model?</button>
           <button type="button" class="chip" data-k="phone" data-i="chip.phone">Can my old phone really help?</button>
           <button type="button" class="chip" data-k="privacy" data-i="chip.privacy">Does my prompt leave my house?</button>
         </div>
-        <p class="sim-note" data-i="hero.sim">Answers here are simulated; the light shows each token’s trip around the ring.</p>
+        <p class="sim-note" data-i="hero.sim">Answers here are simulated; each burst of light is a token waking the 8 experts it chose.</p>
       </div>
     </div>
   </div>
   <div class="hero-foot intro i4">
     <div class="hud">
-      <div><span data-i="hud.speed">ring speed</span><b id="hudTok">8.4 tok/s</b></div>
-      <div><span data-i="hud.arcs">arcs</span><b>7</b></div>
-      <div><span data-i="hud.layers">layers</span><b>81</b></div>
-      <div><span data-i="hud.flight">in flight</span><b id="hudFlight">3</b></div>
+      <div><span data-i="hud.devs">devices</span><b>7</b></div>
+      <div><span data-i="hud.experts">experts</span><b>256</b></div>
+      <div><span data-i="hud.per">per token</span><b>8</b></div>
+      <div><span data-i="hud.flight">calls in flight</span><b id="hudFlight">0</b></div>
     </div>
     <div class="clone">
       <code id="cloneCmd">git clone https://github.com/HumoyunDavronov2001/omnarc.git</code>
@@ -676,16 +676,16 @@ section.s{padding:clamp(96px,10vw,150px) 0}
 </section>
 
 <!-- STORY -->
-<section class="story" id="story" aria-label="How Omnarc works, in four steps">
+<section class="story" id="story" aria-label="How Omnarc works, in five steps">
   <div class="story-stick">
     <canvas id="story3d" aria-hidden="true"></canvas>
     <div class="story-shade"></div>
     <div class="caps">
-      <div class="cap on" data-s="0"><span class="n">1 / 4</span><h2 data-i="s1.h">Seven devices, one model.</h2><p data-i="s1.p">Each arc is one device’s share of the model’s 80 layers, sized by its measured memory bandwidth.</p></div>
-      <div class="cap" data-s="1"><span class="n">2 / 4</span><h2 data-i="s2.h">Inside an arc, a window of layers.</h2><p data-i="s2.p">The token’s hidden state climbs through every layer the device holds. Weights never move; only the state does.</p></div>
-      <div class="cap" data-s="2"><span class="n">3 / 4</span><h2 data-i="s3.h">Then 16 KB hops to the next device.</h2><p data-i="s3.p">For a 70B model, that is all that crosses the network per token, encrypted over QUIC.</p></div>
-      <div class="cap" data-s="3"><span class="n">4 / 5</span><h2 data-i="s4.h">From one home to the world.</h2><p data-i="s4.p">Idle devices behind any NAT can join one ring. That is the goal of stage B6, not a shipped feature.</p></div>
-      <div class="cap" data-s="4"><span class="n">5 / 5</span><h2 data-i="s5.h">Proof, not opinion.</h2><p data-i="s5.p">Four arcs answer in parallel; their hidden states vote, and every public-network answer carries a TOPLOC proof that your ring produced it. Disagreement is a feature: you see the split instead of a confident mistake.</p></div>
+      <div class="cap on" data-s="0"><span class="n">1 / 5</span><h2 data-i="s1.h">Hundreds of experts, one model.</h2><p data-i="s1.p">A mixture-of-experts model is a crowd of small specialists. Each arc is one device’s share of them, sized by the memory its owner lends.</p></div>
+      <div class="cap" data-s="1"><span class="n">2 / 5</span><h2 data-i="s2.h">The core stays on the server.</h2><p data-i="s2.p">Attention, the router, the shared experts and the conversation’s memory live where memory is widest. At every layer the router picks 8 of 256 experts for the token.</p></div>
+      <div class="cap" data-s="2"><span class="n">3 / 5</span><h2 data-i="s3.h">Only the chosen experts wake.</h2><p data-i="s3.p">A few kilobytes of hidden state go to the devices that hold them and come back. The most-called experts stay on the server: in S0’s traces the hottest quarter took two thirds of the calls.</p></div>
+      <div class="cap" data-s="3"><span class="n">4 / 5</span><h2 data-i="s4.h">Every device joins the pool.</h2><p data-i="s4.p">Old phones, laptops, desktops, GPU boxes and servers join one pool. Each takes the part its memory, chip and link can carry; none is left out.</p></div>
+      <div class="cap" data-s="4"><span class="n">5 / 5</span><h2 data-i="s5.h">Measured, not promised.</h2><p data-i="s5.p">Every speed Omnarc shows comes from a run on real devices. In S0 one expert step cost 0.9 ms inside one machine, 28 ms to a phone over Wi-Fi and about 500 ms across the internet.</p></div>
     </div>
     <div class="story-prog" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
   </div>
@@ -695,28 +695,29 @@ section.s{padding:clamp(96px,10vw,150px) 0}
 <section class="s soft" id="lab">
   <div class="wrap">
     <div class="s-head rv">
-      <p class="kicker"><b>01</b><span data-i="nav.lab">Partition lab</span></p>
-      <h2 data-i="lab.h">Build a ring, see where every layer lands.</h2>
-      <p data-i="lab.p">Pick a model and your devices, or measure this browser. The planner solves the same balancing problem as the scheduler.</p>
+      <p class="kicker"><b>01</b><span data-i="nav.lab">Pool lab</span></p>
+      <h2 data-i="lab.h">Build a pool, see where every expert lands.</h2>
+      <p data-i="lab.p">Pick a model and your devices, or measure this browser. The core runs on the fastest machine; the experts spread over all the others.</p>
     </div>
     <div class="lab">
       <div class="panel rv">
-        <h3>Model and network</h3>
-        <p class="sub">Quantised to 4 bits, the usual way to run models at home.</p>
+        <h3 data-i="lab.mn">Model and network</h3>
+        <p class="sub" data-i="lab.mns">Mixture-of-experts models at about 4 bits. The network is the measured cost of one expert step.</p>
         <div class="ctrl-row">
           <div class="seg" role="group" aria-label="Model" id="modelSeg">
-            <button type="button" data-m="8b">Llama 8B</button>
-            <button type="button" data-m="70b" aria-pressed="true">Llama 70B</button>
-            <button type="button" data-m="405b">Llama 405B</button>
+            <button type="button" data-m="glm">GLM-4.7 Flash</button>
+            <button type="button" data-m="oss">gpt-oss 120B</button>
+            <button type="button" data-m="q235" aria-pressed="true">Qwen3 235B</button>
+            <button type="button" data-m="ds3">DeepSeek V3</button>
           </div>
           <div class="seg" role="group" aria-label="Network" id="netSeg">
-            <button type="button" data-n="lan" aria-pressed="true">2.5 GbE</button>
-            <button type="button" data-n="wifi">Wi-Fi 6</button>
-            <button type="button" data-n="wan">Internet</button>
+            <button type="button" data-n="loop" data-i="lab.n1">One machine</button>
+            <button type="button" data-n="wifi" aria-pressed="true" data-i="lab.n2">Wi-Fi</button>
+            <button type="button" data-n="wan" data-i="lab.n3">Internet</button>
           </div>
         </div>
         <div class="measure" id="measure">
-          <div class="m-top"><div><h3 data-i="m.t">This browser</h3><p class="sub" data-i="m.d">Measure real memory bandwidth here, then add this tab to the ring.</p></div>
+          <div class="m-top"><div><h3 data-i="m.t">This browser</h3><p class="sub" data-i="m.d">Measure real memory bandwidth here, then add this tab to the pool.</p></div>
           <button type="button" class="btn btn-brand btn-sm" id="measureBtn" data-i="m.b">Measure this browser</button></div>
           <div class="m-out" id="mOut" hidden>
             <div><span data-i="m.k1">Backend</span><b id="mBack">—</b></div>
@@ -725,38 +726,35 @@ section.s{padding:clamp(96px,10vw,150px) 0}
           </div>
           <p class="m-status" id="mStatus" aria-live="polite"></p>
         </div>
-        <h3>Devices</h3>
-        <p class="sub">Memory bandwidth and free memory for each.</p>
+        <h3 data-i="lab.dv">Devices</h3>
+        <p class="sub" data-i="lab.dvs">Memory each owner lends, and its bandwidth.</p>
         <div class="devs" id="devList"></div>
         <div class="formula">
-          <p class="c">Stage time for device <var>i</var> holding <var>ℓ<sub>i</sub></var> layers of size <var>m</var>, with bandwidth <var>β<sub>i</sub></var>, hidden state <var>h</var>, link <var>B</var> and round trip <var>r</var>:</p>
-          <var>τ<sub>i</sub></var> = <var>ℓ<sub>i</sub></var>·<var>m</var> / <var>β<sub>i</sub></var> + <var>h</var> / <var>B</var> + <var>r</var><br>
-          <p class="c" style="margin-top:8px">The planner minimises the slowest stage, subject to memory:</p>
-          min max<sub><var>i</var></sub> <var>τ<sub>i</sub></var> &nbsp; s.t. &nbsp; Σ<var>ℓ<sub>i</sub></var> = <var>L</var>, &nbsp; <var>ℓ<sub>i</sub></var>·<var>m</var> ≤ <var>M<sub>i</sub></var><br>
-          <p class="c" style="margin-top:8px">which water-fills to</p>
-          <var>ℓ<sub>i</sub></var> = min( <var>M<sub>i</sub></var>/<var>m</var>, &nbsp;λ·<var>β<sub>i</sub></var>/<var>m</var> ), &nbsp; λ chosen so Σ<var>ℓ<sub>i</sub></var> = <var>L</var>
+          <p class="c" data-i="lab.f1">A token calls <var>k</var> of <var>E</var> experts at each of <var>L</var> layers. The core keeps the hottest share <var>x</var> of them, which in S0’s routing traces answered a share <var>h</var>(<var>x</var>) of the calls. A layer waits on the network unless all its <var>k</var> experts are on the core, as in a share <var>s</var>(<var>x</var>) of the steps:</p>
+          <var>W</var> = <var>L</var> · ( 1 − <var>s</var>(<var>x</var>) ), &nbsp; <var>t</var><sub>net</sub> = <var>W</var> · <var>t</var><sub>step</sub>
+          <p class="c" style="margin-top:8px" data-i="lab.f2"><var>h</var> and <var>s</var> come from GLM-4.7 Flash (4 experts a token) and Granite 3B (8 a token); <var>t</var><sub>step</sub> from the three S0 links.</p>
         </div>
       </div>
       <div class="panel result rv d1" aria-live="polite">
-        <h3>Plan</h3>
+        <h3 data-i="lab.plan">Plan</h3>
         <p class="sub" id="planSub">—</p>
         <div class="ring-wrap">
-          <canvas id="labRing" width="240" height="240" aria-label="Layer allocation ring"></canvas>
+          <canvas id="labRing" width="240" height="240" aria-label="Expert placement ring"></canvas>
           <div class="kpis">
-            <div class="kpi"><div class="k" data-i="lab.k1">one request</div><div class="v" id="kSingle">—</div></div>
-            <div class="kpi"><div class="k" data-i="lab.k2">many requests</div><div class="v" id="kMulti">—</div></div>
-            <div class="kpi"><div class="k" data-i="lab.k3">slowest stage</div><div class="v" id="kBottle">—</div></div>
-            <div class="kpi"><div class="k" data-i="lab.k4">memory used</div><div class="v" id="kMem">—</div></div>
+            <div class="kpi"><div class="k" data-i="lab.k1">memory used</div><div class="v" id="kMem">—</div></div>
+            <div class="kpi"><div class="k" data-i="lab.k2">calls on the core</div><div class="v" id="kCore">—</div></div>
+            <div class="kpi"><div class="k" data-i="lab.k3">network waits / token</div><div class="v" id="kWaits">—</div></div>
+            <div class="kpi"><div class="k" data-i="lab.k4">network time / token</div><div class="v" id="kNet">—</div></div>
           </div>
         </div>
         <div class="warn" id="labWarn"></div>
         <div class="tbl-scroll">
           <table class="alloc">
-            <thead><tr><th data-i="thr.dev">Device</th><th data-i="thr.layers">Layers</th><th data-i="thr.mem">Memory</th><th data-i="thr.stage">Stage</th><th data-i="thr.time">Share of time</th></tr></thead>
+            <thead><tr><th data-i="thr.dev">Device</th><th data-i="thr.holds">Holds</th><th data-i="thr.mem">Memory</th><th data-i="thr.calls">Share of calls</th></tr></thead>
             <tbody id="allocBody"></tbody>
           </table>
         </div>
-        <p class="note">Estimate for memory-bound decoding at batch 1, not a benchmark. Real numbers come from omnarc-gate on your hardware.</p>
+        <p class="note" data-i="lab.note">An estimate from S0 measurements, not a benchmark. Prefetching the next layer’s experts cut GLM-4.7 Flash’s waits from 45 to about 16 in those traces; the planner leaves that out.</p>
       </div>
     </div>
   </div>
@@ -765,8 +763,8 @@ section.s{padding:clamp(96px,10vw,150px) 0}
 <!-- STATEMENT -->
 <section class="s st8">
   <div class="wrap">
-    <h2 data-i="st8.h">One prompt. Seven computers. Zero servers.</h2>
-    <p class="st8-sub mono" data-i="st8.s">16 KB · hop to hop · QUIC · encrypted</p>
+    <h2 data-i="st8.h">One prompt. Every device. One pool.</h2>
+    <p class="st8-sub mono" data-i="st8.s">8 of 256 experts a token · hidden states only · encrypted tunnel</p>
   </div>
 </section>
 
@@ -774,9 +772,9 @@ section.s{padding:clamp(96px,10vw,150px) 0}
 <section class="s node" id="node">
   <div class="wrap">
     <div class="s-head rv">
-      <p class="kicker"><b>02</b><span data-i="nav.node">Inside a node</span></p>
-      <h2 data-i="node.h">When the arc is a server rack.</h2>
-      <p data-i="node.p">A ring can hold a whole rack as one arc. Each GPU takes its own window of layers, and heat follows load. Pick a GPU to read it.</p>
+      <p class="kicker"><b>02</b><span data-i="nav.node">The core</span></p>
+      <h2 data-i="node.h">The core, when the server is a rack.</h2>
+      <p data-i="node.p">The core runs where memory is widest: attention, the router, the shared experts and the conversation’s memory. A rack holds it on GPUs, and heat follows load. Pick a GPU to read it.</p>
     </div>
     <div class="node-grid">
       <div class="stage rv" id="stage">
@@ -812,14 +810,14 @@ section.s{padding:clamp(96px,10vw,150px) 0}
   <div class="wrap">
     <div class="s-head rv">
       <p class="kicker"><b>03</b><span data-i="nav.math">The math</span></p>
-      <h2 data-i="math.h">Three formulas behind the ring.</h2>
+      <h2 data-i="math.h">Three formulas behind the pool.</h2>
       <p data-i="math.p">Each one decides a design choice in Omnarc. Move the sliders and watch the trade-off.</p>
     </div>
     <div class="math-grid">
       <article class="mcard rv">
         <div class="top">
           <h3>Speculative decoding</h3>
-          <p>A small draft model guesses <var>k</var> tokens; the ring checks them in one pass. With acceptance rate <var>α</var>, tokens gained per pass:</p>
+          <p>A small draft model guesses <var>k</var> tokens; the full model checks them in one pass. With acceptance rate <var>α</var>, tokens gained per pass:</p>
           <div class="eq"><var>E</var>[<var>n</var>] = <span class="frac"><span>1 − <var>α</var><sup><var>k</var>+1</sup></span><span>1 − <var>α</var></span></span>, &nbsp; speed-up = <span class="frac"><span><var>E</var>[<var>n</var>]</span><span>1 + <var>k</var>·<var>c</var></span></span></div>
           <canvas id="plotSpec" aria-label="Speed-up versus draft length"></canvas>
         </div>
@@ -832,27 +830,27 @@ section.s{padding:clamp(96px,10vw,150px) 0}
       <article class="mcard rv d1">
         <div class="top">
           <h3>Replicas and uptime</h3>
-          <p>Each of <var>W</var> layer windows lives on <var>r</var> devices that are each online with probability <var>p</var>. The ring answers when every window has a copy:</p>
-          <div class="eq"><var>P</var><sub>ring</sub> = ( 1 − (1 − <var>p</var>)<sup><var>r</var></sup> )<sup><var>W</var></sup></div>
-          <canvas id="plotRep" aria-label="Ring availability versus replica count"></canvas>
+          <p>Each of <var>G</var> expert groups lives on <var>r</var> devices that are each online with probability <var>p</var>. The pool answers when every group has a live copy:</p>
+          <div class="eq"><var>P</var><sub>pool</sub> = ( 1 − (1 − <var>p</var>)<sup><var>r</var></sup> )<sup><var>G</var></sup></div>
+          <canvas id="plotRep" aria-label="Pool availability versus copies per expert group"></canvas>
         </div>
         <div class="sliders">
           <label class="sl">Device uptime p<output id="oP"></output><input type="range" id="sP" min="0.5" max="0.99" step="0.01" value="0.85"></label>
-          <label class="sl">Windows W<output id="oW"></output><input type="range" id="sW" min="2" max="16" step="1" value="6"></label>
+          <label class="sl">Expert groups G<output id="oW"></output><input type="range" id="sW" min="2" max="16" step="1" value="6"></label>
           <div class="read" id="rRep"></div>
         </div>
       </article>
       <article class="mcard rv d2">
         <div class="top">
-          <h3>Accuracy mode</h3>
-          <p>Several devices answer the same question and vote. If each is right with probability <var>q</var>, the majority of <var>n</var> is right with:</p>
-          <div class="eq"><var>P</var><sub>maj</sub> = Σ<sub><var>j</var>&gt;<var>n</var>/2</sub> C(<var>n</var>,<var>j</var>) <var>q</var><sup><var>j</var></sup>(1 − <var>q</var>)<sup><var>n</var>−<var>j</var></sup></div>
-          <canvas id="plotVote" aria-label="Majority accuracy versus number of voters"></canvas>
+          <h3>Why only mixture-of-experts</h3>
+          <p>Generation reads every active weight once per token, so speed is capped by memory bandwidth <var>β</var> over the bytes read. A dense model reads all <var>S</var> of them; a mixture-of-experts model reads only its active share <var>a</var>:</p>
+          <div class="eq">tok/s ≤ <span class="frac"><span><var>β</var></span><span><var>a</var> · <var>S</var></span></span></div>
+          <canvas id="plotMoe" aria-label="Upper bound on tokens per second against model size, dense and mixture-of-experts"></canvas>
         </div>
         <div class="sliders">
-          <label class="sl">Single-answer accuracy q<output id="oQ"></output><input type="range" id="sQ" min="0.5" max="0.9" step="0.01" value="0.68"></label>
-          <label class="sl">Error correlation ρ<output id="oR"></output><input type="range" id="sR" min="0" max="0.8" step="0.05" value="0.2"></label>
-          <div class="read" id="rVote"></div>
+          <label class="sl">Memory bandwidth β, GB/s<output id="oB"></output><input type="range" id="sB" min="50" max="1000" step="10" value="400"></label>
+          <label class="sl">Active share a<output id="oAa"></output><input type="range" id="sAa" min="0.02" max="0.3" step="0.01" value="0.06"></label>
+          <div class="read" id="rMoe"></div>
         </div>
       </article>
     </div>
@@ -865,39 +863,37 @@ section.s{padding:clamp(96px,10vw,150px) 0}
     <div class="s-head rv">
       <p class="kicker"><b>04</b><span data-i="use.k">who is it for</span></p>
       <h2 data-i="use.h">One mind for what you do.</h2>
-      <p data-i="use.p">Goals of the roadmap — stages B4, B7 and B8.</p>
+      <p data-i="use.p">Goals of the plan — stages S2, S3 and S4.</p>
     </div>
     <div class="steps">
-      <div class="step rv"><span class="n">B8</span><h3 data-i="use.a.h">Agents on your own model</h3><p data-i="use.a.p">OpenClaw, OpenCode and other agents run on a frontier-class open model spread across your own computers — no per-token bill, no rate limit. One computer can only stream such a model from disk; a cluster keeps all of it in memory.</p></div>
-      <div class="step rv d1"><span class="n">B7</span><h3 data-i="use.b.h">The family ring</h3><p data-i="use.b.p">A family or a team shares one assistant that speaks their language; a weak phone joins by voice and computes nothing.</p></div>
-      <div class="step rv d2"><span class="n">B4</span><h3 data-i="use.c.h">Accuracy mode</h3><p data-i="use.c.p">Several devices answer the same question and check each other; the answer shows how many agreed — a single device’s mistake is caught before you read it.</p></div>
+      <div class="step rv"><span class="n">S3</span><h3 data-i="use.a.h">Agents on your own model</h3><p data-i="use.a.p">OpenCode, OpenClaw and other agents run on a large open mixture-of-experts model spread across your own computers — no per-token bill, no rate limit. Stage S3 passes when exactly that works on a fixed task set.</p></div>
+      <div class="step rv d1"><span class="n">S2</span><h3 data-i="use.b.h">The family pool</h3><p data-i="use.b.p">A family or a team pools every device it has, old phones included, and one assistant answers everyone at once, in their own language.</p></div>
+      <div class="step rv d2"><span class="n">S4</span><h3 data-i="use.c.h">The night office</h3><p data-i="use.c.p">Accounts, quotas and schedules: the office computers serve the team by day and run long jobs at night, with an audit trail.</p></div>
     </div>
   </div>
 </section>
 
-<!-- COMPARE -->
+<!-- BUILT ON -->
 <section class="s soft" id="compare">
   <div class="wrap">
     <div class="s-head rv">
-      <p class="kicker"><b>05</b><span data-i="cmp.k">the comparison</span></p>
-      <h2 data-i="cmp.h">Four ways to spread a model.</h2>
-      <p data-i="cmp.p">Today’s tools each cover one corner of the world’s idle compute.</p>
+      <p class="kicker"><b>05</b><span data-i="cmp.k">the stack</span></p>
+      <h2 data-i="cmp.h">Built on what already works.</h2>
+      <p data-i="cmp.p">Omnarc takes the best open-source parts as they are and writes only what none of them does yet.</p>
     </div>
     <div class="cmp rv">
       <table>
-        <thead><tr><th></th><th>exo</th><th>prima.cpp</th><th>GPUStack</th><th class="om">Omnarc (goal)</th></tr></thead>
+        <thead><tr><th>Need</th><th>Taken from</th><th class="om">What Omnarc adds</th></tr></thead>
         <tbody>
-          <tr><td>Phones: Android, iOS</td><td class="no">—</td><td>Termux only</td><td class="no">—</td><td class="om">native apps</td></tr>
-          <tr><td>Browsers join with a QR code</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="om">✓</td></tr>
-          <tr><td>Windows, Linux, macOS</td><td>macOS</td><td>Linux, macOS</td><td>Linux</td><td class="om">✓</td></tr>
-          <tr><td>CUDA, ROCm/Vulkan, Metal, OpenCL, NPU</td><td>Metal</td><td>CUDA</td><td>server GPUs</td><td class="om">✓</td></tr>
-          <tr><td>Devices join and leave at runtime</td><td>✓</td><td class="no">—</td><td>✓</td><td class="om">✓</td></tr>
-          <tr><td>Across the internet, behind NAT</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="om">✓</td></tr>
-          <tr><td>Inference and training</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="om">✓</td></tr>
+          <tr><td>Inference on every OS and GPU</td><td>llama.cpp releases: llama-server, <code>-fit</code>, <code>-ncmoe</code>, batching, prompt cache</td><td class="om">nothing — used as released</td></tr>
+          <tr><td>One model across machines</td><td>Mesh LLM (being checked in S0), or llama.cpp RPC inside an encrypted tunnel</td><td class="om">the core on the server, the experts on every device</td></tr>
+          <tr><td>Every device in one pool</td><td class="no">—</td><td class="om">old phones to GPU servers, each within its owner’s budget and hours</td></tr>
+          <tr><td>Will it fit, and how fast?</td><td class="no">—</td><td class="om">the measured answer, shown before a model starts</td></tr>
+          <tr><td>A panel a newcomer understands</td><td class="no">—</td><td class="om">every error on every device, in plain words</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="foot">The Omnarc column lists roadmap goals, not shipped features. exo, prima.cpp and GPUStack are great tools, each built for one corner.</p>
+    <p class="foot">The right column is work in progress. Nothing is claimed before it is measured on real devices — rule R-2 of the plan.</p>
   </div>
 </section>
 
@@ -906,21 +902,16 @@ section.s{padding:clamp(96px,10vw,150px) 0}
   <div class="wrap">
     <div class="s-head rv">
       <p class="kicker"><b>06</b><span data-i="road.k">the plan</span></p>
-      <h2 data-i="road.h">Nine stages. Nine gates.</h2>
-      <p data-i="road.p">A stage is done when its public gate passes, not when a blog post ships.</p>
+      <h2 data-i="road.h">Five stages. Five gates.</h2>
+      <p data-i="road.p">A stage is done when its gate is measured on real devices and written to bench/ — not when a post goes out.</p>
     </div>
-    <div class="road-legend"><span class="pill-b ok">B0 ✓</span><span class="pill-b now">B1 ← now</span><span class="pill-b">B2 … B9 next</span></div>
+    <div class="road-legend"><span class="pill-b now">S0 ← now</span><span class="pill-b">S1 … S4 next</span></div>
     <ol class="road rv">
-      <li class="done"><span class="pin"></span><span class="st">B0 foundation</span><span class="wh">Monorepo, CI, protocol v1, design system</span><span class="gt">CI green on 6 platforms</span></li>
-      <li class="now"><span class="pin"></span><span class="st">B1 engine</span><span class="wh">llama.cpp and prima.cpp piped ring, Windows, Vulkan</span><span class="gt">A 70B model across Linux and Windows machines</span></li>
-      <li><span class="pin"></span><span class="st">B2 network</span><span class="wh">iroh P2P, QR pairing, peer-to-peer model distribution</span><span class="gt">Two networks behind NAT form one cluster</span></li>
-      <li><span class="pin"></span><span class="st">B3 scheduler</span><span class="wh">Placement, live join and leave, replicas</span><span class="gt">Recovery within 1 s</span></li>
-      <li><span class="pin"></span><span class="st">B4 speed</span><span class="wh">Pipelined speculation, MoE, sparse FFN, accuracy mode</span><span class="gt">Single-request speed grows with device count</span></li>
-      <li><span class="pin"></span><span class="st">B5 devices</span><span class="wh">Desktop, Android, iOS, browser, NPU</span><span class="gt">Join from a browser in 30 s</span></li>
-      <li><span class="pin"></span><span class="st">B6 scale</span><span class="wh">Organisations, public network, credits</span><span class="gt">1,000+ nodes</span></li>
-      <li><span class="pin"></span><span class="st">B7 modalities</span><span class="wh">Speech, images, LoRA, RL, the family ring</span><span class="gt">Distributed LoRA over the internet</span></li>
-      <li><span class="pin"></span><span class="st">B8 islands + API</span><span class="wh">MLX, vLLM/SGLang, OpenAI, Claude and Ollama APIs</span><span class="gt">Throughput on par with vLLM on NVIDIA</span></li>
-      <li><span class="pin"></span><span class="st">B9 benchmark</span><span class="wh">Open benchmarks against exo, prima.cpp, Parallax and others</span><span class="gt">v1.0</span></li>
+      <li class="now"><span class="pin"></span><span class="st">S0 verify</span><span class="wh">Plain llama.cpp and Mesh LLM on the devices at hand; mixture-of-experts routing traced</span><span class="gt">A private mesh across NAT; gpt-oss-20b and Qwen3-30B-A3B split over two devices, recorded</span></li>
+      <li><span class="pin"></span><span class="st">S1 golden path</span><span class="wh">One installer per OS, a QR invite, a panel with every error in words</span><span class="gt">A newcomer gets an answer on two computers in ≤ 10 minutes, no terminal</span></li>
+      <li><span class="pin"></span><span class="st">S2 pool</span><span class="wh">Every device joins; copies serve many people; owners set budgets and hours</span><span class="gt">N people at once, each at no less than half of single-user speed</span></li>
+      <li><span class="pin"></span><span class="st">S3 large MoE</span><span class="wh">The core on the server, the experts across ordinary devices, speed measured before it starts</span><span class="gt">A large MoE model runs end to end with an agent on a fixed task set</span></li>
+      <li><span class="pin"></span><span class="st">S4 organization</span><span class="wh">Accounts, roles, API keys, quotas, schedules, an audit trail</span><span class="gt">A team of 5 uses one cluster for a week</span></li>
     </ol>
   </div>
 </section>
@@ -929,24 +920,24 @@ section.s{padding:clamp(96px,10vw,150px) 0}
 <section class="s soft" id="try">
   <div class="wrap">
     <div class="s-head rv">
-      <p class="kicker"><b>07</b><span data-i="nav.try">Try it tonight</span></p>
-      <h2 data-i="try.h">Two devices, one ring, wired by hand.</h2>
-      <p data-i="try.p">The commands are real and the wiring is by hand — that is stage B1. Watch the PC and the laptop close one ring, then stream an answer together.</p>
+      <p class="kicker"><b>07</b><span data-i="nav.try">Try it</span></p>
+      <h2 data-i="try.h">Two devices, one answer.</h2>
+      <p data-i="try.p">From S0, 22 October 2026, with plain llama.cpp RPC and no Omnarc code yet: the laptop keeps the core and most experts, and a 32-bit phone holds the experts of layers 0–7 over Wi-Fi. The text is byte for byte what the server writes alone.</p>
     </div>
     <div class="term-duo rv d1" id="termDuo">
       <div class="term">
-        <div class="term-bar"><span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="term-title" data-i="try.t1">pc — the head · layers 0:34 + the output head</span></div>
+        <div class="term-bar"><span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="term-title" data-i="try.t1">laptop — the core · experts of layers 8–31</span></div>
         <pre class="term-body" id="termA"></pre>
       </div>
       <div class="term">
-        <div class="term-bar"><span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="term-title" data-i="try.t2">laptop — layers 34:80</span></div>
+        <div class="term-bar"><span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="term-title" data-i="try.t2">phone — experts of layers 0–7</span></div>
         <pre class="term-body" id="termB"></pre>
       </div>
-      <div class="term-hop" aria-hidden="true"><i></i><span data-i="try.hop">16 KB · QUIC · per hop</span><i></i></div>
+      <div class="term-hop" aria-hidden="true"><i></i><span data-i="try.hop">hidden states · Wi-Fi hotspot</span><i></i></div>
     </div>
     <div class="term-foot rv d2">
       <button type="button" class="btn btn-ghost btn-sm" id="termReplay" data-i="try.replay">Replay</button>
-      <p class="term-hint" data-i="try.hint">Typing is simulated; the commands and the output format are real — the README has the walkthrough.</p>
+      <p class="term-hint" data-i="try.hint">Typing is replayed. The laptop’s command, text and timings are copied from S0’s log; the phone ran llama.cpp’s rpc-server, built for 32-bit ARM.</p>
     </div>
   </div>
 </section>
@@ -957,12 +948,12 @@ section.s{padding:clamp(96px,10vw,150px) 0}
     <div class="s-head rv"><p class="kicker"><b>08</b><span data-i="faq.k">questions</span></p>
       <h2 data-i="faq.h">Questions</h2></div>
     <div class="faq">
-      <details class="rv"><summary>Is Omnarc ready to use?</summary><p>Not yet; it is pre-alpha. Stage B0 is complete and B1 is in progress: devices can already run one model together as a ring wired by hand. Discovery, QR pairing and planning arrive in B2 and B3.</p></details>
-      <details class="rv"><summary>Are the numbers on this page real?</summary><p>The partition lab uses a bandwidth model of decoding, and the rack view is a simulation. They show how the planner reasons, not measured results. Measured results come from <code>omnarc-gate</code> on your own hardware.</p></details>
-      <details class="rv"><summary>Does my data leave my devices?</summary><p>All traffic is encrypted. On your own network everything stays inside it. On the public network raw text never leaves your device, and every answer carries a TOPLOC proof that your ring produced it. There is no telemetry.</p></details>
-      <details class="rv"><summary>Can it really run a 70B model on phones and laptops?</summary><p>Layers split in proportion to each device’s measured power: a phone holds a few, a PC holds many. The B1 gate is a 70B model across Linux and Windows machines, and omnarc-gate checks every split against the whole model.</p></details>
-      <details class="rv"><summary>How do I try it today?</summary><p>Clone the repo, run <code>cargo test --workspace</code>, then <code>cargo run -p omnarc-node -- info</code>. With the engine built, <code>omnarc-node ring</code> joins two nodes into a ring. The README has the full walkthrough.</p></details>
-      <details class="rv"><summary>Is it free?</summary><p>Yes. Apache 2.0, no account, no telemetry. Credits for the public network arrive only in stage B6.</p></details>
+      <details class="rv"><summary>Is Omnarc ready to use?</summary><p>Not yet; it is pre-alpha. Stage S0 is under way: we measure what already exists — plain llama.cpp and Mesh LLM — on real devices before building on it. The golden path, with one installer and a QR invite, is stage S1.</p></details>
+      <details class="rv"><summary>Are the numbers on this page real?</summary><p>The numbers credited to S0 were measured on our own laptop, phone and server; <a href="https://github.com/HumoyunDavronov2001/omnarc/tree/main/bench/s0" target="_blank" rel="noopener">bench/s0</a> lists the hardware, versions and commands. The pool lab is an estimate built from those measurements, and the hero and the rack are animations.</p></details>
+      <details class="rv"><summary>Does my data leave my devices?</summary><p>Your text reaches only your pool’s server, a machine you own or run. Expert devices see hidden states for the layers they hold, never your words. Links run inside an encrypted tunnel, and there is no telemetry.</p></details>
+      <details class="rv"><summary>Why only mixture-of-experts models?</summary><p>Generation reads every active weight once per token. A dense model reads all of them, so splitting it across devices only adds network waits: our own split of a dense 14B model gave 0.37 tokens/s. A mixture-of-experts model reads a small part per token — DeepSeek V3 calls 8 of its 256 experts — so its experts can live on many ordinary devices.</p></details>
+      <details class="rv"><summary>Can my old phone really help?</summary><p>Yes. No device is left out: each takes the part its memory, chip and link can carry — a few experts, a cache, a copy. In S0 a 32-bit phone held the experts of eight layers over Wi-Fi, and the answer stayed the same, byte for byte.</p></details>
+      <details class="rv"><summary>Is it free?</summary><p>Yes. Apache 2.0, no account, no telemetry. The compute is yours and is never sold; what may be sold later is what surrounds it for organizations — accounts, quotas, audit — and only after stage S4.</p></details>
     </div>
   </div>
 </section>
@@ -971,8 +962,8 @@ section.s{padding:clamp(96px,10vw,150px) 0}
 <section class="s cta">
   <svg class="cta-ring" viewBox="0 0 200 200" aria-hidden="true"><g fill="none" stroke-width="5" stroke-linecap="round" transform="rotate(-90 100 100)"><circle cx="100" cy="100" r="80" stroke="#118d4f" stroke-dasharray="150 352"/><circle cx="100" cy="100" r="80" stroke="#c99a2e" stroke-dasharray="60 442" stroke-dashoffset="-160"/><circle cx="100" cy="100" r="80" stroke="#2b5f9e" stroke-dasharray="90 412" stroke-dashoffset="-230"/><circle cx="100" cy="100" r="80" stroke="#1a8f8f" stroke-dasharray="150 352" stroke-dashoffset="-330"/></g></svg>
   <div class="wrap" style="position:relative">
-    <h2 class="rv" data-i="cta.h">Form your ring<br>tonight.</h2>
-    <p class="rv d1" data-i="cta.p">Start with two devices: clone, build, and run a ring wired by hand. Everything runs on your machines.</p>
+    <h2 class="rv" data-i="cta.h">Bring every device<br>tonight.</h2>
+    <p class="rv d1" data-i="cta.p">Start with what you have: a laptop, a phone, a server. The README has S0’s steps, and everything runs on your own machines.</p>
     <div class="hero-actions rv d2">
       <a class="btn btn-brand" href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/README.md" data-i="cta.b1" target="_blank" rel="noopener">Read the README</a>
       <a class="btn btn-ghost" href="https://github.com/HumoyunDavronov2001/omnarc" data-i="cta.b2" target="_blank" rel="noopener">Star on GitHub</a>
@@ -990,10 +981,10 @@ section.s{padding:clamp(96px,10vw,150px) 0}
       <div><h4>Code</h4><a href="https://github.com/HumoyunDavronov2001/omnarc" target="_blank" rel="noopener">Repository</a><a href="https://github.com/HumoyunDavronov2001/omnarc/tree/main/design" target="_blank" rel="noopener">Design</a><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/UPSTREAM.md" target="_blank" rel="noopener">Upstream</a><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/SECURITY.md" target="_blank" rel="noopener">Security</a></div>
       <div><h4>Community</h4><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a><a href="https://github.com/HumoyunDavronov2001/omnarc/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener">Code of conduct</a><a href="https://github.com/HumoyunDavronov2001/omnarc/issues" target="_blank" rel="noopener">Report a bug</a></div>
     </div>
-    <div class="f-bot"><span>© 2026 Omnarc, Apache 2.0. Built on llama.cpp and prima.cpp.</span><span>b0 passed, b1 in progress</span></div>
+    <div class="f-bot"><span>© 2026 Omnarc, Apache 2.0. Built on llama.cpp.</span><span>stage S0 in progress</span></div>
   </div>
 </footer>
-<div class="mini-hud" id="miniHud" aria-hidden="true"><i></i><b id="mhTok">— tok/s</b><span>7 arcs</span><span>hop 0.3 ms</span><span>80 layers</span></div>
+<div class="mini-hud" id="miniHud" aria-hidden="true"><i></i><b>256 experts</b><span>8 a token</span><span>7 devices</span><span>Wi-Fi step 28 ms</span></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (()=>{
@@ -1102,7 +1093,7 @@ function livingArcs(R,arcs,o){
   const U={uTime:{value:0},uIntro:{value:0},uAlpha:{value:o.alpha??1},uR:{value:R},uPR:{value:Math.min(devicePixelRatio||1,1.75)},uDist:{value:20},uRefPx:{value:300},uHover:{value:-1},
     uArcs:{value:slot(a=>new THREE.Vector2(a.a0,a.a1))},uFlow:{value:slot((a,k)=>o.flow?o.flow[k]:.03)},uBoost:{value:new Array(MAXA).fill(0)},
     uC0:{value:slot(a=>C0.clone().lerp(new THREE.Color(a.color),tint))},uC1:{value:slot(a=>C1.clone().lerp(new THREE.Color(a.color),tint*.45))},
-    uHot:{value:new THREE.Color(0xf3c868)},uTok:{value:Array.from({length:MAXA},()=>new THREE.Vector4())},uTokN:{value:0}};
+    uHot:{value:new THREE.Color(0xdffff9)},uTok:{value:Array.from({length:MAXA},()=>new THREE.Vector4())},uTokN:{value:0}};
   const mat=new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
     vertexShader:`attribute vec4 aMeta;attribute float aArc;attribute vec3 aCloud;
       uniform float uTime;uniform float uIntro;uniform float uAlpha;uniform float uR;uniform float uPR;uniform float uDist;uniform float uRefPx;uniform float uHover;
@@ -1152,6 +1143,91 @@ function livingArcs(R,arcs,o){
        A smaller ring on screen packs the same particles tighter, so each gets fainter (the living ring keeps ~9.5 per pixel of arc) */
     scale(dist,pxPerUnit){const ref=R*pxPerUnit/dist;U.uDist.value=dist;U.uRefPx.value=ref;U.uAlpha.value=(o.alpha??1)*Math.min(1,60*ref/o.count);}};
 }
+/* the core in the middle of the ring: servers that keep attention, the router, the shared experts and the hottest experts.
+   Rings of light above them are the core's layers; the orb flashes for every call answered right there */
+function coreCluster(reg,scale){
+  const g=new THREE.Group(),k=scale||1;
+  const ped=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.62,.12,56),M.bezel);ped.position.y=.06;ped.receiveShadow=true;g.add(ped);
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(1.56,.016,6,96),new THREE.MeshBasicMaterial({color:0x1be480,transparent:true,opacity:.65}));
+  rim.rotation.x=Math.PI/2;rim.position.y=.125;g.add(rim);
+  for(let i=0;i<3;i++){const a=i/3*Math.PI*2+Math.PI/2,sv=makeDevice('server',0x1be480,reg);sv.scale.setScalar(.6);
+    sv.position.set(Math.cos(a)*.74,.12,Math.sin(a)*.74);sv.rotation.y=Math.PI/2-a;g.add(sv);}
+  const layers=[];
+  for(let i=0;i<6;i++){const l=new THREE.Mesh(new THREE.TorusGeometry(.95-i*.07,.012,6,72),new THREE.MeshBasicMaterial({color:0x7dffd8,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}));
+    l.rotation.x=Math.PI/2;l.position.y=1.32+i*.13;g.add(l);layers.push(l);}
+  const orb=new THREE.Sprite(new THREE.SpriteMaterial({map:radialTex('rgba(225,255,250,1)','rgba(27,228,128,0)'),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));
+  orb.position.y=2.2;orb.scale.set(1.1,1.1,1);g.add(orb);
+  g.scale.setScalar(k);
+  return {group:g,top:new THREE.Vector3(0,2.2*k,0),
+    pulse(f,t){orb.scale.setScalar(1.05+.5*f+.06*Math.sin(t*5));orb.material.opacity=Math.min(1,.55+.45*f);
+      layers.forEach((l,i)=>{l.material.opacity=.18+.22*Math.max(0,Math.sin(t*3.2-i*.8))+.3*f;});}};
+}
+/* a token's expert calls as lightning. A call that leaves the core is a bolt of particles from the core to the arc that holds
+   the expert: jagged, branching, re-forming three times in its third of a second, throwing sparks where it strikes.
+   A call answered on the core itself only flashes the core (S0: the hottest quarter of experts took two thirds of the calls) */
+function lightning(R,arcs,o){
+  const K=o.k||8,MAXB=K*2,NC=110,NG=14,NS=14,PER=NC+NG+NS,LIFE=.34,SPARK=.5,GLOW=.8,hot=o.hot??.6,from=o.from;
+  const pts=pointCloud(MAXB*PER),ga=pts.geometry.attributes;
+  /* the bolt's filament: one bright line through the jagged path and its branches */
+  const LS=64,lg=new THREE.BufferGeometry(),LP=new Float32Array(MAXB*LS*6),LC=new Float32Array(MAXB*LS*6);
+  lg.setAttribute('position',new THREE.BufferAttribute(LP,3));lg.setAttribute('color',new THREE.BufferAttribute(LC,3));
+  const lines=new THREE.LineSegments(lg,new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,   // alpha follows brightness: a fading bolt never draws dark on the transparent canvas
+    vertexShader:'attribute vec3 color;varying vec3 vC;void main(){vC=color;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'varying vec3 vC;void main(){float a=max(vC.r,max(vC.g,vC.b));if(a<.01)discard;gl_FragColor=vec4(vC/a,a);}'}));
+  lines.frustumCulled=false;const obj=new THREE.Group();obj.add(pts,lines);
+  const span=arcs.map(d=>d.a1-d.a0),tot=span.reduce((s,x)=>s+x,0),bolts=[],toks=[];
+  let flash=0;
+  const rnd=()=>Math.random()-.5;
+  const pickArc=()=>{let r=Math.random()*tot,i=0;while(i<arcs.length-1&&r>span[i]){r-=span[i];i++;}return arcs[i];};
+  const jag=(A,B,levels,rough)=>{let p=[A.clone(),B.clone()];
+    for(let l=0,amp=A.distanceTo(B)*rough;l<levels;l++,amp*=.55){const q=[p[0]];
+      for(let i=1;i<p.length;i++){const m=p[i-1].clone().add(p[i]).multiplyScalar(.5);m.x+=rnd()*amp;m.y+=rnd()*amp*.8;m.z+=rnd()*amp;q.push(m,p[i]);}
+      p=q;}
+    return p;};
+  /* n points spread evenly along a polyline, written into out from index at */
+  const along=(poly,n,out,at)=>{const L=[0];for(let i=1;i<poly.length;i++)L.push(L[i-1]+poly[i].distanceTo(poly[i-1]));const T=L[L.length-1]||1;
+    for(let k=0,i=1;k<n;k++){const d=T*k/Math.max(1,n-1);while(i<poly.length-1&&L[i]<d)i++;out[at+k]=poly[i-1].clone().lerp(poly[i],clamp((d-L[i-1])/((L[i]-L[i-1])||1),0,1));}};
+  function shape(bo){   /* a new jagged path with up to two short branches, sampled once per flicker */
+    const p=jag(from,bo.B,5,.16),br=[];
+    for(let b=0;b<2;b++)if(Math.random()<.7){const i0=4+Math.floor(Math.random()*(p.length-12)),st=p[i0];
+      const end=st.clone().add(p[i0+3].clone().sub(st).multiplyScalar(2+Math.random()*3)).add(new THREE.Vector3(rnd()*.9,rnd()*.5,rnd()*.9));
+      br.push(jag(st,end,3,.25));}
+    const nMain=br.length?Math.round(NC*.72):NC,nBr=br.length?Math.floor((NC-nMain)/br.length):0,pts2=new Array(NC);
+    along(p,nMain,pts2,0);br.forEach((q,j)=>along(q,nBr,pts2,nMain+j*nBr));
+    bo.pts=pts2;bo.nMain=nMain;bo.polys=[p,...br];bo.gain=.65+.35*Math.random();}
+  return {points:obj,
+    fire(t,big){for(let i=0;i<K;i++){
+        if(Math.random()<hot){flash=Math.min(1.6,flash+.35);continue;}
+        const d=pickArc(),a=d.a0+(.06+.88*Math.random())*(d.a1-d.a0);
+        bolts.push({t0:t+i*.022+Math.random()*.02,a,d,big:!!big,B:new THREE.Vector3(Math.cos(a)*R,0,Math.sin(a)*R),flick:-1,struck:false,
+          sp:Array.from({length:NS},()=>new THREE.Vector3(rnd()*2.2,Math.random()*1.6+.3,rnd()*2.2))});}
+      while(bolts.length>MAXB)bolts.shift();},
+    /* returns {toks:[angle, strength, …] newest first, flash, flying} */
+    update(t,dt,onStrike){
+      const P=ga.position.array,C=ga.aColor.array,S=ga.size.array,A=ga.alpha.array;toks.length=0;flash=Math.max(0,flash-dt*3.2);let flying=0;
+      for(let b=0;b<MAXB;b++){const o0=b*PER,bo=bolts[b],age=bo?t-bo.t0:-1;
+        const l0=b*LS*6;LC.fill(0,l0,l0+LS*6);
+        if(!bo||age<0||age>SPARK){for(let k=0;k<PER;k++)A[o0+k]=0;continue;}
+        if(!bo.struck){bo.struck=true;onStrike&&onStrike(bo);}
+        const fl=Math.min(2,Math.floor(age/(LIFE/3)));if(fl!==bo.flick){bo.flick=fl;shape(bo);}
+        const on=age<LIFE?Math.pow(1-age/LIFE,1.3)*bo.gain:0;if(on)flying++;
+        if(on){let n=0;bo.polys.forEach((q,j)=>{const c=on*(j?.55:1)*(bo.big?1.2:1);
+          for(let i=1;i<q.length&&n<LS;i++,n++){const o=l0+n*6;
+            LP[o]=q[i-1].x;LP[o+1]=q[i-1].y;LP[o+2]=q[i-1].z;LP[o+3]=q[i].x;LP[o+4]=q[i].y;LP[o+5]=q[i].z;
+            LC[o]=LC[o+3]=.8*c;LC[o+1]=LC[o+4]=c;LC[o+2]=LC[o+5]=.97*c;}});}
+        for(let k=0;k<NC;k++){const i=o0+k,v=bo.pts[k];if(!v||!on){A[i]=0;continue;}
+          P[i*3]=v.x+rnd()*.03;P[i*3+1]=v.y+rnd()*.03;P[i*3+2]=v.z+rnd()*.03;
+          const br=k>=bo.nMain;C[i*3]=.78;C[i*3+1]=1;C[i*3+2]=.98;S[i]=(br?.24:.36)*(bo.big?1.25:1);A[i]=on*(br?.55:1)*(.75+.25*Math.random());}
+        for(let k=0;k<NG;k++){const i=o0+NC+k,v=bo.pts[Math.floor(k/(NG-1)*(bo.nMain-1))];   // a soft glow along the main path
+          if(!v||!on){A[i]=0;continue;}P[i*3]=v.x;P[i*3+1]=v.y;P[i*3+2]=v.z;C[i*3]=.15;C[i*3+1]=.85;C[i*3+2]=.75;S[i]=1.6;A[i]=on*.16;}
+        for(let k=0;k<NS;k++){const i=o0+NC+NG+k,u=age/SPARK,w=bo.sp[k];   // discharge sparks where it strikes
+          P[i*3]=bo.B.x+w.x*age*(1-u*.5);P[i*3+1]=Math.max(0,w.y*age-2.2*age*age);P[i*3+2]=bo.B.z+w.z*age*(1-u*.5);
+          C[i*3]=.7;C[i*3+1]=1;C[i*3+2]=.95;S[i]=.32*(1-u)+.08;A[i]=Math.pow(1-u,1.6);}}
+      for(let b=bolts.length-1;b>=0;b--){const age=t-bolts[b].t0;if(age>=0&&age<GLOW)toks.push(bolts[b].a,(bolts[b].big?1.2:1)*(1-age/GLOW));}
+      while(bolts.length&&t-bolts[0].t0>Math.max(SPARK,GLOW)+.2)bolts.shift();
+      ['position','aColor','size','alpha'].forEach(n=>ga[n].needsUpdate=true);lg.attributes.position.needsUpdate=lg.attributes.color.needsUpdate=true;
+      return {toks,flash,flying};}};
+}
 function studioEnv(renderer){
   const s=new THREE.Scene();s.background=new THREE.Color(0x0b0f0d);
   [[0xbfffe0,0,7,0,4,0],[0xffffff,-6,2.5,3,3,0],[0x9fd6ff,6,3,2,2.6,0],[0xffd9a0,4,1,-4,2.4,0],[0x123024,0,-6,0,5,0]].forEach(([c,x,y,z,sz])=>{
@@ -1199,7 +1275,7 @@ function loop(el,frame){
     const c='#'+col.toString(16).padStart(6,'0');
     if(kind==='code'){for(let i=0;i<14;i++){let x=24+((i*37)%5)*18;const y=26+i*20;for(let k=0;k<1+(i*7)%4;k++){const ww=30+((i*13+k*29)%90);g.fillStyle=k%2?c:'#4f7a63';g.globalAlpha=k%2?.9:.7;g.fillRect(x,y,ww,8);x+=ww+12;}}g.globalAlpha=1;}
     if(kind==='chat'){for(let i=0;i<5;i++){const me=i%2;g.fillStyle=me?c:'#1d3a2c';const bw=160+((i*53)%140),x=me?w-bw-24:24;g.beginPath();g.roundRect?g.roundRect(x,22+i*58,bw,40,14):g.rect(x,22+i*58,bw,40);g.fill();}}
-    if(kind==='ring'){g.lineWidth=18;g.lineCap='round';[[c,0,2.2],['#c99a2e',2.5,3.6],['#2b5f9e',3.9,5.9]].forEach(([s,a0,a1])=>{g.strokeStyle=s;g.beginPath();g.arc(w/2,h/2,100,a0,a1);g.stroke();});g.fillStyle='#d7e8dd';g.font='600 34px monospace';g.textAlign='center';g.fillText('8.4',w/2,h/2+12);}
+    if(kind==='ring'){g.lineWidth=18;g.lineCap='round';[[c,0,2.2],['#c99a2e',2.5,3.6],['#2b5f9e',3.9,5.9]].forEach(([s,a0,a1])=>{g.strokeStyle=s;g.beginPath();g.arc(w/2,h/2,100,a0,a1);g.stroke();});g.fillStyle='#d7e8dd';g.font='600 34px monospace';g.textAlign='center';g.fillText('8/256',w/2,h/2+12);}
     if(kind==='chart'){g.strokeStyle=c;g.lineWidth=5;g.beginPath();for(let x=0;x<w;x+=8){const y=h*.6-Math.sin(x/40)*40-x/w*90;x?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();g.fillStyle='#4f7a63';for(let i=0;i<8;i++)g.fillRect(30+i*58,h-40,34,-20-((i*37)%70));}
   });}
   const screen=(w,h,tex)=>new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex,toneMapped:false}));
@@ -1227,8 +1303,8 @@ function loop(el,frame){
     const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#0d231a');gr.addColorStop(1,'#06120d');g.fillStyle=gr;g.fillRect(0,0,w,h);
     g.lineWidth=18;g.lineCap='round';const c='#'+colHex.toString(16).padStart(6,'0');
     [[c,0,2.2],['#c99a2e',2.5,3.6],['#2b5f9e',3.9,5.9]].forEach(([s,a0,a1])=>{g.strokeStyle=s;g.beginPath();g.arc(w/2,h/2,100,a0,a1);g.stroke();});
-    g.fillStyle='#d7e8dd';g.font='600 40px monospace';g.textAlign='center';g.fillText(tok.toFixed(1),w/2,h/2+10);
-    g.font='500 16px monospace';g.fillStyle='#7d9384';g.fillText('tok/s',w/2,h/2+38);
+    g.fillStyle='#d7e8dd';g.font='600 40px monospace';g.textAlign='center';g.fillText('8/256',w/2,h/2+10);
+    g.font='500 16px monospace';g.fillStyle='#7d9384';g.fillText('experts',w/2,h/2+38);
   }
   function rslab(w,h,r,mat){
     const s=new THREE.Shape();const x=-w/2,y=-h/2;
@@ -1365,24 +1441,24 @@ function hero(){
   let innerMat=null;
   const R=6.0;
   const DEVS=[
-    {id:'server',label:'server',layers:24,speed:1.00,color:0x1be480},
-    {id:'pc',label:'pc',layers:20,speed:.88,color:0x2fc983},
-    {id:'nas',label:'nas',layers:15,speed:.52,color:0x9fbf3a},
-    {id:'laptop',label:'laptop',layers:10,speed:.56,color:0x1a8f8f},
-    {id:'tablet',label:'tablet',layers:5,speed:.42,color:0x2b5f9e},
-    {id:'phone',label:'phone',layers:4,speed:.36,color:0x5b8fd0},
-    {id:'browser',label:'browser',layers:3,speed:.30,color:0xc99a2e},
+    {id:'server',label:'home server',ex:72,speed:1.00,color:0x1be480},
+    {id:'pc',label:'pc',ex:56,speed:.88,color:0x2fc983},
+    {id:'nas',label:'nas',ex:40,speed:.52,color:0x9fbf3a},
+    {id:'laptop',label:'laptop',ex:32,speed:.56,color:0x1a8f8f},
+    {id:'tablet',label:'tablet',ex:24,speed:.42,color:0x2b5f9e},
+    {id:'phone',label:'phone',ex:20,speed:.36,color:0x5b8fd0},
+    {id:'browser',label:'browser',ex:12,speed:.30,color:0xc99a2e},
   ];
-  const GAP=.07,TOTAL=DEVS.reduce((s,d)=>s+d.layers,0),SPAN=Math.PI*2-GAP*DEVS.length;
+  /* the 256 experts of a layer, shared by the memory each owner lends; the server also keeps the core */
+  const GAP=.07,TOTAL=DEVS.reduce((s,d)=>s+d.ex,0),SPAN=Math.PI*2-GAP*DEVS.length;
   let a=-Math.PI/2+.4,lay=0;
-  DEVS.forEach(d=>{d.a0=a;d.a1=a+SPAN*d.layers/TOTAL;d.mid=(d.a0+d.a1)/2;d.l0=lay;d.l1=lay+d.layers;lay+=d.layers;a=d.a1+GAP;});
-  DEVS.forEach(d=>{d.frac=(d.a1-d.a0)/(Math.PI*2);d.flash=0;});
-  const TAU=Math.PI*2,OMEGA=2.42,AVGFR=1/7,lapT=[];
+  DEVS.forEach(d=>{d.a0=a;d.a1=a+SPAN*d.ex/TOTAL;d.mid=(d.a0+d.a1)/2;d.l0=lay;d.l1=lay+d.ex;lay+=d.ex;a=d.a1+GAP;d.flash=0;});
+  const exText=d=>(d.core?t('hud.core')+' · ':'')+t('hud.experts')+' '+d.l0+'–'+(d.l1-1);
   /* arcs — each device's share is a river of particles; a token lights the spot it passes */
   const vw=innerWidth,live=livingArcs(R,DEVS,{count:vw>960?24000:vw>600?18000:12000,glow:vw>960?2200:vw>600?1700:1200,flow:DEVS.map(d=>.03*d.speed),alpha:.85});
-  world.add(live.points);const boost=DEVS.map(()=>0),toks=[];
-  /* layer ticks */
-  {const pts=[];DEVS.forEach(d=>{for(let i=0;i<=d.layers;i++){const x=lerp(d.a0,d.a1,i/d.layers),big=i===0||i===d.layers,r1=R+.2,r2=R+(big?.52:.32);pts.push(Math.cos(x)*r1,0,Math.sin(x)*r1,Math.cos(x)*r2,0,Math.sin(x)*r2);}});
+  world.add(live.points);const boost=DEVS.map(()=>0);
+  /* expert ticks, one per four */
+  {const pts=[];DEVS.forEach(d=>{for(let i=0;i<=d.ex;i+=4){const x=lerp(d.a0,d.a1,i/d.ex),big=i===0||i===d.ex,r1=R+.2,r2=R+(big?.52:.32);pts.push(Math.cos(x)*r1,0,Math.sin(x)*r1,Math.cos(x)*r2,0,Math.sin(x)*r2);}});
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
     var tickMat=new THREE.LineBasicMaterial({color:0x4d7a62,transparent:true,opacity:.55});world.add(new THREE.LineSegments(g,tickMat));}
   {const inner=new THREE.Mesh(new THREE.TorusGeometry(R-.55,.008,6,256),new THREE.MeshBasicMaterial({color:0x2a5a42,transparent:true,opacity:.6}));inner.rotation.x=Math.PI/2;world.add(inner);innerMat=inner.material;}
@@ -1412,17 +1488,17 @@ function hero(){
     /* link from arc to pedestal */
     const lg=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(Math.cos(d.mid)*(R+.55),0,Math.sin(d.mid)*(R+.55)),new THREE.Vector3(Math.cos(d.mid)*(R+.95),-.8,Math.sin(d.mid)*(R+.95))]);
     const lkMat=new THREE.LineBasicMaterial({color:d.color,transparent:true,opacity:.3});world.add(new THREE.Line(lg,lkMat));d.lkMat=lkMat;d.colBase=new THREE.Color(d.color);
-    const el=document.createElement('div');el.className='dlabel';el.innerHTML=`<b>${d.label}</b><span>layers ${d.l0}–${d.l1-1}</span><br><span class="ld"></span>`;
+    const el=document.createElement('div');el.className='dlabel';el.innerHTML=`<b>${d.label}</b><span>${exText(d)}</span><br><span class="ld"></span>`;
     labelsEl.appendChild(el);labels.push({el,ld:el.querySelector('.ld'),d});
     d.pulse=0;d.load=.5;
   });
-  addEventListener('omnarc-lang',()=>{const lw=t('hud.layers');
-    labels.forEach(o=>{const s=o.el.querySelector('span');if(s)s.textContent=lw+' '+o.d.l0+'–'+(o.d.l1-1);});cardRefresh();});
+  addEventListener('omnarc-lang',()=>{
+    labels.forEach(o=>{const s=o.el.querySelector('span');if(s)s.textContent=exText(o.d);});cardRefresh();});
 
   /* device inspector — click a device, read its telemetry */
   const card=document.createElement('div');card.className='dev-card';card.hidden=true;labelsEl.appendChild(card);
   let selDev=null,hoverDev=null;
-  function cardBody(d){return `<b>${d.label}</b><span>${t('hud.layers')} ${d.l0}–${d.l1-1}</span><span>load ${Math.round(d.load*100)}% · ${Math.round(30+d.load*45)}° · ${Math.round(60+Math.pow(d.load,1.3)*520)} W</span>`;}
+  function cardBody(d){return `<b>${d.label}</b><span>${exText(d)}</span><span>load ${Math.round(d.load*100)}% · ${Math.round(30+d.load*45)}° · ${Math.round(60+Math.pow(d.load,1.3)*520)} W</span>`;}
   function cardRefresh(){if(selDev)card.innerHTML=cardBody(selDev);}
   function cardUpdate(){labels.forEach(o=>o.el.classList.toggle('sel',o.d===selDev));
     if(selDev){card.hidden=false;card.innerHTML=cardBody(selDev);}else card.hidden=true;}
@@ -1437,14 +1513,12 @@ function hero(){
   addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(e.target&&e.target.closest&&e.target.closest('form,textarea,input'))return;selDev=null;cardUpdate();});
 
   leds.forEach(l=>l.base=l.m.material.color.getHex());
-  /* tokens */
-  const NC=30,TR=30;
-  const comets=pointCloud(NC*TR);world.add(comets);
-  const C=[];for(let i=0;i<NC;i++)C.push({on:false,a:0,trav:0,hist:[],amb:false,big:false});
-  const startA=DEVS[0].a0+.02;
-  for(let i=0;i<3;i++)Object.assign(C[i],{on:true,amb:true,a:startA+i*(Math.PI*2/3),w:OMEGA,laps:0});
-  api.spawn=(o={})=>{const c=C.find(c=>!c.on);if(!c)return;Object.assign(c,{on:true,a:startA,trav:0,amb:false,big:!!o.big,w:OMEGA*2.55,laps:0});c.hist.length=0;};
-  const colAt=x=>{const t=((x%(Math.PI*2))+Math.PI*2)%(Math.PI*2);for(const d of DEVS){const a0=((d.a0%(Math.PI*2))+Math.PI*2)%(Math.PI*2);let rel=t-a0;if(rel<0)rel+=Math.PI*2;if(rel<=d.a1-d.a0+GAP)return d;}return DEVS[0];};
+  /* the core in the middle: servers that keep attention, the router, the shared and the hottest experts */
+  const coreC=coreCluster({leds,fans,floaters},1);coreC.group.position.y=-.9;world.add(coreC.group);
+  /* tokens: each wakes 8 experts; a call that leaves the core strikes its arc as lightning */
+  const zap=lightning(R,DEVS,{k:8,hot:.6,from:new THREE.Vector3(0,-.9+coreC.top.y,0)});world.add(zap.points);
+  let nextBurst=0;
+  api.spawn=(o={})=>zap.fire(T,!!o.big);
   /* dust */
   const ND=650,dust=pointCloud(ND);world.add(dust);
   {const p=dust.geometry.attributes.position.array,c=dust.geometry.attributes.aColor.array,s=dust.geometry.attributes.size.array,al=dust.geometry.attributes.alpha.array;
@@ -1460,8 +1534,8 @@ function hero(){
   key.castShadow=true;key.shadow.mapSize.set(1024,1024);Object.assign(key.shadow.camera,{left:-9,right:9,top:9,bottom:-9,far:40});key.shadow.bias=-.0004;
   const shFloor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.ShadowMaterial({opacity:.42}));
   shFloor.rotation.x=-Math.PI/2;shFloor.position.y=-.945;shFloor.receiveShadow=true;world.add(shFloor);
-  /* the token carries a real light around the ring */
-  const tokenLight=new THREE.PointLight(0xaaffd2,2.2,8,2);tokenLight.position.set(Math.cos(startA)*R,.5,Math.sin(startA)*R);world.add(tokenLight);
+  /* a light follows the latest strike */
+  const tokenLight=new THREE.PointLight(0xaaffd2,2.2,8,2);tokenLight.position.set(0,.5,0);world.add(tokenLight);
   const st={yaw:0,pitch:0,mx:0,my:0,dragging:false,moved:0};
   dragYaw(canvas,st,()=>reduceMotion&&L.once());
   const t0Intro=performance.now();let W=1,H=1,camBase=new THREE.Vector3(),crect=null;const center=$('#heroCenter');
@@ -1473,7 +1547,7 @@ function hero(){
     cam.updateProjectionMatrix();live.scale(camBase.distanceTo(world.position),H/(2*Math.tan(cam.fov*Math.PI/360)));}
   new ResizeObserver(resize).observe(canvas);resize();
   const v=new THREE.Vector3();let T=0,hudT=0;
-  const tokEl=$('#hudTok'),flightEl=$('#hudFlight');
+  const flightEl=$('#hudFlight');
   function frame(dt,t){
     T+=dt;
     if(!st.dragging&&!reduceMotion)st.yaw+=dt*.05;
@@ -1487,38 +1561,13 @@ function hero(){
       d.flash=Math.max(0,d.flash-dt*2.4);
       if(d.lkMat){d.lkMat.opacity=.24+.76*d.flash;d.lkMat.color.copy(d.colBase).multiplyScalar(.5+1.1*d.flash);}
       boost[i]=(d.load-.5)*.5+d.pulse*.8;d.pedMat.opacity=.35+d.pulse*.65;});
-    /* comets */
-    const P=comets.geometry.attributes.position.array,Cc=comets.geometry.attributes.aColor.array,S=comets.geometry.attributes.size.array,A=comets.geometry.attributes.alpha.array;
-    let fl=0;
-    C.forEach((c,ci)=>{
-      if(!c.on){for(let j=0;j<TR;j++)A[ci*TR+j]=0;return;}
-      fl++;const prev=c.a;
-      /* bosqich-vaqt modeli: token har qurilmaning ulushiga proporsional vaqt o'tkazadi */
-      const dNow=colAt(c.a);
-      c.a+=dt*(c.w||OMEGA)*(AVGFR/dNow.frac);
-      c.trav+=c.a-prev;
-      const rel=x=>((x-DEVS[0].a0)%TAU+TAU)%TAU,r0=rel(prev),r1=rel(c.a);
-      for(const dd of DEVS){
-        const bp=((dd.a0-DEVS[0].a0)%TAU+TAU)%TAU;
-        const crossed=r0<=r1?(bp>r0&&bp<=r1):(bp>r0||bp<=r1);
-        if(crossed){dd.pulse=Math.max(dd.pulse,c.amb?.7:1);dd.flash=1;}
-      }
-      if(r1<r0){c.laps=(c.laps||0)+1;if(c.amb)lapT.push(T);DEVS[0].pulse=Math.max(DEVS[0].pulse,.9);}
-      c.hist.unshift(c.a);if(c.hist.length>TR)c.hist.length=TR;
-      while(c.hist.length<TR)c.hist.push(c.hist[c.hist.length-1]);
-      const done=!c.amb&&c.trav>=Math.PI*2,fade=done?0:1;if(done)c.on=false;
-      for(let j=0;j<TR;j++){const k=ci*TR+j,x=c.hist[j],f=1-j/TR;
-        P[k*3]=Math.cos(x)*R;P[k*3+1]=.2+Math.sin(T*3+ci)*.02;P[k*3+2]=Math.sin(x)*R;
-        /* tokens are gold comets, as in the living ring */
-        const w=j===0?.8:.15*f;Cc[k*3]=lerp(.89,1,w);Cc[k*3+1]=lerp(.69,.97,w);Cc[k*3+2]=lerp(.24,.88,w);
-        S[k]=(j===0?(c.big?7:4.2):(c.big?3.2:2.2)*f+.3);A[k]=fade*(j===0?1:.85*f*f);}
-    });
-    const hC=C.find(c=>c.on);
-    if(hC){tokenLight.position.set(Math.cos(hC.a)*R,.5,Math.sin(hC.a)*R);tokenLight.color.set(colAt(hC.a).color);}
-    flightEl.textContent=fl;
-    ['position','aColor','size','alpha'].forEach(n=>comets.geometry.attributes[n].needsUpdate=true);
-    toks.length=0;C.forEach(c=>{if(c.on)toks.push(c.a,c.big?1.2:1);});
-    const hi=selDev||hoverDev;live.set(T,it,toks,boost,hi?DEVS.indexOf(hi):-1);
+    /* tokens: a burst of 8 expert calls; lightning where a call leaves the core, a flash where it stays */
+    if(!reduceMotion&&!api.streaming&&T>=nextBurst){zap.fire(T);nextBurst=T+.62;}
+    const zk=zap.update(T,dt,e=>{e.d.pulse=Math.max(e.d.pulse,e.big?1:.75);e.d.flash=1;
+      tokenLight.position.set(Math.cos(e.a)*R,.5,Math.sin(e.a)*R);tokenLight.color.setHex(0xc8fff6);});
+    coreC.pulse(zk.flash,T);
+    flightEl.textContent=zk.flying;
+    const hi=selDev||hoverDev;live.set(T,it,zk.toks,boost,hi?DEVS.indexOf(hi):-1);
     dust.rotation.y+=dt*.01;
     leds.forEach(l=>l.m.material.color.setHex(noise1(T*3+l.ph)>.35?l.base:0x0a2016));
     fans.forEach(f=>f.rotation.x+=dt*14);
@@ -1532,98 +1581,93 @@ function hero(){
       o.el.style.left=((v.x+1)/2*W)+'px';o.el.style.top=((1-v.y)/2*H)+'px';});
     if(selDev){selDev.group.getWorldPosition(v);v.y+=3.3;v.project(cam);
       card.style.left=((v.x+1)/2*W)+'px';card.style.top=((1-v.y)/2*H)+'px';card.style.opacity=v.z<1?1:0;}
-    hudT+=dt;if(hudT>.5){hudT=0;crect=null;if(!api.streaming){while(lapT.length&&lapT[0]<T-2.6)lapT.shift();tokNow=lapT.length/2.6*7.2;tokEl.textContent=tokNow.toFixed(1)+' tok/s';window.__ringTok=tokNow;heroScreens.forEach(r=>r.redraw());
+    hudT+=dt;if(hudT>.5){hudT=0;crect=null;heroScreens.forEach(r=>r.redraw());
       labels.forEach(o=>o.ld.textContent='load '+Math.round(o.d.load*100)+'%');cardRefresh();}
-    }
   }
   const L=loop(host,frame);if(reduceMotion){frame(0,0);L.once();}
   api.redraw=()=>reduceMotion&&L.once();
   return api;
 }
 
-/* ───────── LAB: layer partition ───────── */
+/* ───────── LAB: expert pool ───────── */
 function lab(){
   const DEV=[
-    {id:'h100',name:'Server, H100 80 GB',bw:3350,mem:76,color:'#1be480',on:false},
+    {id:'h100',name:'Server, H100 80 GB',bw:3350,mem:76,color:'#1be480',on:true},
     {id:'pc',name:'Desktop, RTX 4090',bw:1008,mem:22,color:'#2fc983',on:true},
     {id:'mac',name:'MacBook Pro, M3 Max',bw:400,mem:36,color:'#1a8f8f',on:true},
     {id:'mini',name:'Mini PC, 32 GB RAM',bw:68,mem:26,color:'#9fbf3a',on:true},
     {id:'laptop',name:'Laptop, integrated GPU',bw:90,mem:10,color:'#2b5f9e',on:true},
     {id:'phone',name:'Android phone, 12 GB',bw:64,mem:6,color:'#6d9be0',on:true},
+    {id:'old',name:'Old phone, 3 GB',bw:12,mem:1.5,color:'#8fa6c9',on:true},
     {id:'browser',name:'Browser tab, WebGPU',bw:40,mem:3,color:'#c99a2e',on:false},
   ];
-  const MODELS={'8b':{name:'Llama 8B',gb:4.9,L:32,h:4096},'70b':{name:'Llama 70B',gb:42.5,L:80,h:8192},'405b':{name:'Llama 405B',gb:243,L:126,h:16384}};
-  const NETS={lan:{B:2.5,rtt:.25,name:'2.5 GbE'},wifi:{B:.6,rtt:3,name:'Wi-Fi 6'},wan:{B:.1,rtt:28,name:'the internet'}};
-  let model='70b',net='lan';
+  /* about 4 bits a weight; L MoE layers, E experts in each, k called per token, x: share of the bytes in the experts */
+  const MODELS={glm:{name:'GLM-4.7 Flash',gb:18,L:45,E:64,k:4,x:.95},oss:{name:'gpt-oss 120B',gb:65,L:36,E:128,k:4,x:.98},
+    q235:{name:'Qwen3 235B-A22B',gb:142,L:94,E:128,k:8,x:.97},ds3:{name:'DeepSeek V3',gb:404,L:58,E:256,k:8,x:.97}};
+  /* one remote expert step, ms, measured in S0 */
+  const STEP={loop:.9,wifi:28,wan:500};
+  /* S0 routing traces. h: share of calls the hottest share x of the experts answers; s: share of steps with all k experts on the core.
+     GLM-4.7 Flash for 4 experts a token, Granite 3B for 8 */
+  const CURVE={4:{h:[[0,0],[.1,.41],[.25,.667],[1,1]],s:[[0,0],[.25,.168],[.5,.537],[1,1]]},
+               8:{h:[[0,0],[.1,.278],[.25,.527],[1,1]],s:[[0,0],[.25,.01],[.5,.198],[1,1]]}};
+  const at=(pts,x)=>{x=clamp(x,0,1);for(let i=1;i<pts.length;i++)if(x<=pts[i][0]){const [a,b]=pts[i-1],[c,d]=pts[i];return b+(d-b)*(x-a)/(c-a);}return 1;};
+  const KV=2;   // GB the core keeps for the conversation's memory
+  let model='q235',net='wifi';
   const list=$('#devList');
   function addRow(d,first){const l=document.createElement('label');l.className='dev'+(d.id==='me'?' me':'');l.dataset.id=d.id;
-    l.innerHTML=`<input type="checkbox" ${d.on?'checked':''}><span><span class="nm">${d.name}</span><br><span class="sp">${d.bw.toLocaleString('en')} GB/s · ${d.mem} GB free</span></span><span class="sw" style="background:${d.color}"></span>`;
+    l.innerHTML=`<input type="checkbox" ${d.on?'checked':''}><span><span class="nm">${d.name}</span><br><span class="sp">${d.bw.toLocaleString('en')} GB/s · ${d.mem} GB</span></span><span class="sw" style="background:${d.color}"></span>`;
     l.querySelector('input').addEventListener('change',e=>{d.on=e.target.checked;solve();});first?list.prepend(l):list.appendChild(l);}
   DEV.forEach(d=>addRow(d));
   const seg=(id,cb)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$(id).querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));cb(b);solve();});
   seg('#modelSeg',b=>model=b.dataset.m);seg('#netSeg',b=>net=b.dataset.n);
   const fmt=(x,d=1)=>x>=100?Math.round(x).toString():x.toFixed(d);
-
-  function waterfill(act,Lt,m){
-    const cap=act.map(d=>Math.floor(d.mem/m));
-    if(cap.reduce((s,c)=>s+c,0)<Lt)return null;
-    let lo=0,hi=Lt/Math.min(...act.map(d=>d.bw))+1;
-    const f=l=>act.reduce((s,d,i)=>s+Math.min(cap[i],l*d.bw),0);
-    for(let it=0;it<80;it++){const mid=(lo+hi)/2;f(mid)<Lt?lo=mid:hi=mid;}
-    const cont=act.map((d,i)=>Math.min(cap[i],hi*d.bw));
-    const n=cont.map(Math.floor);let rem=Lt-n.reduce((s,x)=>s+x,0);
-    const order=cont.map((x,i)=>[x-Math.floor(x),i]).sort((a,b)=>b[0]-a[0]);
-    for(const [,i] of order){if(rem<=0)break;if(n[i]<cap[i]){n[i]++;rem--;}}
-    for(let i=0;rem>0&&i<n.length;i++){while(rem>0&&n[i]<cap[i]){n[i]++;rem--;}}
-    return n;
-  }
-  function latencyPlan(act,Lt,m,comm){
-    /* minimise Σℓ·t + hops: fill fastest first */
-    const s=[...act].sort((a,b)=>b.bw-a.bw);let left=Lt,cost=0,used=[];
-    for(const d of s){if(left<=0)break;const take=Math.min(left,Math.floor(d.mem/m));if(take<=0)continue;left-=take;cost+=take*m/d.bw*1000+comm;used.push(d.name.split(',')[0]);}
-    if(left>0)return null;if(used.length===1)cost-=comm;return {tps:1000/cost,used};
-  }
+  const num=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+  const pct=x=>Math.round(x*100)+' %';
+  const ms=x=>x>=1000?(x/1000).toFixed(1)+' s':x>=10?Math.round(x)+' ms':x.toFixed(1)+' ms';
+  const short=d=>d.name.split(',')[0];
   const ringCv=$('#labRing');
-  function drawRing(rows,Lt,label){
+  function drawRing(rows,label){
     const dpr=Math.min(devicePixelRatio||1,2),S=240;ringCv.width=S*dpr;ringCv.height=S*dpr;const g=ringCv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,S,S);
-    const cx=S/2,cy=S/2,r=92;g.lineCap='butt';
+    const cx=S/2,cy=S/2,r=92,held=rows.filter(o=>o.n>0),tot=held.reduce((s,o)=>s+o.n,0);g.lineCap='butt';
     g.strokeStyle='rgba(215,232,221,.08)';g.lineWidth=20;g.beginPath();g.arc(cx,cy,r,0,Math.PI*2);g.stroke();
-    let a=-Math.PI/2;const gap=rows.length>1?.035:0;
-    rows.forEach(o=>{if(!o.n)return;const span=Math.PI*2*o.n/Lt;g.strokeStyle=o.d.color;g.lineWidth=20;g.beginPath();g.arc(cx,cy,r,a+gap/2,a+span-gap/2);g.stroke();
-      g.strokeStyle='rgba(7,17,13,.35)';g.lineWidth=1;if(Lt<=40)for(let i=1;i<o.n;i++){const x=a+span*i/o.n;g.beginPath();g.moveTo(cx+Math.cos(x)*(r-10),cy+Math.sin(x)*(r-10));g.lineTo(cx+Math.cos(x)*(r+10),cy+Math.sin(x)*(r+10));g.stroke();}
-      a+=span;});
-    g.fillStyle='#d7e8dd';g.textAlign='center';g.font='600 26px "Geist Mono",monospace';g.fillText(label[0],cx,cy+4);
-    g.fillStyle='#7d9384';g.font='12px Geist,system-ui,sans-serif';g.fillText(label[1],cx,cy+24);
+    let a=-Math.PI/2;const gap=held.length>1?.035:0;
+    held.forEach(o=>{const span=Math.PI*2*o.n/tot;g.strokeStyle=o.d.color;g.lineWidth=20;g.beginPath();g.arc(cx,cy,r,a+gap/2,a+span-gap/2);g.stroke();a+=span;});
+    g.fillStyle='#d7e8dd';g.textAlign='center';g.font='600 26px "JetBrains Mono",monospace';g.fillText(label[0],cx,cy+4);
+    g.fillStyle='#7d9384';g.font='12px Inter,system-ui,sans-serif';g.fillText(label[1],cx,cy+24);
   }
+  const show=k=>['#kMem','#kCore','#kWaits','#kNet'].forEach((id,i)=>$(id).innerHTML=k?k[i]:'—');
   function solve(){
-    const M=MODELS[model],N=NETS[net],m=M.gb/M.L,act=DEV.filter(d=>d.on);
-    const warn=$('#labWarn'),body=$('#allocBody');
-    const totalMem=act.reduce((s,d)=>s+d.mem,0);
-    const comm=(M.h*2*8)/(N.B*1e9)*1000+N.rtt;
-    const n=act.length?waterfill(act,M.L,m):null;
-    if(!n){
-      warn.classList.add('on');warn.textContent=act.length?tf('plan.need',{name:M.name,gb:M.gb,total:totalMem,more:Math.ceil(M.gb-totalMem+.5)}):t('plan.pick');
-      body.innerHTML='';['#kSingle','#kMulti','#kBottle'].forEach(id=>$(id).textContent='—');$('#kMem').innerHTML=`${fmt(M.gb)} <small>/ ${totalMem} GB</small>`;
-      $('#planSub').textContent=tf('plan.nofit',{name:M.name});drawRing([],1,['—','layers']);return;}
+    const M=MODELS[model],act=DEV.filter(d=>d.on),warn=$('#labWarn'),body=$('#allocBody');
+    const lent=act.reduce((s,d)=>s+d.mem,0),need=M.gb+KV,coreGB=M.gb*(1-M.x)+KV,expGB=M.gb*M.x,nExp=M.L*M.E;
+    const fail=msg=>{warn.classList.add('on');warn.textContent=msg;body.innerHTML='';show(null);$('#planSub').textContent='—';drawRing([],['—',t('ring.waits')]);};
+    if(!act.length)return fail(t('plan.pick'));
+    const core=act.reduce((a,b)=>b.bw>a.bw?b:a);   // the core runs where memory is fastest
+    if(core.mem<coreGB)return fail(tf('plan.core',{name:M.name,gb:fmt(coreGB),dev:short(core)}));
+    if(lent<need)return fail(tf('plan.need',{name:M.name,gb:fmt(need),total:fmt(lent),more:Math.ceil(need-lent)}));
     warn.classList.remove('on');
-    const rows=act.map((d,i)=>({d,n:n[i]}));const used=rows.filter(o=>o.n>0);const multi=used.length>1;
-    let l0=0;rows.forEach(o=>{o.t=o.n*m/o.d.bw*1000+(o.n&&multi?comm:0);o.l0=l0;l0+=o.n;});
-    const sum=rows.reduce((s,o)=>s+o.t,0),bott=rows.reduce((a,b)=>b.t>a.t?b:a);
-    const single=1000/sum,many=1000/bott.t;
-    $('#kSingle').innerHTML=`${fmt(single)} <small>tok/s</small>`;
-    $('#kMulti').innerHTML=`${fmt(many)} <small>tok/s total</small>`;
-    $('#kBottle').innerHTML=`${fmt(bott.t,2)} <small>ms</small>`;
-    $('#kMem').innerHTML=`${fmt(M.gb)} <small>/ ${totalMem} GB</small>`;
-    const lp=latencyPlan(act,M.L,m,comm);
-    let sub=tf('plan.base',{name:M.name,L:M.L,m:m.toFixed(2),net:N.name,n:used.length});
-    if(lp&&lp.tps>single*1.08)sub+=' '+tf('plan.fast',{used:lp.used.join(t('plan.and')),tps:fmt(lp.tps)});
-    $('#planSub').textContent=sub;
-    body.innerHTML=rows.map(o=>{const used=o.n*m;return `<tr><td><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${o.d.color};margin-right:8px"></span>${o.d.name.split(',')[0]}</td>
-      <td>${o.n?`${o.l0}–${o.l0+o.n-1}`:t('row.standby')}</td>
-      <td>${fmt(used)} / ${o.d.mem} GB</td>
-      <td>${o.n?fmt(o.t,2)+' ms':'—'}</td>
-      <td><div class="bar"><i style="width:${(o.t/sum*100).toFixed(1)}%;background:${o===bott?'#e2b13c':o.d.color}"></i></div></td></tr>`;}).join('');
-    drawRing(rows,M.L,[fmt(many),t('ring.many')]);
+    const row=(d,holds,gb,share,n)=>({d,holds,gb,share,n});
+    let rows,h,W;
+    if(need<=core.mem){   /* it fits whole: never split; every device that can hold it runs its own copy */
+      rows=act.map(d=>d===core?row(d,t('row.whole'),need,1,1):d.mem>=need?row(d,t('row.copy'),need,0,1):row(d,t('row.client'),0,0,0));
+      h=1;W=0;
+      const copies=rows.filter(o=>o.d!==core&&o.n).length;
+      $('#planSub').textContent=tf('plan.whole',{name:M.name,dev:short(core)})+(copies?' '+tf('plan.copies',{n:copies}):'');
+    }else{   /* the core and the hottest experts on the core device, the rest in proportion to the memory lent */
+      const hotGB=Math.min(expGB,core.mem-coreGB),others=act.filter(d=>d!==core),om=others.reduce((s,d)=>s+d.mem,0);
+      const per=expGB/nExp,f=om?(expGB-hotGB)/om:0,xs=hotGB/expGB,cv=CURVE[M.k];
+      h=at(cv.h,xs);W=M.L*(1-at(cv.s,xs));
+      const nHot=Math.round(hotGB/per),restN=nExp-nHot,ns=others.map(d=>Math.floor(d.mem*f/per));
+      for(let i=0,left=restN-ns.reduce((s,x)=>s+x,0);left>0&&ns.length;i=(i+1)%ns.length,left--)ns[i]++;
+      rows=[row(core,`${t('row.core')} + ${num(nHot)} ${t('row.exp')}`,coreGB+hotGB,h,nHot)]
+        .concat(others.map((d,i)=>row(d,`${num(ns[i])} ${t('row.exp')}`,d.mem*f,restN?(1-h)*ns[i]/restN:0,ns[i])));
+      const spare=lent-need;
+      $('#planSub').textContent=tf('plan.split',{name:M.name,L:M.L,E:M.E,k:M.k,net:t('net.'+net),dev:short(core),hot:pct(xs)})+(spare>=1?' '+tf('plan.spare',{gb:fmt(spare)}):'');
+    }
+    show([`${fmt(need)} <small>/ ${fmt(lent)} GB</small>`,pct(h),String(Math.round(W)),W?ms(W*STEP[net]):'0 ms']);
+    body.innerHTML=rows.map(o=>`<tr><td><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${o.d.color};margin-right:8px"></span>${short(o.d)}</td>
+      <td>${o.holds}</td><td>${fmt(o.gb)} / ${o.d.mem} GB</td>
+      <td title="${pct(o.share)}"><div class="bar"><i style="width:${(o.share*100).toFixed(1)}%;background:${o.d===core?'#e2b13c':o.d.color}"></i></div></td></tr>`).join('');
+    drawRing(rows,[String(Math.round(W)),t('ring.waits')]);
   }
   solve();
   addEventListener('omnarc-lang',()=>solve());
@@ -1761,7 +1805,7 @@ function plot(cv,o){
   const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
   const fg=css('--fg'),mu=css('--muted'),bd=css('--border'),pl=44,pr=14,pt=12,pb=30;
   const X=x=>pl+(x-o.x0)/(o.x1-o.x0)*(w-pl-pr),Y=y=>pt+(1-(y-o.y0)/(o.y1-o.y0))*(h-pt-pb);
-  g.font='11px "Geist Mono",monospace';g.fillStyle=mu;g.strokeStyle=bd;g.lineWidth=1;
+  g.font='11px "JetBrains Mono",monospace';g.fillStyle=mu;g.strokeStyle=bd;g.lineWidth=1;
   o.yt.forEach(y=>{g.beginPath();g.moveTo(pl,Y(y));g.lineTo(w-pr,Y(y));g.stroke();g.textAlign='right';g.fillText(o.yf(y),pl-6,Y(y)+4);});
   o.xt.forEach(x=>{g.textAlign='center';g.fillText(o.xf?o.xf(x):x,X(x),h-pb+16);});
   g.textAlign='right';g.fillText(o.xl,w-pr,h-2);
@@ -1770,8 +1814,8 @@ function plot(cv,o){
     if(s.dots){g.fillStyle=s.color;s.pts.forEach(([x,y])=>{g.beginPath();g.arc(X(x),Y(y),2.6,0,Math.PI*2);g.fill();});}
   });
   (o.marks||[]).forEach(m=>{g.fillStyle=css('--card');g.strokeStyle=m.color;g.lineWidth=2.5;g.beginPath();g.arc(X(m.x),Y(m.y),6,0,Math.PI*2);g.fill();g.stroke();
-    g.fillStyle=fg;g.font='600 12px Geist,system-ui,sans-serif';g.textAlign=X(m.x)>w*.7?'right':'left';g.fillText(m.label,X(m.x)+(X(m.x)>w*.7?-10:10),Y(m.y)-9);});
-  (o.legend||[]).forEach((l,i)=>{const lx=pl+8,ly=pt+12+i*16;g.strokeStyle=l.color;g.lineWidth=2;g.setLineDash(l.dash||[]);g.beginPath();g.moveTo(lx,ly-4);g.lineTo(lx+16,ly-4);g.stroke();g.setLineDash([]);g.fillStyle=mu;g.font='11.5px Geist,system-ui,sans-serif';g.textAlign='left';g.fillText(l.t,lx+22,ly);});
+    g.fillStyle=fg;g.font='600 12px Inter,system-ui,sans-serif';g.textAlign=X(m.x)>w*.7?'right':'left';g.fillText(m.label,X(m.x)+(X(m.x)>w*.7?-10:10),Y(m.y)-9);});
+  (o.legend||[]).forEach((l,i)=>{const lx=pl+8,ly=pt+12+i*16;g.strokeStyle=l.color;g.lineWidth=2;g.setLineDash(l.dash||[]);g.beginPath();g.moveTo(lx,ly-4);g.lineTo(lx+16,ly-4);g.stroke();g.setLineDash([]);g.fillStyle=mu;g.font='11.5px Inter,system-ui,sans-serif';g.textAlign='left';g.fillText(l.t,lx+22,ly);});
 }
 function math(){
   const brand=()=>css('--brand'),gold=()=>css('--gold'),lapis=()=>css('--lapis');
@@ -1788,25 +1832,23 @@ function math(){
     $('#rSpec').textContent=`Best draft length k = ${best}: ${E(best).toFixed(2)} tokens per pass, ${Sp(best).toFixed(2)}× faster than plain decoding.`;}
   /* replicas */
   function rep(){const p=+$('#sP').value,Wn=+$('#sW').value;const f=(r,w)=>Math.pow(1-Math.pow(1-p,r),w);const rs=[1,2,3,4,5];
-    plot($('#plotRep'),{x0:1,x1:5,y0:0,y1:1,xt:rs,yt:[0,.25,.5,.75,1],yf:y=>Math.round(y*100)+'%',xl:'replicas per window r',
+    plot($('#plotRep'),{x0:1,x1:5,y0:0,y1:1,xt:rs,yt:[0,.25,.5,.75,1],yf:y=>Math.round(y*100)+'%',xl:'copies per group r',
       series:[{pts:rs.map(r=>[r,f(r,Wn*2)]),color:lapis(),dash:[5,4]},{pts:rs.map(r=>[r,f(r,Wn)]),color:brand(),w:2.5,dots:true}],
-      legend:[{t:`W = ${Wn}`,color:brand()},{t:`W = ${Wn*2}`,color:lapis(),dash:[5,4]}]});
+      legend:[{t:`G = ${Wn}`,color:brand()},{t:`G = ${Wn*2}`,color:lapis(),dash:[5,4]}]});
     let need=rs.find(r=>f(r,Wn)>=.999);
-    $('#rRep').textContent=`No replicas: ring up ${pct(f(1,Wn))} of the time. Two copies: ${pct(f(2,Wn))}. `+(need?`Three nines need r = ${need}.`:'Three nines need more than 5 copies.');}
-  /* voting */
-  function vote(){const q=+$('#sQ').value,rho=+$('#sR').value;
-    const C=(n,k)=>{let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return r;};
-    const ind=n=>{let s=0;for(let j=Math.floor(n/2)+1;j<=n;j++)s+=C(n,j)*Math.pow(q,j)*Math.pow(1-q,n-j);return s;};
-    const cor=n=>rho*q+(1-rho)*ind(n);
-    const ns=[1,3,5,7,9,11,13,15];const y0=Math.floor(q*10)/10-.05;
-    plot($('#plotVote'),{x0:1,x1:15,y0:Math.max(.4,y0),y1:1,xt:[1,3,5,7,9,11,13,15],yt:[.5,.6,.7,.8,.9,1].filter(v=>v>=Math.max(.4,y0)),yf:y=>Math.round(y*100)+'%',xl:'devices voting n',
-      series:[{pts:ns.map(n=>[n,ind(n)]),color:gold(),dash:[5,4]},{pts:ns.map(n=>[n,cor(n)]),color:brand(),w:2.5,dots:true}],
-      legend:[{t:`errors correlated, ρ = ${rho}`,color:brand()},{t:'fully independent',color:gold(),dash:[5,4]}]});
-    $('#rVote').textContent=`5 devices: ${pct(cor(5))} right, against ${pct(q)} alone. Independent errors would give ${pct(ind(5))}; shared mistakes cap the gain.`;}
+    $('#rRep').textContent=`One copy: the pool is up ${pct(f(1,Wn))} of the time. Two copies: ${pct(f(2,Wn))}. `+(need?`Three nines need r = ${need}.`:'Three nines need more than 5 copies.');}
+  /* bytes per token: why only mixture-of-experts */
+  function moe(){const B=+$('#sB').value,a=+$('#sAa').value,lg=Math.log10;
+    const Ss=[10,15,20,30,40,60,80,100,150,200,250,300,350,400];
+    plot($('#plotMoe'),{x0:10,x1:400,y0:-1,y1:3,xt:[10,100,200,300,400],yt:[-1,0,1,2,3],yf:y=>y<0?'0.1':String(10**y),xl:'model size S, GB',
+      series:[{pts:Ss.map(S=>[S,clamp(lg(B/S),-1,3)]),color:gold(),dash:[5,4]},{pts:Ss.map(S=>[S,clamp(lg(B/(a*S)),-1,3)]),color:brand(),w:2.5}],
+      legend:[{t:`mixture-of-experts, a = ${a.toFixed(2)}`,color:brand()},{t:'dense',color:gold(),dash:[5,4]}]});
+    const f=v=>v>=10?v.toFixed(0):v.toFixed(1);
+    $('#rMoe').textContent=`A 400 GB model at ${B} GB/s: dense ≤ ${f(B/400)} tokens/s, mixture-of-experts ≤ ${f(B/(a*400))} — before any network wait.`;}
   const fs=[
     bind('#sA','#oA',v=>v.toFixed(2),spec),bind('#sC','#oC',v=>v.toFixed(2),spec),
     bind('#sP','#oP',v=>v.toFixed(2),rep),bind('#sW','#oW',v=>v,rep),
-    bind('#sQ','#oQ',v=>v.toFixed(2),vote),bind('#sR','#oR',v=>v.toFixed(2),vote)];
+    bind('#sB','#oB',v=>v,moe),bind('#sAa','#oAa',v=>v.toFixed(2),moe)];
   const all=()=>fs.forEach(f=>f());all();
   let rt;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(all,60);}).observe($('#math'));
   addEventListener('omnarc-theme',()=>setTimeout(all,30));
@@ -1814,119 +1856,155 @@ function math(){
 
 /* ───────── i18n ───────── */
 const T={
-en:{"nav.story":"How it works","nav.lab":"Partition lab","nav.node":"Inside a node","nav.math":"The math","nav.road":"Roadmap","nav.faq":"FAQ","nav.start":"Get started",
-"hero.status":"pre-alpha, stage B1 in progress","hero.h1a":"Every device is an arc.","hero.h1b":"Together, one mind.","hero.ph":"Ask the ring anything…",
-"chip.ring":"How does a ring run one model?","chip.phone":"Can my old phone really help?","chip.privacy":"Does my prompt leave my house?",
-"hero.sim":"Answers here are simulated; the light shows each token’s trip around the ring.","sim":"simulated",
-"hud.speed":"ring speed","hud.arcs":"arcs","hud.layers":"layers","hud.flight":"in flight","copy":"Copy","copied":"Copied",
-"s1.h":"Seven devices, one model.","s1.p":"Each arc is one device’s share of the model’s 80 layers, sized by its measured memory bandwidth.",
-"s2.h":"Inside an arc, a window of layers.","s2.p":"The token’s hidden state climbs through every layer the device holds. Weights never move; only the state does.",
-"s3.h":"Then 16 KB hops to the next device.","s3.p":"For a 70B model, that is all that crosses the network per token, encrypted over QUIC.",
-"s4.h":"From one home to the world.","s4.p":"Idle devices behind any NAT can join one ring. That is the goal of stage B6, not a shipped feature.",
-"lab.h":"Build a ring, see where every layer lands.","lab.p":"Pick a model and your devices, or measure this browser. The planner solves the same balancing problem as the scheduler.",
-"node.h":"When the arc is a server rack.","node.p":"A ring can hold a whole rack as one arc. Each GPU takes its own window of layers, and heat follows load. Pick a GPU to read it.",
-"math.h":"Three formulas behind the ring.","math.p":"Each one decides a design choice in Omnarc. Move the sliders and watch the trade-off.",
-"cmp.h":"Four ways to spread a model.","cmp.p":"Today’s tools each cover one corner of the world’s idle compute.",
-"road.h":"Nine stages. Nine gates.","road.p":"A stage is done when its public gate passes, not when a blog post ships.","faq.h":"Questions",
-"cta.h":"Form your ring<br>tonight.","cta.p":"Start with two devices: clone, build, and run a ring wired by hand. Everything runs on your machines.","cta.b1":"Read the README","cta.b2":"Star on GitHub",
-"m.t":"This browser","m.d":"Measure real memory bandwidth here, then add this tab to the ring.","m.b":"Measure this browser","m.again":"Measure again","m.k1":"Backend","m.k2":"Copy bandwidth","m.k3":"Memory budget",
-"m.run":"Measuring… keep this tab in front.","m.ok":"Added to the ring as a measured device. The plan on the right now includes it.","m.cpu":"WebGPU is not available here, so this measured the CPU path instead.","m.fail":"Measurement failed. Close other heavy tabs and try again.","m.name":"This browser (measured)",
-"a.prefill":"prefill","a.done":"tokens in",
-"thr.dev":"Device","thr.layers":"Layers","thr.mem":"Memory","thr.stage":"Stage","thr.time":"Share of time",
-"lab.k1":"one request","lab.k2":"many requests","lab.k3":"slowest stage","lab.k4":"memory used",
-"row.standby":"standby","plan.and":" and ",
-"plan.base":"{name}: {L} layers of {m} GB over {net}. Devices holding layers: {n}.",
-"plan.fast":"For a single request, using only {used} would give {tps} tok/s; slow arcs add stage time.",
-"plan.need":"{name} needs {gb} GB; these devices have {total} GB free. Add {more} GB or pick a smaller model.",
-"plan.pick":"Pick at least one device.","plan.nofit":"{name} does not fit yet.",
-"ring.many":"tok/s, many requests",
+en:{"nav.story":"How it works","nav.lab":"Pool lab","nav.node":"The core","nav.math":"The math","nav.road":"Roadmap","nav.faq":"FAQ","nav.start":"Get started","nav.try":"Try it",
+"hero.status":"pre-alpha · stage S0: measuring","hero.h1a":"Every device is an arc.","hero.h1b":"Together, one mind.","hero.ph":"Ask the pool anything…",
+"chip.ring":"How do my devices share one model?","chip.phone":"Can my old phone really help?","chip.privacy":"Does my prompt leave my house?",
+"hero.sim":"Answers here are simulated; each burst of light is a token waking the 8 experts it chose.","sim":"simulated",
+"hud.devs":"devices","hud.experts":"experts","hud.per":"per token","hud.flight":"calls in flight","hud.core":"core","copy":"Copy","copied":"Copied",
+"s1.h":"Hundreds of experts, one model.","s1.p":"A mixture-of-experts model is a crowd of small specialists. Each arc is one device’s share of them, sized by the memory its owner lends.",
+"s2.h":"The core stays on the server.","s2.p":"Attention, the router, the shared experts and the conversation’s memory live where memory is widest. At every layer the router picks 8 of 256 experts for the token.",
+"s3.h":"Only the chosen experts wake.","s3.p":"A few kilobytes of hidden state go to the devices that hold them and come back. The most-called experts stay on the server: in S0’s traces the hottest quarter took two thirds of the calls.",
+"s4.h":"Every device joins the pool.","s4.p":"Old phones, laptops, desktops, GPU boxes and servers join one pool. Each takes the part its memory, chip and link can carry; none is left out.",
+"s5.h":"Measured, not promised.","s5.p":"Every speed Omnarc shows comes from a run on real devices. In S0 one expert step cost 0.9 ms inside one machine, 28 ms to a phone over Wi-Fi and about 500 ms across the internet.",
+"lab.h":"Build a pool, see where every expert lands.","lab.p":"Pick a model and your devices, or measure this browser. The core runs on the fastest machine; the experts spread over all the others.",
+"lab.mn":"Model and network","lab.mns":"Mixture-of-experts models at about 4 bits. The network is the measured cost of one expert step.",
+"lab.n1":"One machine","lab.n2":"Wi-Fi","lab.n3":"Internet","lab.dv":"Devices","lab.dvs":"Memory each owner lends, and its bandwidth.",
+"lab.f1":"A token calls <var>k</var> of <var>E</var> experts at each of <var>L</var> layers. The core keeps the hottest share <var>x</var> of them, which in S0’s routing traces answered a share <var>h</var>(<var>x</var>) of the calls. A layer waits on the network unless all its <var>k</var> experts are on the core, as in a share <var>s</var>(<var>x</var>) of the steps:",
+"lab.f2":"<var>h</var> and <var>s</var> come from GLM-4.7 Flash (4 experts a token) and Granite 3B (8 a token); <var>t</var><sub>step</sub> from the three S0 links.",
+"lab.plan":"Plan","lab.k1":"memory used","lab.k2":"calls on the core","lab.k3":"network waits / token","lab.k4":"network time / token",
+"lab.note":"An estimate from S0 measurements, not a benchmark. Prefetching the next layer’s experts cut GLM-4.7 Flash’s waits from 45 to about 16 in those traces; the planner leaves that out.",
+"thr.dev":"Device","thr.holds":"Holds","thr.mem":"Memory","thr.calls":"Share of calls",
+"net.loop":"one machine, 0.9 ms a step","net.wifi":"Wi-Fi to a phone, 28 ms a step","net.wan":"the internet, about 500 ms a step",
+"plan.pick":"Pick at least one device.",
+"plan.core":"The core of {name} needs {gb} GB on {dev}, the fastest device here. Free more memory there or pick a smaller model.",
+"plan.whole":"{name} fits whole on {dev}, so it is not split and nothing waits on the network.",
+"plan.copies":"{n} more devices can hold their own copy and serve more people at once.",
+"plan.need":"{name} needs {gb} GB; these devices lend {total} GB. Add {more} GB or pick a smaller model.",
+"plan.split":"{name}: {L} layers × {E} experts, {k} called per token; link: {net}. The core is on {dev}, with the hottest {hot} of the experts.",
+"plan.spare":"{gb} GB to spare holds copies of hot experts, so a device can leave without stopping the answer.",
+"row.core":"core","row.exp":"experts","row.whole":"the whole model","row.copy":"a copy","row.client":"asks · caches","ring.waits":"waits / token",
+"m.t":"This browser","m.d":"Measure real memory bandwidth here, then add this tab to the pool.","m.b":"Measure this browser","m.again":"Measure again","m.k1":"Backend","m.k2":"Copy bandwidth","m.k3":"Memory budget",
+"m.run":"Measuring… keep this tab in front.","m.ok":"Added to the pool as a measured device. The plan on the right now includes it.","m.cpu":"WebGPU is not available here, so this measured the CPU path instead.","m.fail":"Measurement failed. Close other heavy tabs and try again.","m.name":"This browser (measured)",
+"a.prefill":"prefill","a.done":"tokens in","a.model":"MoE · 256 experts · 8 a token",
+"st8.h":"One prompt. Every device. One pool.","st8.s":"8 of 256 experts a token · hidden states only · encrypted tunnel",
+"node.h":"The core, when the server is a rack.","node.p":"The core runs where memory is widest: attention, the router, the shared experts and the conversation’s memory. A rack holds it on GPUs, and heat follows load. Pick a GPU to read it.",
 "node.drag":"Drag to turn. Click a GPU.","node.sm":"132 streaming multiprocessors","node.pw":"Power, last 60 s","node.lim":"limit 700 W",
-"use.k":"who is it for","use.h":"One mind for what you do.","use.p":"Goals of the roadmap — stages B4, B7 and B8.",
-"use.a.h":"Agents on your own model","use.a.p":"OpenClaw, OpenCode and other agents run on a frontier-class open model spread across your own computers — no per-token bill, no rate limit. One computer can only stream such a model from disk; a cluster keeps all of it in memory.",
-"use.b.h":"The family ring","use.b.p":"A family or a team shares one assistant that speaks their language; a weak phone joins by voice and computes nothing.",
-"use.c.h":"Accuracy mode","use.c.p":"Several devices answer the same question and check each other; the answer shows how many agreed — a single device’s mistake is caught before you read it.",
-"cmp.k":"the comparison","road.k":"the plan","faq.k":"questions","s5.h":"Proof, not opinion.","s5.p":"Four arcs answer in parallel; their hidden states vote, and every public-network answer carries a TOPLOC proof that your ring produced it. Disagreement is a feature: you see the split instead of a confident mistake.",
-"nav.try":"Try it tonight","try.h":"Two devices, one ring, wired by hand.","try.p":"The commands are real and the wiring is by hand — that is stage B1. Watch the PC and the laptop close one ring, then stream an answer together.","try.replay":"Replay","try.hint":"Typing is simulated; the commands and the output format are real — the README has the walkthrough.","try.t1":"pc — the head · layers 0:34 + the output head","try.t2":"laptop — layers 34:80","try.hop":"16 KB · QUIC · per hop","try.haiku":"seventy minds, one thought —\nthe ring closes softly,\na lamp in each hand"},
-uz:{"nav.story":"Qanday ishlaydi","nav.lab":"Bo‘lish laboratoriyasi","nav.node":"Node ichida","nav.math":"Matematika","nav.road":"Yo‘l xaritasi","nav.faq":"Savollar","nav.start":"Boshlash",
-"hero.status":"pre-alfa, B1 bosqichi davom etmoqda","hero.h1a":"Har bir qurilma — bitta yoy.","hero.h1b":"Birgalikda — bitta aql.","hero.ph":"Halqadan so‘rang…",
-"chip.ring":"Halqa bitta modelni qanday ishlatadi?","chip.phone":"Eski telefonim rostdan yordam beradimi?","chip.privacy":"So‘rovim uyimdan chiqib ketadimi?",
-"hero.sim":"Bu yerdagi javoblar simulyatsiya; nur har bir tokenning halqa bo‘ylab yo‘lini ko‘rsatadi.","sim":"simulyatsiya",
-"hud.speed":"halqa tezligi","hud.arcs":"yoylar","hud.layers":"qatlamlar","hud.flight":"yo‘lda","copy":"Nusxa","copied":"Nusxalandi",
-"s1.h":"Yetti qurilma, bitta model.","s1.p":"Har bir yoy — modelning 80 qatlamidan bitta qurilmaga tushgan ulush. Uning kattaligi o‘lchangan xotira o‘tkazuvchanligiga qarab belgilanadi.",
-"s2.h":"Yoy ichida — qatlamlar oynasi.","s2.p":"Tokenning yashirin holati qurilmadagi har bir qatlamdan o‘tib yuqoriga ko‘tariladi. Og‘irliklar joyidan qimirlamaydi, faqat holat harakatlanadi.",
-"s3.h":"Keyin 16 KB keyingi qurilmaga o‘tadi.","s3.p":"70B model uchun har bir tokenda tarmoq orqali faqat shuncha ma’lumot o‘tadi, QUIC orqali shifrlangan holda.",
-"s4.h":"Bitta uydan butun dunyoga.","s4.p":"Istalgan NAT ortidagi bo‘sh qurilmalar bitta halqaga qo‘shila oladi. Bu B6 bosqichining maqsadi, hali tayyor funksiya emas.",
-"lab.h":"Halqa tuzing va har bir qatlam qayerga tushishini ko‘ring.","lab.p":"Modelni va qurilmalaringizni tanlang yoki shu brauzerni o‘lchang. Planner rejalashtiruvchi yechadigan muvozanat masalasining aynan o‘zini yechadi.",
-"node.h":"Yoy server stoykasi bo‘lganda.","node.p":"Halqa butun stoykani bitta yoy sifatida qabul qila oladi. Har bir GPU o‘z qatlamlar oynasini oladi, harorat esa yuklamaga ergashadi. Ma’lumotni ko‘rish uchun GPU’ni tanlang.",
-"math.h":"Halqa ortidagi uchta formula.","math.p":"Har biri Omnarc’dagi bitta loyihaviy qarorni belgilaydi. Slayderlarni suring va murosani kuzating.",
-"cmp.h":"Modelni taqsimlashning to‘rt yo‘li.","cmp.p":"Bugungi vositalarning har biri dunyodagi bo‘sh hisoblash quvvatining faqat bir burchagini qamraydi.",
-"road.h":"To‘qqiz bosqich. To‘qqiz gate.","road.p":"Bosqich blog posti chiqqanda emas, ochiq gate’dan o‘tganda tugagan hisoblanadi.","faq.h":"Savollar",
-"cta.h":"Halqangizni<br>bugun tuzing.","cta.p":"Ikki qurilmadan boshlang: klonlang, yig‘ing va qo‘lda ulangan halqani ishga tushiring. Hammasi o‘z kompyuterlaringizda ishlaydi.","cta.b1":"README’ni o‘qish","cta.b2":"GitHub’da yulduzcha",
-"m.t":"Shu brauzer","m.d":"Bu yerda haqiqiy xotira o‘tkazuvchanligini o‘lchang va shu tabni halqaga qo‘shing.","m.b":"Brauzerni o‘lchash","m.again":"Qayta o‘lchash","m.k1":"Backend","m.k2":"Nusxalash tezligi","m.k3":"Xotira byudjeti",
-"m.run":"O‘lchanmoqda… bu tabni ochiq qoldiring.","m.ok":"O‘lchangan qurilma sifatida halqaga qo‘shildi. O‘ngdagi reja endi uni ham hisobga oladi.","m.cpu":"Bu yerda WebGPU yo‘q, shuning uchun CPU yo‘li o‘lchandi.","m.fail":"O‘lchab bo‘lmadi. Boshqa og‘ir tablarni yopib, qayta urinib ko‘ring.","m.name":"Shu brauzer (o‘lchangan)",
-"a.prefill":"prefill","a.done":"token,",
-"thr.dev":"Qurilma","thr.layers":"Qatlamlar","thr.mem":"Xotira","thr.stage":"Bosqich","thr.time":"Vaqt ulushi",
-"lab.k1":"bitta so‘rov","lab.k2":"ko‘p so‘rov","lab.k3":"eng sekin bosqich","lab.k4":"band xotira",
-"row.standby":"zaxirada","plan.and":" va ",
-"plan.base":"{name}: {L} qatlam, har biri {m} GB, {net} orqali. Qatlamlarni ushlab turgan qurilmalar: {n}.",
-"plan.fast":"Bitta so‘rov uchun faqat {used} dan foydalanish {tps} tok/s beradi; sekin yoylar bosqich vaqtini oshiradi.",
-"plan.need":"{name} uchun {gb} GB kerak; bu qurilmalarda {total} GB bo‘sh bor. Yana {more} GB qo‘shing yoki kichikroq model tanlang.",
-"plan.pick":"Kamida bitta qurilma tanlang.","plan.nofit":"{name} hali sig‘mayapti.",
-"ring.many":"tok/s, ko‘p so‘rov",
-"node.drag":"Aylantirish uchun sudrang. GPU’ni tanlang.","node.sm":"132 oqim multiprokssorlari","node.pw":"Quvvat, oxirgi 60 s","node.lim":"chegara 700 vatt",
-"use.k":"kim uchun","use.h":"Bir aql — siz qiladigan ish uchun.","use.p":"Yo‘l xaritasi maqsadlari — B4, B7 va B8 bosqichlari.",
-"use.a.h":"O‘z modellingizdagi agentlar","use.a.p":"OpenClaw, OpenCode va boshqa agentlar frontier-class ochiq model ustida ishlaydi — model sizning kompyuterlaringizga bo‘lingan: tokenga pul yo‘q, limit yo‘q. Bitta kompyuter bunday modelni diskdan faqat oqizadi; klaster esa hammasini xotirada ushlab turadi.",
-"use.b.h":"Oilaviy halqa","use.b.p":"Oilalar va jamoalar o‘z tilida gaplashadigan bitta yordamchini bo‘lishadi; kuchsiz telefon ovoz bilan qo‘shiladi va hech narsa hisoblamaydi.",
-"use.c.h":"Aniqlik rejimi","use.c.p":"Bir nechta qurilma bir savolga parallel javob beradi va bir-birini tekshiradi; javob nechta rozi bo‘lganini ko‘rsatadi — bitta qurilmaning xatosi siz o‘qishdan oldin ushlanadi.",
-"cmp.k":"taqqoslash","road.k":"reja","faq.k":"savollar","s5.h":"Fikr emas — isbot.","s5.p":"To‘rt yoy parallel javob beradi; yashirin holatlari ovoz beradi va ommaviy tarmoqdagi har bir javob TOPLOC isbotini olib yuradi — uni aynan sizning halqangiz yaratganini tasdiqlaydi. Kelishmovchilik xususiyat: ishonchli xato o‘rniga bo‘linishni ko‘rasiz.",
-"nav.try":"Bugun sinab ko‘ring","try.h":"Ikki qurilma, bitta halqa — qo‘lda ulangan.","try.p":"Buyruqlar haqiqiy, ulanish qo‘lda — bu B1 bosqichi. PC va noutbuk bitta halqani qanday yopishi va javobni birgalikda oqizishi shu yerda.","try.replay":"Qayta ijro","try.hint":"Yozish simulyatsiya; buyruqlar va chiqish formati haqiqiy — to‘liq yo‘l xaritasi README’da.","try.t1":"pc — bosh qurilma · 0:34 qatlamlar + chiqish boshi","try.t2":"noutbuk — 34:80 qatlamlar","try.hop":"16 KB · QUIC · har o‘tishda","try.haiku":"yetmish aql, bitta fikr —\nhalqa yumshoq yopiladi,\nhar qo‘lda bitta chiroq"},
-ru:{"nav.story":"Как это работает","nav.lab":"Лаборатория разбиения","nav.node":"Внутри узла","nav.math":"Математика","nav.road":"Дорожная карта","nav.faq":"Вопросы","nav.start":"Начать",
-"hero.status":"пре-альфа, идёт этап B1","hero.h1a":"Каждое устройство — дуга.","hero.h1b":"Вместе — один разум.","hero.ph":"Спросите кольцо…",
-"chip.ring":"Как кольцо запускает одну модель?","chip.phone":"Мой старый телефон правда поможет?","chip.privacy":"Покидает ли мой запрос дом?",
-"hero.sim":"Ответы здесь смоделированы; свет показывает путь каждого токена по кольцу.","sim":"симуляция",
-"hud.speed":"скорость кольца","hud.arcs":"дуги","hud.layers":"слои","hud.flight":"в пути","copy":"Копировать","copied":"Скопировано",
-"s1.h":"Семь устройств, одна модель.","s1.p":"Каждая дуга — доля устройства в 80 слоях модели; её размер зависит от измеренной пропускной способности памяти.",
-"s2.h":"Внутри дуги — окно слоёв.","s2.p":"Скрытое состояние токена поднимается через каждый слой устройства. Веса не перемещаются — движется только состояние.",
-"s3.h":"Затем 16 КБ переходят на следующее устройство.","s3.p":"Для модели 70B это всё, что передаётся по сети на один токен, в зашифрованном виде по QUIC.",
-"s4.h":"От одного дома — ко всему миру.","s4.p":"Простаивающие устройства за любым NAT смогут войти в одно кольцо. Это цель этапа B6, а не готовая функция.",
-"lab.h":"Соберите кольцо и посмотрите, куда попадёт каждый слой.","lab.p":"Выберите модель и устройства или измерьте этот браузер. Планировщик решает ту же задачу балансировки, что и scheduler Omnarc.",
-"node.h":"Когда дуга — это серверная стойка.","node.p":"Кольцо может вместить целую стойку как одну дугу. Каждый GPU берёт своё окно слоёв, а нагрев следует за нагрузкой. Выберите GPU, чтобы увидеть его показатели.",
-"math.h":"Три формулы за кольцом.","math.p":"Каждая определяет одно проектное решение в Omnarc. Двигайте ползунки и смотрите на компромисс.",
-"cmp.h":"Четыре способа распределить модель.","cmp.p":"Сегодняшние инструменты покрывают лишь по одному уголку простаивающих мощностей мира.",
-"road.h":"Девять этапов. Девять гейтов.","road.p":"Этап завершён, когда пройден его публичный гейт, а не когда вышел пост в блоге.","faq.h":"Вопросы",
-"cta.h":"Соберите кольцо<br>сегодня.","cta.p":"Начните с двух устройств: клонируйте, соберите и запустите кольцо, связанное вручную. Всё работает на ваших машинах.","cta.b1":"Читать README","cta.b2":"Звезда на GitHub",
-"m.t":"Этот браузер","m.d":"Измерьте реальную пропускную способность памяти и добавьте эту вкладку в кольцо.","m.b":"Измерить браузер","m.again":"Измерить снова","m.k1":"Бэкенд","m.k2":"Скорость копирования","m.k3":"Бюджет памяти",
-"m.run":"Измеряем… не уходите с этой вкладки.","m.ok":"Добавлено в кольцо как измеренное устройство. План справа теперь его учитывает.","m.cpu":"WebGPU здесь недоступен, поэтому измерен путь через CPU.","m.fail":"Измерение не удалось. Закройте тяжёлые вкладки и попробуйте снова.","m.name":"Этот браузер (измерен)",
-"a.prefill":"префилл","a.done":"токенов за",
-"thr.dev":"Устройство","thr.layers":"Слои","thr.mem":"Память","thr.stage":"Этап","thr.time":"Доля времени",
-"lab.k1":"один запрос","lab.k2":"много запросов","lab.k3":"самый медленный этап","lab.k4":"занятая память",
-"row.standby":"в резерве","plan.and":" и ",
-"plan.base":"{name}: {L} слоёв по {m} ГБ через {net}. Слои держат устройств: {n}.",
-"plan.fast":"Для одного запроса только {used} дали бы {tps} ток/с; медленные дуги добавляют время этапа.",
-"plan.need":"{name} требует {gb} ГБ; на этих устройствах свободно {total} ГБ. Добавьте ещё {more} ГБ или выберите модель поменьше.",
-"plan.pick":"Выберите хотя бы одно устройство.","plan.nofit":"{name} пока не помещается.",
-"ring.many":"ток/с, много запросов",
+"math.h":"Three formulas behind the pool.","math.p":"Each one decides a design choice in Omnarc. Move the sliders and watch the trade-off.",
+"use.k":"who is it for","use.h":"One mind for what you do.","use.p":"Goals of the plan — stages S2, S3 and S4.",
+"use.a.h":"Agents on your own model","use.a.p":"OpenCode, OpenClaw and other agents run on a large open mixture-of-experts model spread across your own computers — no per-token bill, no rate limit. Stage S3 passes when exactly that works on a fixed task set.",
+"use.b.h":"The family pool","use.b.p":"A family or a team pools every device it has, old phones included, and one assistant answers everyone at once, in their own language.",
+"use.c.h":"The night office","use.c.p":"Accounts, quotas and schedules: the office computers serve the team by day and run long jobs at night, with an audit trail.",
+"cmp.k":"the stack","cmp.h":"Built on what already works.","cmp.p":"Omnarc takes the best open-source parts as they are and writes only what none of them does yet.",
+"road.k":"the plan","road.h":"Five stages. Five gates.","road.p":"A stage is done when its gate is measured on real devices and written to bench/ — not when a post goes out.",
+"faq.k":"questions","faq.h":"Questions",
+"try.h":"Two devices, one answer.","try.p":"From S0, 22 October 2026, with plain llama.cpp RPC and no Omnarc code yet: the laptop keeps the core and most experts, and a 32-bit phone holds the experts of layers 0–7 over Wi-Fi. The text is byte for byte what the server writes alone.",
+"try.replay":"Replay","try.hint":"Typing is replayed. The laptop’s command, text and timings are copied from S0’s log; the phone ran llama.cpp’s rpc-server, built for 32-bit ARM.",
+"try.t1":"laptop — the core · experts of layers 8–31","try.t2":"phone — experts of layers 0–7","try.hop":"hidden states · Wi-Fi hotspot",
+"cta.h":"Bring every device<br>tonight.","cta.p":"Start with what you have: a laptop, a phone, a server. The README has S0’s steps, and everything runs on your own machines.","cta.b1":"Read the README","cta.b2":"Star on GitHub"},
+uz:{"nav.story":"Qanday ishlaydi","nav.lab":"Hovuz laboratoriyasi","nav.node":"Yadro","nav.math":"Matematika","nav.road":"Yo‘l xaritasi","nav.faq":"Savollar","nav.start":"Boshlash","nav.try":"Sinab ko‘ring",
+"hero.status":"pre-alfa · S0 bosqichi: o‘lchov","hero.h1a":"Har bir qurilma — bitta yoy.","hero.h1b":"Birgalikda — bitta aql.","hero.ph":"Hovuzdan so‘rang…",
+"chip.ring":"Qurilmalarim bitta modelni qanday bo‘lishadi?","chip.phone":"Eski telefonim rostdan yordam beradimi?","chip.privacy":"So‘rovim uyimdan chiqib ketadimi?",
+"hero.sim":"Bu yerdagi javoblar simulyatsiya; har bir nur chaqnashi — o‘zi tanlagan 8 ta ekspertni uyg‘otayotgan token.","sim":"simulyatsiya",
+"hud.devs":"qurilmalar","hud.experts":"ekspertlar","hud.per":"har tokenda","hud.flight":"yo‘ldagi chaqiruvlar","hud.core":"yadro","copy":"Nusxa","copied":"Nusxalandi",
+"s1.h":"Yuzlab ekspert, bitta model.","s1.p":"Mixture-of-experts modeli — kichik mutaxassislar to‘dasi. Har bir yoy — ulardan bitta qurilmaga tushgan ulush; kattaligi egasi ajratgan xotiraga qarab belgilanadi.",
+"s2.h":"Yadro serverda qoladi.","s2.p":"Attention, yo‘naltirgich (router), umumiy ekspertlar va suhbat xotirasi xotira eng keng joyda turadi. Har bir qatlamda yo‘naltirgich token uchun 256 ekspertdan 8 tasini tanlaydi.",
+"s3.h":"Faqat tanlangan ekspertlar uyg‘onadi.","s3.p":"Bir necha kilobayt yashirin holat ularni ushlab turgan qurilmalarga borib qaytadi. Eng ko‘p chaqiriladigan ekspertlar serverda qoladi: S0 izlarida eng issiq chorak chaqiruvlarning uchdan ikkisini oldi.",
+"s4.h":"Har bir qurilma hovuzga qo‘shiladi.","s4.p":"Eski telefonlar, noutbuklar, kompyuterlar, GPU’li mashinalar va serverlar bitta hovuzga qo‘shiladi. Har biri xotirasi, chipi va aloqasi ko‘tara oladigan qismni oladi; hech biri chetda qolmaydi.",
+"s5.h":"Va’da emas — o‘lchov.","s5.p":"Omnarc ko‘rsatadigan har bir tezlik haqiqiy qurilmalardagi ishga tushirishdan olinadi. S0 da bitta ekspert qadami bitta mashina ichida 0,9 ms, Wi-Fi orqali telefongacha 28 ms, internet orqali esa taxminan 500 ms turdi.",
+"lab.h":"Hovuz tuzing va har bir ekspert qayerga tushishini ko‘ring.","lab.p":"Modelni va qurilmalaringizni tanlang yoki shu brauzerni o‘lchang. Yadro eng tez mashinada ishlaydi; ekspertlar qolgan hammasiga tarqaladi.",
+"lab.mn":"Model va tarmoq","lab.mns":"Taxminan 4 bitli mixture-of-experts modellari. Tarmoq — bitta ekspert qadamining o‘lchangan narxi.",
+"lab.n1":"Bitta mashina","lab.n2":"Wi-Fi","lab.n3":"Internet","lab.dv":"Qurilmalar","lab.dvs":"Har bir ega ajratgan xotira va uning o‘tkazuvchanligi.",
+"lab.f1":"Token har bir <var>L</var> qatlamda <var>E</var> ta ekspertdan <var>k</var> tasini chaqiradi. Yadro ularning eng issiq <var>x</var> ulushini saqlaydi; S0 marshrut izlarida bu ulush chaqiruvlarning <var>h</var>(<var>x</var>) qismiga javob berdi. Qatlamning hamma <var>k</var> eksperti yadroda bo‘lmasa, u tarmoqni kutadi; hammasi yadroda bo‘lgan qadamlar ulushi — <var>s</var>(<var>x</var>):",
+"lab.f2":"<var>h</var> va <var>s</var> GLM-4.7 Flash (tokenga 4 ekspert) va Granite 3B (tokenga 8) dan olingan; <var>t</var><sub>step</sub> — S0 dagi uchta aloqadan.",
+"lab.plan":"Reja","lab.k1":"band xotira","lab.k2":"yadrodagi chaqiruvlar","lab.k3":"tarmoq kutishi / token","lab.k4":"tarmoq vaqti / token",
+"lab.note":"S0 o‘lchovlaridan olingan taxmin, benchmark emas. O‘sha izlarda keyingi qatlam ekspertlarini oldindan so‘rash GLM-4.7 Flash kutishlarini 45 dan taxminan 16 gacha kamaytirdi; planner buni hisobga olmaydi.",
+"thr.dev":"Qurilma","thr.holds":"Nimani ushlaydi","thr.mem":"Xotira","thr.calls":"Chaqiruvlar ulushi",
+"net.loop":"bitta mashina, qadamiga 0,9 ms","net.wifi":"telefongacha Wi-Fi, qadamiga 28 ms","net.wan":"internet, qadamiga taxminan 500 ms",
+"plan.pick":"Kamida bitta qurilma tanlang.",
+"plan.core":"{name} yadrosiga {dev} da {gb} GB kerak — bu yerdagi eng tez qurilma. U yerda ko‘proq xotira bo‘shating yoki kichikroq model tanlang.",
+"plan.whole":"{name} butunligicha {dev} ga sig‘adi, shuning uchun bo‘linmaydi va hech narsa tarmoqni kutmaydi.",
+"plan.copies":"Yana {n} ta qurilma o‘z nusxasini ushlab, bir vaqtda ko‘proq odamga xizmat qila oladi.",
+"plan.need":"{name} uchun {gb} GB kerak; bu qurilmalar {total} GB ajratadi. Yana {more} GB qo‘shing yoki kichikroq model tanlang.",
+"plan.split":"{name}: {L} qatlam × {E} ekspert, har tokenda {k} tasi chaqiriladi; aloqa: {net}. Yadro {dev} da, ekspertlarning eng issiq {hot} qismi bilan.",
+"plan.spare":"Ortib qolgan {gb} GB issiq ekspertlar nusxalarini saqlaydi — qurilma chiqib ketsa ham javob to‘xtamaydi.",
+"row.core":"yadro","row.exp":"ekspert","row.whole":"butun model","row.copy":"nusxa","row.client":"so‘raydi · keshlaydi","ring.waits":"kutish / token",
+"m.t":"Shu brauzer","m.d":"Bu yerda haqiqiy xotira o‘tkazuvchanligini o‘lchang va shu tabni hovuzga qo‘shing.","m.b":"Brauzerni o‘lchash","m.again":"Qayta o‘lchash","m.k1":"Backend","m.k2":"Nusxalash tezligi","m.k3":"Xotira byudjeti",
+"m.run":"O‘lchanmoqda… bu tabni ochiq qoldiring.","m.ok":"O‘lchangan qurilma sifatida hovuzga qo‘shildi. O‘ngdagi reja endi uni ham hisobga oladi.","m.cpu":"Bu yerda WebGPU yo‘q, shuning uchun CPU yo‘li o‘lchandi.","m.fail":"O‘lchab bo‘lmadi. Boshqa og‘ir tablarni yopib, qayta urinib ko‘ring.","m.name":"Shu brauzer (o‘lchangan)",
+"a.prefill":"prefill","a.done":"token,","a.model":"MoE · 256 ekspert · tokenga 8",
+"st8.h":"Bitta so‘rov. Har bir qurilma. Bitta hovuz.","st8.s":"tokenga 256 dan 8 ekspert · faqat yashirin holatlar · shifrlangan tunnel",
+"node.h":"Yadro — server stoyka bo‘lganda.","node.p":"Yadro xotira eng keng joyda ishlaydi: attention, yo‘naltirgich, umumiy ekspertlar va suhbat xotirasi. Stoyka uni GPU’larda ushlaydi, harorat esa yuklamaga ergashadi. Ma’lumotni ko‘rish uchun GPU’ni tanlang.",
+"node.drag":"Aylantirish uchun sudrang. GPU’ni tanlang.","node.sm":"132 oqim multiprotsessori","node.pw":"Quvvat, oxirgi 60 s","node.lim":"chegara 700 vatt",
+"math.h":"Hovuz ortidagi uchta formula.","math.p":"Har biri Omnarc’dagi bitta loyihaviy qarorni belgilaydi. Slayderlarni suring va murosani kuzating.",
+"use.k":"kim uchun","use.h":"Bir aql — siz qiladigan ish uchun.","use.p":"Reja maqsadlari — S2, S3 va S4 bosqichlari.",
+"use.a.h":"O‘z modelingizdagi agentlar","use.a.p":"OpenCode, OpenClaw va boshqa agentlar o‘z kompyuterlaringizga taqsimlangan katta ochiq mixture-of-experts modeli ustida ishlaydi — tokenga pul yo‘q, limit yo‘q. S3 bosqichi aynan shu belgilangan vazifalar to‘plamida ishlaganda o‘tadi.",
+"use.b.h":"Oilaviy hovuz","use.b.p":"Oila yoki jamoa bor qurilmalarini, eski telefonlarni ham, bitta hovuzga jamlaydi, va bitta yordamchi hammaga bir vaqtda, o‘z tilida javob beradi.",
+"use.c.h":"Tungi ofis","use.c.p":"Hisoblar, kvotalar va jadvallar: ofis kompyuterlari kunduzi jamoaga xizmat qiladi, tunda esa uzoq ishlarni bajaradi — hammasi audit iziga yoziladi.",
+"cmp.k":"asos","cmp.h":"Allaqachon ishlaydigan narsalar ustiga qurilgan.","cmp.p":"Omnarc eng yaxshi ochiq manbali qismlarni o‘zgartirmasdan oladi va faqat ularning hech biri hali qilmaydigan narsani yozadi.",
+"road.k":"reja","road.h":"Besh bosqich. Besh gate.","road.p":"Bosqich post chiqqanda emas, uning gate’i haqiqiy qurilmalarda o‘lchanib, bench/ ga yozilganda tugaydi.",
+"faq.k":"savollar","faq.h":"Savollar",
+"try.h":"Ikki qurilma, bitta javob.","try.p":"S0 dan, 2026-yil 22-oktabr, oddiy llama.cpp RPC bilan, hali Omnarc kodisiz: noutbuk yadroni va ekspertlarning ko‘pini ushlaydi, 32 bitli telefon esa Wi-Fi orqali 0–7 qatlam ekspertlarini ushlaydi. Matn server yolg‘iz yozgan matn bilan bayt-baytigacha bir xil.",
+"try.replay":"Qayta ijro","try.hint":"Yozish qayta ijro etiladi. Noutbuk buyrug‘i, matni va vaqtlari S0 jurnalidan olingan; telefonda 32 bitli ARM uchun yig‘ilgan llama.cpp rpc-server ishladi.",
+"try.t1":"noutbuk — yadro · 8–31 qatlam ekspertlari","try.t2":"telefon — 0–7 qatlam ekspertlari","try.hop":"yashirin holatlar · Wi-Fi hotspot",
+"cta.h":"Har bir qurilmani<br>bugun ulang.","cta.p":"Bor narsadan boshlang: noutbuk, telefon, server. S0 qadamlari README’da, hammasi o‘z mashinalaringizda ishlaydi.","cta.b1":"README’ni o‘qish","cta.b2":"GitHub’da yulduzcha"},
+ru:{"nav.story":"Как это работает","nav.lab":"Лаборатория пула","nav.node":"Ядро","nav.math":"Математика","nav.road":"Дорожная карта","nav.faq":"Вопросы","nav.start":"Начать","nav.try":"Попробуйте",
+"hero.status":"пре-альфа · этап S0: измерения","hero.h1a":"Каждое устройство — дуга.","hero.h1b":"Вместе — один разум.","hero.ph":"Спросите пул…",
+"chip.ring":"Как мои устройства делят одну модель?","chip.phone":"Мой старый телефон правда поможет?","chip.privacy":"Покидает ли мой запрос дом?",
+"hero.sim":"Ответы здесь смоделированы; каждая вспышка — токен, будящий 8 выбранных им экспертов.","sim":"симуляция",
+"hud.devs":"устройства","hud.experts":"эксперты","hud.per":"на токен","hud.flight":"вызовов в пути","hud.core":"ядро","copy":"Копировать","copied":"Скопировано",
+"s1.h":"Сотни экспертов, одна модель.","s1.p":"Модель mixture-of-experts — это толпа небольших специалистов. Каждая дуга — доля одного устройства, её размер зависит от памяти, которую выделил владелец.",
+"s2.h":"Ядро остаётся на сервере.","s2.p":"Attention, маршрутизатор (router), общие эксперты и память диалога живут там, где память шире всего. На каждом слое маршрутизатор выбирает для токена 8 из 256 экспертов.",
+"s3.h":"Просыпаются только выбранные эксперты.","s3.p":"Несколько килобайт скрытого состояния уходят к устройствам, где лежат эти эксперты, и возвращаются. Самые востребованные эксперты остаются на сервере: в трассах S0 самая горячая четверть взяла две трети вызовов.",
+"s4.h":"Каждое устройство входит в пул.","s4.p":"Старые телефоны, ноутбуки, компьютеры, машины с GPU и серверы входят в один пул. Каждое берёт ту часть, которую выдержат его память, чип и связь; никто не остаётся в стороне.",
+"s5.h":"Измерено, а не обещано.","s5.p":"Каждая скорость, которую показывает Omnarc, взята из запуска на реальных устройствах. В S0 один шаг эксперта стоил 0,9 мс внутри одной машины, 28 мс до телефона по Wi-Fi и около 500 мс через интернет.",
+"lab.h":"Соберите пул и посмотрите, куда попадёт каждый эксперт.","lab.p":"Выберите модель и устройства или измерьте этот браузер. Ядро работает на самой быстрой машине, эксперты распределяются по всем остальным.",
+"lab.mn":"Модель и сеть","lab.mns":"Модели mixture-of-experts примерно в 4 битах. Сеть — измеренная цена одного шага эксперта.",
+"lab.n1":"Одна машина","lab.n2":"Wi-Fi","lab.n3":"Интернет","lab.dv":"Устройства","lab.dvs":"Память, которую выделяет каждый владелец, и её пропускная способность.",
+"lab.f1":"Токен вызывает <var>k</var> из <var>E</var> экспертов на каждом из <var>L</var> слоёв. Ядро хранит самую горячую долю <var>x</var>; в трассах маршрутизации S0 эта доля ответила на долю <var>h</var>(<var>x</var>) вызовов. Слой ждёт сеть, если не все его <var>k</var> экспертов на ядре; доля шагов, где все на ядре, — <var>s</var>(<var>x</var>):",
+"lab.f2":"<var>h</var> и <var>s</var> взяты из GLM-4.7 Flash (4 эксперта на токен) и Granite 3B (8 на токен); <var>t</var><sub>step</sub> — из трёх каналов S0.",
+"lab.plan":"План","lab.k1":"занятая память","lab.k2":"вызовов на ядре","lab.k3":"ожиданий сети / токен","lab.k4":"время сети / токен",
+"lab.note":"Оценка по измерениям S0, а не бенчмарк. Предзагрузка экспертов следующего слоя сократила ожидания GLM-4.7 Flash с 45 примерно до 16 в тех же трассах; планировщик этого не учитывает.",
+"thr.dev":"Устройство","thr.holds":"Что держит","thr.mem":"Память","thr.calls":"Доля вызовов",
+"net.loop":"одна машина, 0,9 мс на шаг","net.wifi":"Wi-Fi до телефона, 28 мс на шаг","net.wan":"интернет, около 500 мс на шаг",
+"plan.pick":"Выберите хотя бы одно устройство.",
+"plan.core":"Ядру {name} нужно {gb} ГБ на {dev} — самом быстром устройстве здесь. Освободите там память или выберите модель поменьше.",
+"plan.whole":"{name} целиком помещается на {dev}, поэтому не делится и ничего не ждёт сеть.",
+"plan.copies":"Ещё {n} устройств могут держать свою копию и обслуживать больше людей одновременно.",
+"plan.need":"{name} требует {gb} ГБ; эти устройства выделяют {total} ГБ. Добавьте ещё {more} ГБ или выберите модель поменьше.",
+"plan.split":"{name}: {L} слоёв × {E} экспертов, {k} вызываются на токен; связь: {net}. Ядро на {dev} вместе с самыми горячими {hot} экспертов.",
+"plan.spare":"Свободные {gb} ГБ хранят копии горячих экспертов — если устройство уйдёт, ответ не остановится.",
+"row.core":"ядро","row.exp":"экспертов","row.whole":"вся модель","row.copy":"копия","row.client":"спрашивает · кэширует","ring.waits":"ожиданий / токен",
+"m.t":"Этот браузер","m.d":"Измерьте реальную пропускную способность памяти и добавьте эту вкладку в пул.","m.b":"Измерить браузер","m.again":"Измерить снова","m.k1":"Бэкенд","m.k2":"Скорость копирования","m.k3":"Бюджет памяти",
+"m.run":"Измеряем… не уходите с этой вкладки.","m.ok":"Добавлено в пул как измеренное устройство. План справа теперь его учитывает.","m.cpu":"WebGPU здесь недоступен, поэтому измерен путь через CPU.","m.fail":"Измерение не удалось. Закройте тяжёлые вкладки и попробуйте снова.","m.name":"Этот браузер (измерен)",
+"a.prefill":"префилл","a.done":"токенов за","a.model":"MoE · 256 экспертов · 8 на токен",
+"st8.h":"Один запрос. Каждое устройство. Один пул.","st8.s":"8 из 256 экспертов на токен · только скрытые состояния · зашифрованный туннель",
+"node.h":"Ядро, когда сервер — это стойка.","node.p":"Ядро работает там, где память шире всего: attention, маршрутизатор, общие эксперты и память диалога. Стойка держит его на GPU, а нагрев следует за нагрузкой. Выберите GPU, чтобы увидеть его показатели.",
 "node.drag":"Потяните, чтобы повернуть. Кликните по GPU.","node.sm":"132 потоковых мультипроцессора","node.pw":"Мощность, последние 60 с","node.lim":"лимит 700 Вт",
-"use.k":"для кого","use.h":"Один разум для ваших задач.","use.p":"Цели дорожной карты — этапы B4, B7 и B8.",
-"use.a.h":"Агенты на своей модели","use.a.p":"OpenClaw, OpenCode и другие агенты работают на opensource-модели переднего уровня, распределённой по вашим машинам — без платы за токены и лимитов. Один компьютер может лишь стримить такую модель с диска; кластер держит её целиком в памяти.",
-"use.b.h":"Семейное кольцо","use.b.p":"Семья или команда делят одного ассистента, говорящего на их языке; слабый телефон подключается голосом и ничего не считает.",
-"use.c.h":"Режим точности","use.c.p":"Несколько устройств отвечают на один вопрос параллельно и проверяют друг друга; в ответе видно, сколько их сошлось — ошибка одного устройства ловится раньше, чем вы её прочтёте.",
-"cmp.k":"сравнение","road.k":"план","faq.k":"вопросы","s5.h":"Доказательство, а не мнение.","s5.p":"Четыре дуги отвечают параллельно; их скрытые состояния голосуют, и каждый ответ в публичной сети несёт доказательство TOPLOC, что его создало ваше кольцо. Расхождение — это функция: вы видите раскол вместо уверенной ошибки.",
-"nav.try":"Попробуйте сегодня","try.h":"Два устройства, одно кольцо — соединённые вручную.","try.p":"Команды настоящие, соединение вручную — это этап B1. Посмотрите, как ПК и ноутбук замыкают одно кольцо и вместе стримят ответ.","try.replay":"Повторить","try.hint":"Набор симулирован; команды и формат вывода настоящие — полный путь в README.","try.t1":"пк — голова · слои 0:34 + выходная голова","try.t2":"ноутбук — слои 34:80","try.hop":"16 КБ · QUIC · за переход","try.haiku":"семьдесят умов, одна мысль —\nкольцо тихо замыкается,\nлампа в каждой руке"}
+"math.h":"Три формулы за пулом.","math.p":"Каждая определяет одно проектное решение в Omnarc. Двигайте ползунки и смотрите на компромисс.",
+"use.k":"для кого","use.h":"Один разум для ваших задач.","use.p":"Цели плана — этапы S2, S3 и S4.",
+"use.a.h":"Агенты на своей модели","use.a.p":"OpenCode, OpenClaw и другие агенты работают на большой открытой модели mixture-of-experts, распределённой по вашим компьютерам, — без платы за токены и без лимитов. Этап S3 пройден, когда именно это работает на фиксированном наборе задач.",
+"use.b.h":"Семейный пул","use.b.p":"Семья или команда объединяет все свои устройства, включая старые телефоны, и один ассистент отвечает всем сразу, на их языке.",
+"use.c.h":"Ночной офис","use.c.p":"Учётные записи, квоты и расписания: днём офисные компьютеры обслуживают команду, ночью выполняют долгие задачи — с журналом аудита.",
+"cmp.k":"основа","cmp.h":"Построено на том, что уже работает.","cmp.p":"Omnarc берёт лучшие открытые компоненты как есть и пишет только то, чего пока не делает ни один из них.",
+"road.k":"план","road.h":"Пять этапов. Пять гейтов.","road.p":"Этап завершён, когда его гейт измерен на реальных устройствах и записан в bench/, а не когда вышел пост.",
+"faq.k":"вопросы","faq.h":"Вопросы",
+"try.h":"Два устройства, один ответ.","try.p":"Из S0, 22 октября 2026 года, на чистом llama.cpp RPC, ещё без кода Omnarc: ноутбук держит ядро и большинство экспертов, а 32-битный телефон по Wi-Fi держит экспертов слоёв 0–7. Текст байт в байт совпадает с тем, что пишет один сервер.",
+"try.replay":"Повторить","try.hint":"Набор воспроизводится. Команда, текст и тайминги ноутбука скопированы из журнала S0; на телефоне работал rpc-server из llama.cpp, собранный для 32-битного ARM.",
+"try.t1":"ноутбук — ядро · эксперты слоёв 8–31","try.t2":"телефон — эксперты слоёв 0–7","try.hop":"скрытые состояния · Wi-Fi-точка",
+"cta.h":"Подключите каждое<br>устройство сегодня.","cta.p":"Начните с того, что есть: ноутбук, телефон, сервер. Шаги S0 — в README, и всё работает на ваших машинах.","cta.b1":"Читать README","cta.b2":"Звезда на GitHub"}
 };
 const ANS={
-en:{ring:"A model is a stack of layers. Omnarc measures each device and gives it a window of layers in proportion to its memory bandwidth: the server here holds 24, the phone holds 4. When you ask something, the server embeds your words and runs its window, then sends a 16 KB hidden state to the next device. Each one adds its layers and passes it on. When the state comes back around, the server turns it into the next token, and the trip starts again.",
-phone:"Yes, within limits. A phone with 12 GB of RAM can spare about 6 GB, which holds a few layers of a 70B model. Its memory bandwidth is low, so it gets a small arc, and the planner may leave it on standby when speed matters more than memory. Weak phones can also join by voice only: they send your question and play the answer while the ring computes.",
-privacy:"On your own network, nothing leaves it: every hop between your devices is encrypted QUIC on your LAN. On the public network, raw text stays on your device; other devices only see hidden states, and every answer carries a TOPLOC proof that your ring produced it. Omnarc sends no telemetry.",
-trace:n=>`Your prompt is about ${n} tokens. The server holds layers 0–23 and the output head, so it embedded the prompt and ran the first window. The hidden state then made six hops, through the pc, nas, laptop, tablet, phone and browser, each adding its layers. Every word streaming here made that trip once.\n\nThis answer is simulated. Build Omnarc and run omnarc-node ring to get real answers from your own devices.`},
-uz:{ring:"Model — bu qatlamlar to‘plami. Omnarc har bir qurilmani o‘lchaydi va xotira o‘tkazuvchanligiga mos ravishda unga qatlamlar oynasini beradi: bu yerda server 24 ta, telefon esa 4 ta qatlamni ushlab turadi. Siz savol berganingizda server so‘zlaringizni embedding qiladi, o‘z oynasini hisoblaydi va 16 KB yashirin holatni keyingi qurilmaga yuboradi. Har bir qurilma o‘z qatlamlarini qo‘shib, uni uzatadi. Holat aylanib qaytganda server undan keyingi tokenni chiqaradi va yo‘l yana boshlanadi.",
-phone:"Ha, ma’lum chegarada. 12 GB operativ xotirali telefon taxminan 6 GB ajrata oladi, bu 70B modelning bir necha qatlamiga yetadi. Uning xotira o‘tkazuvchanligi past, shuning uchun unga kichik yoy tegadi. Tezlik xotiradan muhimroq bo‘lganda planner uni kutish rejimida qoldirishi mumkin. Kuchsiz telefonlar faqat ovoz orqali ham qo‘shila oladi: ular savolingizni yuboradi va halqa hisoblayotganda javobni o‘qib beradi.",
-privacy:"O‘z tarmog‘ingizda hech narsa tashqariga chiqmaydi: qurilmalaringiz orasidagi har bir o‘tish lokal tarmoqda shifrlangan QUIC orqali bo‘ladi. Ommaviy tarmoqda esa xom matn qurilmangizda qoladi; boshqa qurilmalar faqat yashirin holatlarni ko‘radi va har bir javobda uni sizning halqangiz yaratganini tasdiqlovchi TOPLOC isboti bo‘ladi. Omnarc hech qanday telemetriya yubormaydi.",
-trace:n=>`So‘rovingiz taxminan ${n} tokendan iborat. Server 0–23 qatlamlarni va chiqish boshini ushlab turadi, shuning uchun so‘rovni u embedding qildi va birinchi oynani hisobladi. Keyin yashirin holat olti marta o‘tdi: pc, nas, noutbuk, planshet, telefon va brauzer orqali, har biri o‘z qatlamlarini qo‘shdi. Bu yerda chiqayotgan har bir so‘z shu yo‘lni bir marta bosib o‘tdi.\n\nBu javob simulyatsiya. Omnarc’ni yig‘ing va o‘z qurilmalaringizdan haqiqiy javob olish uchun omnarc-node ring’ni ishga tushiring.`},
-ru:{ring:"Модель — это стопка слоёв. Omnarc измеряет каждое устройство и выдаёт ему окно слоёв пропорционально пропускной способности памяти: здесь сервер держит 24 слоя, телефон — 4. Когда вы задаёте вопрос, сервер превращает слова в эмбеддинги, прогоняет своё окно и отправляет 16 КБ скрытого состояния следующему устройству. Каждое добавляет свои слои и передаёт дальше. Когда состояние возвращается, сервер выдаёт следующий токен, и путь начинается снова.",
-phone:"Да, в пределах возможностей. Телефон с 12 ГБ оперативной памяти может выделить около 6 ГБ — этого хватает на несколько слоёв модели 70B. Пропускная способность памяти у него низкая, поэтому он получает маленькую дугу, а когда скорость важнее памяти, планировщик может оставить его в резерве. Слабые телефоны могут подключиться только голосом: они отправляют вопрос и озвучивают ответ, пока считает кольцо.",
-privacy:"Внутри вашей сети ничего её не покидает: каждый переход между устройствами идёт по зашифрованному QUIC в локальной сети. В публичной сети исходный текст остаётся на вашем устройстве; другие видят только скрытые состояния, а каждый ответ содержит доказательство TOPLOC, что его создало ваше кольцо. Omnarc не отправляет телеметрию.",
-trace:n=>`Ваш запрос — примерно ${n} токенов. Сервер держит слои 0–23 и выходную голову, поэтому он превратил запрос в эмбеддинги и прогнал первое окно. Затем скрытое состояние сделало шесть переходов — через pc, nas, ноутбук, планшет, телефон и браузер, — и каждое устройство добавило свои слои. Каждое слово, которое здесь появляется, прошло этот путь один раз.\n\nЭтот ответ смоделирован. Соберите Omnarc и запустите omnarc-node ring, чтобы получать настоящие ответы от своих устройств.`}
+en:{ring:"A mixture-of-experts model is a crowd of small specialists. Your server keeps the core: attention, the router, the shared experts and the conversation’s memory. The experts are spread over every device you have, each holding as many as its owner lends memory for. For every token, at every layer, the router picks 8 of the 256 experts, and only a few kilobytes of hidden state travel to the devices that hold them and back. The experts called most stay on the server, so most steps never touch the network.",
+phone:"Yes. Every device joins the pool and takes a part it can carry: a few experts, a cache, a copy. In S0 a 32-bit phone with 1.4 GB free held the experts of eight layers over Wi-Fi; each step cost about 28 ms, and the answer was the same text the server writes alone. A phone in its owner’s hand runs slower, so the pool measures it live and keeps copies elsewhere.",
+privacy:"Your words reach only your pool’s server — a machine you own or run. Expert devices receive hidden states for the layers they hold, never your text. The links run inside an encrypted tunnel, and Omnarc sends no telemetry.",
+trace:n=>`Your prompt is about ${n} tokens. The server read it whole and keeps the conversation’s memory. For every word streaming here, 8 of 256 experts woke at each layer — the bursts of light on the ring. Most were hot experts on the server itself; the rest were a few kilobytes away on your other devices.\n\nThis answer is simulated. The Try it section below shows a real run from S0.`},
+uz:{ring:"Mixture-of-experts modeli — kichik mutaxassislar to‘dasi. Serveringiz yadroni ushlaydi: attention, yo‘naltirgich, umumiy ekspertlar va suhbat xotirasi. Ekspertlar bor qurilmalaringizning hammasiga tarqalgan — har biri egasi qancha xotira ajratsa, shuncha ekspertni ushlaydi. Har bir token uchun har bir qatlamda yo‘naltirgich 256 ekspertdan 8 tasini tanlaydi va faqat bir necha kilobayt yashirin holat ularni ushlab turgan qurilmalarga borib qaytadi. Eng ko‘p chaqiriladigan ekspertlar serverda qoladi, shuning uchun qadamlarning ko‘pi tarmoqqa umuman chiqmaydi.",
+phone:"Ha. Har bir qurilma hovuzga qo‘shiladi va ko‘tara oladigan qismni oladi: bir necha ekspert, kesh yoki nusxa. S0 da 1,4 GB bo‘sh xotirali 32 bitli telefon Wi-Fi orqali sakkiz qatlam ekspertlarini ushladi; har bir qadam taxminan 28 ms turdi, javob esa server yolg‘iz yozgan matn bilan bir xil chiqdi. Egasi qo‘lidagi telefon sekinroq ishlaydi, shuning uchun hovuz uni jonli o‘lchaydi va boshqa joyda nusxa saqlaydi.",
+privacy:"So‘zlaringiz faqat hovuzingiz serveriga yetadi — o‘zingizniki yoki o‘zingiz boshqaradigan mashina. Ekspert qurilmalari faqat o‘zlaridagi qatlamlar uchun yashirin holatlarni oladi, matningizni hech qachon ko‘rmaydi. Aloqalar shifrlangan tunnel ichida yuradi, Omnarc hech qanday telemetriya yubormaydi.",
+trace:n=>`So‘rovingiz taxminan ${n} tokendan iborat. Server uni butunligicha o‘qidi va suhbat xotirasini saqlaydi. Bu yerda chiqayotgan har bir so‘z uchun har bir qatlamda 256 ekspertdan 8 tasi uyg‘ondi — halqadagi nur chaqnashlari shular. Ularning ko‘pi serverning o‘zidagi issiq ekspertlar edi; qolganlari boshqa qurilmalaringizda, bir necha kilobayt narida.\n\nBu javob simulyatsiya. Pastdagi «Sinab ko‘ring» bo‘limida S0 dagi haqiqiy ishga tushirish bor.`},
+ru:{ring:"Модель mixture-of-experts — это толпа небольших специалистов. Ваш сервер держит ядро: attention, маршрутизатор, общие эксперты и память диалога. Эксперты распределены по всем вашим устройствам — каждое держит столько, на сколько владелец выделил памяти. Для каждого токена на каждом слое маршрутизатор выбирает 8 из 256 экспертов, и лишь несколько килобайт скрытого состояния уходят к устройствам, где они лежат, и обратно. Самые востребованные эксперты остаются на сервере, поэтому большинство шагов вообще не выходит в сеть.",
+phone:"Да. Каждое устройство входит в пул и берёт посильную часть: несколько экспертов, кэш, копию. В S0 32-битный телефон с 1,4 ГБ свободной памяти держал экспертов восьми слоёв по Wi-Fi; каждый шаг стоил около 28 мс, а ответ совпал с текстом, который пишет один сервер. Телефон в руках владельца работает медленнее, поэтому пул измеряет его на лету и держит копии в другом месте.",
+privacy:"Ваши слова доходят только до сервера вашего пула — машины, которая принадлежит вам или которой вы управляете. Устройства с экспертами получают лишь скрытые состояния своих слоёв и никогда не видят текст. Связь идёт внутри зашифрованного туннеля, Omnarc не отправляет телеметрию.",
+trace:n=>`Ваш запрос — примерно ${n} токенов. Сервер прочитал его целиком и хранит память диалога. Для каждого слова, которое здесь появляется, на каждом слое просыпались 8 из 256 экспертов — это вспышки на кольце. Большинство были горячими экспертами на самом сервере, остальные — в нескольких килобайтах, на других ваших устройствах.\n\nЭтот ответ смоделирован. Настоящий запуск из S0 — ниже, в разделе «Попробуйте».`}
 };
 let LANG='en';
 const t=k=>(T[LANG]&&T[LANG][k])||T.en[k]||k;
@@ -1957,21 +2035,19 @@ function chat(H){
     if(busy)return;busy=true;send.disabled=true;chips.querySelectorAll('button').forEach(b=>b.disabled=true);
     box.classList.add('on');q.textContent=question;txt.textContent='';txt.classList.add('typing');
     const nIn=Math.max(1,Math.round(question.length/4));
-    meta.textContent=`Llama 8B · 7 arcs · ${t('a.prefill')} ${nIn}`;
+    meta.textContent=`${t('a.model')} · ${t('a.prefill')} ${nIn}`;
     H.streaming=true;H.spawn({big:true});
     await sleep(reduceMotion?0:900);
     const toks=answer.match(/\s+|[^\s]+/g)||[];let k=0;const t0=performance.now();
-    const tokEl=$('#hudTok');
     for(const tk of toks){
       if(/^\s+$/.test(tk)){txt.appendChild(document.createTextNode(tk));continue;}
       const s=document.createElement('span');s.className='tk';s.textContent=tk;txt.appendChild(s);k++;
       if(k%2===1)H.spawn();
       box.scrollTop=box.scrollHeight;
-      if(k%6===0){const el=(performance.now()-t0)/1000;tokEl.textContent=(k*1.3/el).toFixed(1)+' tok/s';}
       if(!reduceMotion)await sleep(36+Math.random()*38);
     }
     const secs=((performance.now()-t0)/1000).toFixed(1);
-    txt.classList.remove('typing');meta.textContent=`Llama 8B · ${Math.round(k*1.3)} ${t('a.done')} ${secs} s`;
+    txt.classList.remove('typing');meta.textContent=`${t('a.model')} · ${Math.round(k*1.3)} ${t('a.done')} ${secs} s`;
     H.streaming=false;busy=false;grow();chips.querySelectorAll('button').forEach(b=>b.disabled=false);
   }
   form.addEventListener('submit',e=>{e.preventDefault();const v=inp.value.trim();if(!v||busy)return;inp.value='';grow();
@@ -1998,7 +2074,7 @@ function story(){
   const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(6,12,8);scene.add(key);
   const COLS=[0x1be480,0x2fc983,0x9fbf3a,0x1a8f8f,0x2b5f9e,0x5b8fd0,0xc99a2e],SH=[24,20,15,10,5,4,3];
   /* 1. ring */
-  let storyGrid=null,live=null;
+  let storyGrid=null,live=null,zap=null,coreC=null;
   const ring=new THREE.Group();scene.add(ring);const R=6;
   {let a=0;const gap=.06,span=Math.PI*2-gap*7,sArcs=[];
    const IDS=['server','pc','nas','laptop','tablet','phone','browser'];
@@ -2014,8 +2090,10 @@ function story(){
      halo.rotation.x=Math.PI/2;halo.position.set(x0,-.39,z0);ring.add(halo);
      a=a1+gap;});
    live=livingArcs(R,sArcs,{count:innerWidth>700?20000:11000,glow:innerWidth>700?1900:1100,flow:SH.map((n,i)=>.03*(1-i*.09))});ring.add(live.points);
+   coreC=coreCluster({leds:sLed,fans:sFan,floaters:sFloat},.85);coreC.group.position.y=-.42;ring.add(coreC.group);
+   zap=lightning(R,sArcs,{k:8,hot:.6,from:new THREE.Vector3(0,-.42+coreC.top.y,0)});ring.add(zap.points);
    const g=new THREE.PolarGridHelper(13,24,8,96,0x1c3a2b,0x112419);g.position.y=-.42;g.material.transparent=true;g.material.opacity=.5;ring.add(g);storyGrid=g;}
-  const rc=pointCloud(4*24);ring.add(rc);const rcA=[0,1.6,3.2,4.7];
+  let nextBurst=0;
   /* 2. layer stack */
   const stack=new THREE.Group();stack.position.set(0,0,-44);scene.add(stack);
   const NL=10,plates=[];
@@ -2051,7 +2129,7 @@ function story(){
   const pkPath=new THREE.CatmullRomCurve3([new THREE.Vector3(0,NL*.8,-44),new THREE.Vector3(3,10,-62),new THREE.Vector3(-2,13,-84),nodes[0]?nodes[0].clone().add(globe.position):new THREE.Vector3(0,10,-108)]);
   const trailGeo=new THREE.BufferGeometry().setFromPoints(pkPath.getPoints(120));
   scene.add(new THREE.Line(trailGeo,new THREE.LineDashedMaterial({color:0xe2b13c,dashSize:.6,gapSize:.4,transparent:true,opacity:.7})).computeLineDistances());
-  const pkTag=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(512,128,g=>{g.fillStyle='rgba(7,17,13,.75)';g.fillRect(0,20,512,88);g.strokeStyle='#e2b13c';g.lineWidth=3;g.strokeRect(2,22,508,84);g.fillStyle='#f3d58a';g.font='600 46px monospace';g.fillText('16 KB · QUIC · ✓',22,82);}),transparent:true,depthWrite:false}));
+  const pkTag=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(512,128,g=>{g.fillStyle='rgba(7,17,13,.75)';g.fillRect(0,20,512,88);g.strokeStyle='#e2b13c';g.lineWidth=3;g.strokeRect(2,22,508,84);g.fillStyle='#f3d58a';g.font='600 46px monospace';g.fillText('8 of 256 · ✓',22,82);}),transparent:true,depthWrite:false}));
   pkTag.scale.set(4.4,1.1,1);scene.add(pkTag);
   const pkTrail=pointCloud(40);scene.add(pkTrail);const pkHist=[];
   /* stars */
@@ -2061,7 +2139,7 @@ function story(){
   /* stage 5 — the vote: four arcs answer, one proof */
   const voteSpr=new THREE.Sprite(new THREE.SpriteMaterial({map:radialTex('rgba(226,177,60,.95)','rgba(226,177,60,0)'),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));
   voteSpr.scale.set(3.2,3.2,1);voteSpr.position.copy(nodes[0]);globe.add(voteSpr);
-  const voteTag=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(512,128,g=>{g.fillStyle='rgba(7,17,13,.8)';g.fillRect(0,22,512,84);g.strokeStyle='#1be480';g.lineWidth=3;g.strokeRect(2,24,508,80);g.fillStyle='#b9f4d6';g.font='600 44px monospace';g.fillText('TOPLOC ✓ 4/4',22,82);}),transparent:true,depthWrite:false}));
+  const voteTag=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(512,128,g=>{g.fillStyle='rgba(7,17,13,.8)';g.fillRect(0,22,512,84);g.strokeStyle='#1be480';g.lineWidth=3;g.strokeRect(2,24,508,80);g.fillStyle='#b9f4d6';g.font='600 44px monospace';g.fillText('measured · S0 ✓',22,82);}),transparent:true,depthWrite:false}));
   voteTag.scale.set(3.7,.92,1);scene.add(voteTag);voteTag.visible=false;
 
   /* camera keys */
@@ -2082,11 +2160,10 @@ function story(){
     T+=dt;const target=prog();sp=reduceMotion?target:lerp(sp,target,1-Math.exp(-dt*7));if(dt===0)sp=target;
     setStage(target);camAt(sp);
     cam.position.set(cp.x+mp.x*.8,cp.y-mp.y*.5,cp.z);cam.lookAt(cl);
-    /* ring comets */
-    {const P=rc.geometry.attributes.position.array,C=rc.geometry.attributes.aColor.array,S=rc.geometry.attributes.size.array,A=rc.geometry.attributes.alpha.array;
-     rcA.forEach((a0,c)=>{const a=a0+T*.8;for(let j=0;j<24;j++){const k=c*24+j,x=a-j*.03,f=1-j/24;P[k*3]=Math.cos(x)*R;P[k*3+1]=.22;P[k*3+2]=Math.sin(x)*R;const w=j?.15*f:.8;C[k*3]=lerp(.89,1,w);C[k*3+1]=lerp(.69,.97,w);C[k*3+2]=lerp(.24,.88,w);S[k]=j?2.6*f+.3:5;A[k]=j?f*f*.85:1;}});
-     ['position','aColor','size','alpha'].forEach(n=>rc.geometry.attributes[n].needsUpdate=true);}
-    live.set(T,reduceMotion?1:clamp(T/2.6,0,1),rcA.flatMap(a0=>[a0+T*.8,1]),null,-1);
+    /* tokens: each wakes 8 experts on the ring */
+    if(!reduceMotion&&T>=nextBurst){zap.fire(T);nextBurst=T+.7;}
+    const zk=zap.update(T,dt);coreC.pulse(zk.flash,T);
+    live.set(T,reduceMotion?1:clamp(T/2.6,0,1),zk.toks,null,-1);
     ring.rotation.y=T*.05;
     /* token climbs the stack in .26–.52, loops locally otherwise */
     const lp=clamp((sp-.26)/.24,0,1),ty=-.6+lp*(NL*.8+.4)+(sp<.26?0:0);
@@ -2188,7 +2265,6 @@ function measure(LAB){
     const on=scrollY>innerHeight*.9&&!shown? true : scrollY<=innerHeight*.9? false : hud.classList.contains('on');
     hud.classList.toggle('on',scrollY>innerHeight*.9);shown=scrollY>innerHeight*.9;
   },{passive:true});
-  setInterval(()=>{const t=window.__ringTok;if(t&&hud.classList.contains('on'))b.textContent=t.toFixed(1)+' tok/s';},700);
 })();
 
 /* ───────── try it: ikki qurilma bitta halqani yopadi ───────── */
@@ -2212,9 +2288,11 @@ function tryit(){
     d.removeChild(cur);scroll(el);
     return true;
   }
+  /* the prompt and the 24 tokens the laptop and the phone wrote together in S0 (same text as the server alone) */
+  const PROMPT='The history of the city begins in the early medieval period, when',OUT=' it was a small village. In the 12th century, it became a market town and a center';
   async function streamTok(el,my){
-    const d=document.createElement('div');d.appendChild(cur);el.appendChild(d);scroll(el);
-    for(const w of t('try.haiku').split(/(\s+)/)){
+    const d=document.createElement('div');d.appendChild(document.createTextNode(PROMPT));d.appendChild(cur);el.appendChild(d);scroll(el);
+    for(const w of OUT.split(/(\s+)/)){
       if(my!==run)return false;
       if(w.trim()){const s=document.createElement('span');s.className='tl-tok';s.textContent=w;d.insertBefore(s,cur);}
       else d.insertBefore(document.createTextNode(w),cur);
@@ -2225,28 +2303,14 @@ function tryit(){
     return true;
   }
   function scriptA(){return[
-    {c:'git clone https://github.com/HumoyunDavronov2001/omnarc.git',d:380,o:'Cloning into \'omnarc\'... done.'},
-    {c:'cd omnarc',d:220},
-    {c:'cargo build -r -p omnarc-node',d:860,o:'   Compiling omnarc-node v0.1.0\n    Finished `release` profile [optimized]'},
-    {c:'omnarc-node ring --model llama-3.3-70b.Q4_K_M.gguf \\\n      --layers 0:34 --next 7f3a@192.168.1.12:7700 --prev 7f3a \\\n      --prompt "Write a haiku about many small things becoming one." --generate 24',d:560},
-    {ok:'omnarc: layers 0:34 loaded on cuda',d:340},
-    {ok:'omnarc: node b1e2 listening on 0.0.0.0:7700',d:260},
-    {ok:'omnarc: ring session started',d:480},
-    {tok:1,d:130},
-    {o:'omnarc: 9 prompt tokens, 24 generated; first token after 341 ms',d:240},
-    {o:'omnarc: 118.8 ms per output token (8.4 tokens/s)',d:0}
+    {c:'./llama-completion -m granite-3b-a800m-Q4_K_M.gguf -t 4 -ngl 0 \\\n    --rpc 192.168.43.145:50052 \\\n    -ot "blk\\.(0|1|2|3|4|5|6|7)\\.ffn_.*_exps\\.weight=RPC0[192.168.43.145:50052]" \\\n    -n 24 -no-cnv --temp 0 \\\n    -p "The history of the city begins in the early medieval period, when"',d:1500},
+    {tok:1,d:900},
+    {o:'common_perf_print: prompt eval time =    4575.98 ms /    15 tokens (  305.07 ms per token,     3.28 tokens per second)',d:260},
+    {o:'common_perf_print:        eval time =    5734.72 ms /    23 runs   (  249.34 ms per token,     4.01 tokens per second)',d:0}
   ];}
   function scriptB(){return[
-    {c:'git clone https://github.com/HumoyunDavronov2001/omnarc.git',d:380,o:'Cloning into \'omnarc\'... done.'},
-    {c:'cd omnarc',d:220},
-    {c:'cargo build -r -p omnarc-node',d:860,o:'   Compiling omnarc-node v0.1.0\n    Finished `release` profile [optimized]'},
-    {c:'omnarc-node ring --model llama-3.3-70b.Q4_K_M.gguf \\\n      --layers 34:80 --next b1e2@192.168.1.10:7700 --prev b1e2',d:560},
-    {ok:'omnarc: layers 34:80 loaded on vulkan',d:340},
-    {ok:'omnarc: node 7f3a listening on 0.0.0.0:7700',d:260},
-    {ok:'omnarc: ring session started',d:520},
-    {st:'holding layers 34:80 · stage 46 ms · kv 3.9 GiB',d:560},
-    {st:'holding layers 34:80 · stage 51 ms · kv 4.1 GiB',d:760},
-    {st:'holding layers 34:80 · stage 44 ms · kv 4.1 GiB',d:0}
+    {c:'./rpc-server -H 0.0.0.0 -p 50052',d:500},
+    {o:'Starting RPC server v8.0.0\n  endpoint       : 0.0.0.0:50052\n  local cache    : n/a',d:0}
   ];}
   async function play(){
     const my=++run;
