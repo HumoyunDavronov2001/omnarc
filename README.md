@@ -1,241 +1,62 @@
 <div align="center">
 
-<img src="design/assets/living-ring.webp" width="360" alt="The Omnarc living ring: every arc is a device, gold comets are tokens travelling through them">
+<img src="design/assets/living-ring.webp" width="320" alt="The Omnarc ring: every arc is a device, gold comets are words travelling through them">
 
 # Omnarc
 
-**Every device is an arc. Together, one mind.**
+**A private AI cluster from the devices you already own.**
 
-Omnarc turns computers, phones, servers and browsers into one AI cluster —<br>
-from the devices in one home to idle devices around the world.
+Omnarc joins your phones, laptops and computers into one AI that runs an open model across all of them —
+on your own network, with nothing sent out, and free at home.
 
-[![CI](https://github.com/HumoyunDavronov2001/omnarc/actions/workflows/ci.yml/badge.svg)](https://github.com/HumoyunDavronov2001/omnarc/actions/workflows/ci.yml)
-[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-3dd7cf)](LICENSE)
-![Status: pre-alpha, stage B1 in progress](https://img.shields.io/badge/status-pre--alpha%20%C2%B7%20B1%20in%20progress-f2c156)
-
-[Plan](PLAN.md) · [Requirements](REQUIREMENTS.md) · [Specification](SPEC.md) · [Design concept](design/concept.html) · [Protocol](protocol/README.md) · [Contributing](CONTRIBUTING.md)
+**[Download](https://omnarc.uz/download/)** · [How it works](https://omnarc.uz/how-it-works/) · [Benchmarks](https://omnarc.uz/benchmarks/) · [Docs](https://omnarc.uz/docs/getting-started/what-omnarc-is/) · [FAQ](https://omnarc.uz/docs/getting-started/faq/) · [O‘zbekcha](https://omnarc.uz/uz/)
 
 </div>
 
-> *Omnarc* = *omni* (all) + *arc*: every device is an arc, and together they close one ring.
+> This repository holds Omnarc's **early open versions (to October 2026)**. The apps on
+> [omnarc.uz](https://omnarc.uz/download/) are free, and their source is not public. Issues and questions are welcome here.
+> Omnarc (omnarc.uz) is not affiliated with Omnara.
 
-## Why
+## What it does
 
-Billions of devices sit idle most of the day. Together they hold more compute than any data center, yet today's
-tools each cover only one corner of it:
+- **One model across many devices.** Each device holds a block of the model's layers; for every word a small state
+  travels around them — a ring. Together they run a model none of them could hold alone.
+- **Mixture-of-experts models** (Qwen3 30B-A3B, Qwen3 Coder 30B-A3B, GLM-4.7 Flash, Qwen3 235B-A22B): large models
+  of which only a small part works for each word, which is what lets laptops and phones keep up.
+- **Windows, Linux and Android.** A graphics card is used through Vulkan (NVIDIA, AMD, Intel); without one, the processor.
+  A phone helps only while it charges, on Wi-Fi, cool and unused.
+- **Private by construction.** Questions and answers stay on your devices; it works with the internet off; a device
+  joins only after you confirm the same four symbols on both screens; every update is signed.
+- **The API your code already speaks.** Every device serves an OpenAI-, Anthropic- and Ollama-shaped API on your own
+  network — no key from anyone, no charge.
 
-| | exo | prima.cpp | GPUStack | **Omnarc** (goal) |
-|---|:-:|:-:|:-:|:-:|
-| Phones: Android, iOS | — | Termux only | — | native apps |
-| Browsers: join with a QR code, no install | — | — | — | ✓ |
-| Windows · Linux · macOS | macOS | Linux, macOS | Linux | ✓ |
-| CUDA · ROCm/Vulkan · Metal · OpenCL · NPU | Metal | CUDA | server GPUs | ✓ |
-| Devices join and leave at runtime | ✓ | — | ✓ | ✓ |
-| Across the internet, behind NAT | — | — | — | ✓ |
-| Inference **and** training | — | — | — | ✓ |
+## Measured, not promised
 
-The Omnarc column lists goals of the [roadmap](#roadmap), not shipped features.
+On deliberately modest hardware — a budget laptop (Ryzen 5 7520U, 5.1 GB), an old 32-bit phone (MT6739, 2.9 GB) and a
+server on another continent — running GLM-4.7-Flash (8.3 GB, 31B parameters), which none of them holds alone:
 
-## What it is for
+| | tokens/s, 8 prompts at once |
+|---|---|
+| The server alone (the only device that can) | 0.92 |
+| Omnarc ring: laptop + phone + server | 4.17 (4.5×) |
 
-- **Agents on your own model.** OpenClaw, OpenCode and other agents run on a frontier-class open model spread over
-  your own computers — no per-token bill and no rate limit. One computer can only stream such a model from disk; a
-  cluster keeps all of it in memory.
-- **The family ring.** A family or a team shares one assistant that speaks their language; a weak phone joins by voice
-  and computes nothing.
-- **Accuracy mode.** Several devices answer the same question in parallel and check each other, and the answer shows
-  how many of them agreed.
+- 13× faster than llama.cpp RPC on the same layers and devices
+- −0.0015 % perplexity change when the model is split (16-bit between devices)
+- 6 % slowdown of the owner's own work while the ring runs
 
-These are goals of the [roadmap](#roadmap), stages B4, B7 and B8.
+More devices add room for larger models; they do not make a small model faster than one good GPU.
+Every run, with its devices, version and command: [omnarc.uz/benchmarks](https://omnarc.uz/benchmarks/).
 
-## How it works
+## Editions
 
-- **Every device is an arc on the ring.** A model's layers are split across devices in proportion to their measured
-  power, and a token travels around the ring through each of them.
-- **More devices make a single answer faster, too.** A continuous pipeline with speculative decoding keeps every
-  device busy at the same time instead of waiting for its turn.
-- **Adding a device never slows you down.** A model that fits on one device gets whole copies on the others, not
-  slices; layers are split only when a model does not fit.
-- **Only what is active is computed.** MoE experts and hot/cold neurons are spread across devices, so
-  trillion-parameter models fit on ordinary hardware.
-- **Nothing stops when a device leaves.** Layer replicas and continuously copied KV caches take over within a second.
-- **Any device, any link.** Native apps on five platforms plus a WebGPU browser node; QUIC with NAT traversal over
-  Wi-Fi, Ethernet, USB-C and Thunderbolt.
-- **Private by default.** All traffic is encrypted. On the public network raw text never leaves your device, and every
-  answer carries a TOPLOC proof.
+| | |
+|---|---|
+| **Omnarc** | your own devices — free, no account |
+| **Omnarc for organizations** | on the organization's own computers and network, one signed license file, no account; data never leaves the building |
+| **Developer API** | OpenAI-, Anthropic- and Ollama-compatible, on your own cluster |
 
-```mermaid
-flowchart LR
-  U["App / user<br/>OpenAI · Claude · Ollama API"] --> G
-  subgraph N["omnarc-node (on every device, Rust)"]
-    G["API gateway"] --> P["Plan executor"]
-    P --> E["Engine host"]
-    T["Network: iroh QUIC<br/>gossip · Raft"] --- P
-    S["Model store<br/>iroh-blobs, BLAKE3"] --- E
-  end
-  E <-->|"shared memory"| L["libomnarc (C++)<br/>llama.cpp + patches"]
-  N <-->|"QUIC, encrypted"| N2["other nodes"]
-  B["Browser node<br/>WASM + WebGPU"] <-->|"WebRTC"| N
-```
+## Links
 
-## Design
+[Website](https://omnarc.uz) · [Docs](https://omnarc.uz/docs/getting-started/what-omnarc-is/) · [Trust center](https://omnarc.uz/trust/) · [Changelog](https://omnarc.uz/changelog/) · [Security](https://omnarc.uz/docs/security/report-a-vulnerability/)
 
-<picture>
-  <source media="(prefers-color-scheme: light)" srcset="design/assets/home-screen-light.png">
-  <img src="design/assets/home-screen-dark.png" alt="The Ring home screen: six devices as arcs around the ring, the token path below and the device list on the right">
-</picture>
-
-The interface shows the mechanism itself: an arc's length is the device's share of layers, its color is the load,
-and tokens move at the measured speed — so a slow device or a slow link stands out at a glance.
-
-- Colors come from mineral pigments — lapis, turquoise and gold on a warm plaster white — with a single accent.
-- One token source ([`design/colors.py`](design/colors.py)) generates CSS, Swift, Kotlin and TypeScript; every text
-  color passes WCAG AA and every chart color passes color-vision checks.
-- The living ring ([`design/living-ring.js`](design/living-ring.js), WebGL2, no dependencies) is the brand mark:
-  ~15,000 GPU particles, one comet per token in flight.
-
-See the full [design concept](design/concept.html) (download it and open it in a browser) and the
-[living ring video](design/living-ring.mp4).
-
-## Status
-
-**Pre-alpha.** Stage B0 (foundation) is complete; stage B1 (engine) is in progress. Devices can already run one
-model together as a ring wired by hand; discovery, pairing and planning come in stages B2 and B3.
-
-Stage B1 so far:
-
-- [`engine/`](engine) — libomnarc on llama.cpp: a model splits into **windows of layers** that run as separate
-  shards, with hidden states passed between them ([`engine/patches`](engine/patches/README.md)). The accuracy gate,
-  `omnarc-gate`, checks every split against the whole model: on the CPU the split run is bit for bit the whole run,
-  and with the hidden state sent as `f16` the perplexity stays within 0.2%.
-- The engine runs in **its own process**, driven by the agent through shared memory
-  ([`engine/HOST.md`](engine/HOST.md), [`omnarc-engine-host`](node/crates/omnarc-engine-host)).
-- **The ring** — prima.cpp's piped ring on Omnarc's engine and network
-  ([`omnarc-node ring`](node/crates/omnarc-node/src/ring.rs), [`omnarc-network`](node/crates/omnarc-network)): the
-  device that serves the request keeps the first layers and the output head, the hidden state travels around the
-  ring over QUIC (iroh), and a ring of two nodes generates token for token what one device generates.
-
-Stage B0 delivered:
-
-- [`protocol/`](protocol) — `omnarc.v1` messages and the tensor frame spec, with a Rust implementation and property tests.
-- [`node/`](node) — the Rust workspace; `omnarc-node info` describes a device the way it will announce itself.
-- [`engine/`](engine) — the engine's C ABI, tested from plain C.
-- [`design/`](design) — design tokens for every platform with a contrast gate, the living ring, the design concept.
-- [`web/`](web) — the Svelte 5 component library in Storybook, with visual-regression and axe (WCAG 2.2 AA) checks.
-- CI on Linux, Windows, macOS, Android, iOS and the web.
-
-## Roadmap
-
-| Stage | Scope | Gate |
-|---|---|---|
-| **B0 Foundation** ✓ done | monorepo, CI, protocol v1, design system | CI green on 6 platforms; visual and accessibility checks |
-| **B1 Engine** ← in progress | llama.cpp + prima.cpp piped-ring, Windows, Vulkan | a 70B model across Linux and Windows machines |
-| B2 Network | iroh P2P, QR pairing, peer-to-peer model distribution | two networks behind NAT form one cluster |
-| B3 Scheduler | placement, live join and leave, replicas | recovery within 1 s; adding a device never slows a request |
-| B4 Speed and accuracy | pipelined speculation, MoE, sparse FFN, accuracy mode | single-request speed grows with the device count; 8 devices answer more accurately than one |
-| B5 Devices | desktop, Android, iOS, browser, NPU | six node types; joining from a browser in 30 s |
-| B6 Scale | organizations, public network, credits | 1,000+ nodes |
-| B7 Modalities and training | speech, images, LoRA, RL, the family ring | distributed LoRA over the internet; spoken answers on a weak phone |
-| B8 Islands and API | MLX, vLLM/SGLang, OpenAI/Claude/Ollama APIs, agent backend | throughput on par with vLLM on NVIDIA; agents on a frontier-class open model |
-| B9 World benchmark | open benchmarks against exo, prima.cpp, Parallax, Mesh LLM, colibri and others | v1.0 |
-
-Details: [PLAN.md](PLAN.md), [REQUIREMENTS.md](REQUIREMENTS.md) and [SPEC.md](SPEC.md) — every screen and function with its
-state.
-
-## Build
-
-```bash
-# Protocol and node agent (Rust)
-cargo test --workspace
-cargo run -p omnarc-node -- info
-
-# Engine (C++20 on llama.cpp, a git submodule; the tests need Python with numpy)
-git submodule update --init
-cmake -S engine -B build/engine && cmake --build build/engine && ctest --test-dir build/engine
-
-# Design tokens and the concept page
-python3 design/colors.py && python3 design/build.py
-
-# Component library (inside web/)
-pnpm install && pnpm check && pnpm test && pnpm build-storybook && pnpm test:visual
-```
-
-With [just](https://github.com/casey/just) installed, `just check` runs all of it.
-
-Form a cluster (stage B2, in progress):
-
-```bash
-omnarc-node create --name "Home cluster"   # on the first device: it becomes the cluster's admin
-omnarc-node invite                         # prints a QR code and a ticket, valid for 10 minutes
-omnarc-node join OMNARC:...                # on the new device; both screens show the same four symbols
-omnarc-node members
-omnarc-node serve                          # on every device: it hears the others and shows their load;
-                                           # the control API answers on http://127.0.0.1:7600
-omnarc-node serve --invite                 # the admin's service can invite while it runs
-omnarc-node remove Laptop                  # an admin removes a member while its own service runs
-omnarc-node service install                # run serve whenever the device is on (--print shows what it does)
-```
-
-Devices on different networks meet through a relay you run (`relay/README.md`): create the cluster with
-`--relay "https://relay.example.com?token=..."`, or add one later with `omnarc-node relay add`. Devices on one
-network find each other by mDNS without one.
-
-The panel — the first run that creates or joins a cluster, the ring of your devices (also as a table, and from arc to
-arc by keyboard), the device list that sorts and filters and each device's own page with its temperature, power and
-links, adding a device with its QR code and four symbols, removing one — is built once with
-`cd web && pnpm install && pnpm build`, then served by the node:
-
-```bash
-omnarc-node serve --panel web/apps/panel/build   # open http://127.0.0.1:7600
-```
-
-Spread a model inside the cluster: the internet is used once, and each device fetches only the layers it runs.
-
-```bash
-# one device downloads the model once, checks its SHA-256 and adds it (a broken download resumes)
-omnarc-node model pull bartowski/DeepSeek-R1-Distill-Llama-70B-GGUF DeepSeek-R1-Distill-Llama-70B-Q4_K_M.gguf
-omnarc-node model add DeepSeek-R1-Distill-Llama-70B-Q4_K_M.gguf   # or a file already there, added where it lies
-omnarc-node serve                                                  # the members fetch from it while it runs
-
-# on another member (with its own serve stopped): layers 40–79 and the output head, nothing else
-omnarc-node model fetch <hash> --layers 40:81
-omnarc-node model export <hash> --layers 40:81 --out window.gguf  # the full length, holes outside the window
-omnarc-node model list
-```
-
-Run a ring of two devices (stage B1 wires it by hand; `omnarc-engine` must sit next to `omnarc-node`):
-
-```bash
-omnarc-node id    # on each device: its node id
-
-# the worker: layers 40–79 of an 80-layer model
-omnarc-node ring --model model.gguf --layers 40:80 --listen 0.0.0.0:7700 \
-  --next <head id>@<head ip>:7700 --prev <head id>
-
-# the head: layers 0–39 and the output head (layer 80); it generates and prints the time per token
-omnarc-node ring --model model.gguf --layers 0:40,80:81 --listen 0.0.0.0:7700 \
-  --next <worker id>@<worker ip>:7700 --prev <worker id> --prompt "Explain how a ring of devices runs one model." --generate 64
-```
-
-## Repository
-
-```
-protocol/   Protobuf messages (omnarc.v1) and the tensor frame spec
-node/       Rust workspace: omnarc-protocol, omnarc-engine-host, omnarc-network, omnarc-store, omnarc-api,
-            omnarc-node, omnarc-simulation (1,000 network scenarios); fuzz targets in node/fuzz
-engine/     libomnarc — C++20 engine on llama.cpp with a C ABI
-relay/      running the relay for devices on different networks
-design/     design tokens, the living ring, the design concept
-web/        Svelte 5 component library (Storybook)
-docs/uz/    Uzbek reading copy of the plan, the requirements and the specification
-```
-
-## Credits
-
-Omnarc builds on [llama.cpp](https://github.com/ggml-org/llama.cpp), [prima.cpp](https://github.com/OpenCPIL/prima.cpp),
-[exo](https://github.com/exo-explore/exo), [GPUStack](https://github.com/gpustack/gpustack) and other open-source work —
-see [UPSTREAM.md](UPSTREAM.md) and [NOTICE](NOTICE).
-
-## License
-
-[Apache License 2.0](LICENSE)
+Made in Uzbekistan.
